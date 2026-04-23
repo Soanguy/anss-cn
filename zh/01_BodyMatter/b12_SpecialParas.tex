@@ -1,0 +1,1511 @@
+%%% File:      b12_SpecialParas.tex
+%%% Author:    Joaquín Ataz-López et al
+%%% Begun:     July 2020
+%%% Concluded: August 2020
+%%% Contents:  本章是一个大的最终杂烩。所有无法明确归入其他章节的内容都在这里。我在写本章时才决定了最终结构，因为开始处理某些材料时我意识到它们可以放在别处。
+%%%
+%%% Edited: Emacs + AUCTeX - 有时也使用 vim + context-plugin
+%%%
+
+\environment introCTX_env.tex
+
+\startcomponent b12_SpecialParas.tex
+
+\startchapter
+    [title={特殊构造与段落}]
+
+\TocChap
+
+\startsection
+    [title={脚注与尾注}]
+
+注释是“用于各种目的的次级文本元素，例如阐明或扩展正文、提供来源的参考文献、包含引文、引用其他文档或陈述文本的含义”[{\em Libro de Estilo de la Lengua española} (西班牙语语言指南), 第~195页]。它们在学术性文本中尤为重要。它们可以放置在页面或文档的不同位置。如今，最广泛使用的是位于页面底部的注释（因此称为脚注）；有时也位于页边空白处（边注）、每章或每节末尾，或文档末尾（尾注）。在特别复杂的文档中，还可能存在不同的{\em 系列}注释：作者注、译者注、更新注等。特别是在评注版中，注释装置可能变得相当复杂，只有少数排版系统能够支持；\ConTeXt\ 就是其中之一。有许多命令可用于建立和配置不同类型的注释。
+
+为了解释这一点，首先指出注释可能涉及的几个要素是有用的：
+
+\startitemize
+
+  \item {\em 标记}或注释{\em 锚点}：放置在正文中的符号，表示存在与之链接的注释。并非所有类型的注释都有相关联的{\em 锚点}，但当有锚点时，该{\em 锚点}出现在两个地方：在正文中注释所指的位置，以及在注释文本本身的开头。同一参考标记在这两个地方的出现，使得注释能够与正文关联起来。
+
+  \item 注释{\em ID或标识符}：标识注释并使其区别于其他注释的字母、数字或符号。有些注释，例如边注，可以没有 ID。当没有 ID 时，ID 通常与{\em 锚点}一致。
+
+    \startSmallPrint
+
+        如果我们只考虑脚注，我们看不出我刚才所说的{\em 参考标记}和{\em id}之间的区别。我们在其他类型的注释中能清楚地看到区别：例如行注有一个 id，但没有参考标记。
+
+    \stopSmallPrint
+
+  \item 注释的{\em 文本}或{\em 内容}，总是位于页面或文档中与生成注释并指示其内容的命令不同的位置。
+
+  \item 与注释关联的{\em 标签}：与注释关联的标签或名称，不会显示在最终文档中，但允许我们在文档的其他地方引用它并检索其 ID。
+
+\stopitemize
+
+\startsubsection
+    [title=\ConTeXt 中的注释类型及其相关命令]
+
+我们在 \ConTeXt 中有多种类型的注释。目前我只列出它们，用一般术语描述并提供生成它们的命令的信息。稍后我将详细说明前两种：
+
+\startitemize
+
+  \item {\bf 脚注：}无疑是最流行的，以至于所有类型的注释通常都被泛称为{\em 脚注}。脚注在文档中找到命令的位置引入带有注释{\em id}的{\em 标记}，并将注释文本本身插入到标记出现页面的底部。它们通过 \tex{footnote} 命令创建。
+
+  \item {\bf 尾注：}这些注释通过 \tex{endnote} 命令创建，在文档中放置 \tex{endnote} 命令的位置插入带有注释标识符的标记。然而，注释的内容被插入到文档的另一个位置，并且插入是由另一个命令 (\tex{placenotes}) 产生的。
+
+  \item {\bf 边注：}顾名思义，它们写在文本的页边空白处，在文档正文中没有 ID 或自动生成的标记或锚点。创建它们的主要命令（但不是唯一的）是 \tex{inmargin} 和 \tex{margintext}。
+
+  \item {\bf 行注：}一种典型于对行进行编号的环境的注释类型，例如在 \tex{startlinenumbering ... \stoplinenumbering} 的情况下（参见 \in{Section}[sec:linenumbering]）。注释通常写在底部，指的是特定的行号。它们由 \PlaceMacro{linenote}\tex{linenote} 命令生成，并通过 \PlaceMacro{setuplinenote}\tex{setuplinenote} 进行配置。该命令在正文中不打印{\em 标记}，但在注释本身中打印注释所指的行号（用作{\em ID}）。
+
+\stopitemize
+
+我现在将专门阐述前两种类型的注释，因为：
+
+\startitemize
+
+  \item 边注在其他地方处理（\in{Section}[sec:margintext]）；以及
+
+  \item 行注具有高度专业化的用途（尤其是在评注版中），我认为在像这样的一篇入门文档中，读者只需知道它们存在就足够了。
+
+% JD注：此URL已失效。我问过Pablo，他告诉我不仅一些文件（Flash视频！）消失了，而且材料现在已经过时。所以，除非有人找到合适的替代品，否则我们只能略过。
+%  \startSmallPrint
+%
+%      然而，对于感兴趣的读者，我推荐一个视频（西班牙语）并附有文本（也是西班牙语），关于 \ConTeXt 中的评注版，作者是 Pablo Rodríguez。可在 \goto{此链接}[url(http://www.ediciones-criticas.tk/)] 找到。这对于理解一般注释的若干通用设置也相当有用。
+%
+%  \stopSmallPrint
+
+\stopitemize
+
+\stopsubsection
+
+
+\startsubsection
+    [title={仔细审视脚注和尾注}]
+\PlaceMacro{footnote}\PlaceMacro{endnote}
+
+脚注和尾注命令的语法以及它们所具有的配置和定制机制非常相似，因为实际上，这两种注释都是更通用构造（注释）的特定实例，其他实例可以使用 \tex{definenote} 命令创建（参见 \in{Section}[sec:definenote]）。
+
+创建每种注释的命令语法如下：
+
+\starttyping
+\footnote[Label]{Text}
+\endnote[Label]{Text}
+\stoptyping
+
+其中：
+
+\startitemize
+
+  \item {\tt Label} 是一个可选参数，为注释分配一个标签，允许我们在文档的其他地方引用它。
+
+  \item {\tt Text} 是注释的内容。它可以任意长，并包含特殊的段落和设置，但应注意，对于脚注，在注释丰富且过长的文档中，正确的页面布局相当困难。
+
+    \startSmallPrint
+
+% TODO: 有人能列出一些此类事物的例子吗？或者提供一些见解？
+
+        原则上，任何可以在正文中使用的命令都可以在注释文本中使用。然而，我已经能够验证，某些在正文中不构成任何问题的构造和字符，当出现在注释文本中时确实会产生编译错误。这些情况是我在测试时发现的，但我没有以任何方式整理它们。
+
+    \stopSmallPrint
+
+\stopitemize
+
+当使用 {\tt Label} 参数为注释设置了标签时，\PlaceMacro{note}\tex{note} 命令允许我们检索该注释的 ID。此命令在文档上打印与其作为参数的标签相关联的注释的 ID。因此，例如：\footnote{因为脚注位于页面底部，此示例在右侧排版版本周围使用一个矩形框，以示意脚注在（横向）页面上是如何排列的。}
+
+\startbuffer[Humpty]
+Humpty Dumpty\footnote[humpty]
+{Probably the best-known English 
+nursery rhyme character}
+sat on a wall,\\
+Humpty Dumpty\note[humpty]
+had a great fall.\\
+All the king's horses and
+all the king's men\\
+Couldn't put Humpty\note[humpty]
+together again.
+\stopbuffer
+
+\ShowAndTypeset[Humpty]{height=130mm}
+
+% TODO: 这在 MkIV 中有效，但在 LMTX 中脚注会跑到页面底部。已向邮件列表提问，希望很快有答案。
+% 此后的示例同样如此。
+%
+% 无论如何，既然情况不再相同，本节需要大幅重写
+%% 
+%% \startDoubleExample
+%% \startcolumns[n=2,distance=1.cm,separator=rule]
+%% %\switchtobodyfont[small]
+%% %\setupnotation[footnote][width=-1cm]
+%% \starttyping
+%% Humpty Dumpty\footnote[humpty]{Probably the
+%% best-known English nursery rhyme character}
+%% sat on a wall, Humpty Dumpty\note[humpty]
+%% had a great fall.\\
+%% All the king's horses and
+%% all the king's men Couldn't put
+%% Humpty\note[humpty] together again.
+%% \stoptyping
+%% \column
+%% \switchtobodyfont[small]
+%% \obeylines \setupwhitespace[none]
+%% Humpty Dumpty\footnote[humpty]{Probably the best-known English nursery
+%% rhyme character} sat on a wall,
+%% Humpty Dumpty\note[humpty] had a great fall.
+%% All the king's horses and all the king's men
+%% Couldn't put Humpty\note[humpty] together again.
+%% \stopcolumns
+%% \stopDoubleExample
+
+\tex{footnote} 和 \tex{endnote} 之间的主要区别在于注释出现的位置：
+
+\startdescription{\tex{footnote}}
+
+通常，它在命令所在页面的底部打印注释文本，因此注释标记及其文本（或文本的开头，如果要跨两页）将出现在同一页上。为此，\ConTeXt\ 将通过计算页面底部注释位置所需的空间来对页面排版进行必要的调整。
+
+\startSmallPrint
+
+    历史注：在 \ConTeXt\ MkIV 中，在某些环境下，\tex{footnote} 不会将注释文本插入页面底部本身，而是插入环境的“脚部”。例如，这发生在表格中，也发生在 {\tt columns} 环境中。在这种情况下，如果希望环境内的注释放在页面底部，可以使用 \tex{footnotetext} 命令与前面提到的 \tex{note} 命令组合使用，而不是 \tex{footnote}。前者也接受一个可选参数作为标签，但只打印注释文本而不打印标签。由于 \tex{note} 只打印标签而不打印文本，将两者结合起来可以让我们将注释放在任何想要的位置。所以，例如，我们可以在表格或多列环境内写 \tex{note[MyLabel]}，然后，在该环境之外，写 \type{\footnotetext[MyLabel]{Note text}}。
+
+% TODO: 这个例子在 LMTX 中没有意义。
+%       但是一个说明何时使用 \footnotetext 的例子可能是有启发性的。
+%       也许反过来，展示一个两列环境底部的脚注。
+%
+%    另一个使用 \tex{footnotetext} 与 \tex{note} 结合的例子是注释内的注释。例如：
+%
+%    \startDoubleExample
+%    %\switchtobodyfont[small]
+%    \setupnotation[footnote][width=-1cm]
+%\vbox{%
+%    \starttyping
+%This%
+%\footnote{or this\note[noteB], if you prefer.}%
+%\footnotetext[noteB]
+%{or possibly even this one\note[noteC].}
+%\footnotetext[noteC]{could be something
+%entirely different.}
+%is a sentence with nested notes.
+%    \stoptyping
+%}
+%
+%    This%
+%    \footnote{or this\note[noteB], if you prefer.}%
+%    \footnotetext[noteB]{or possibly even this\note[noteC].}\footnotetext[noteC]{could be something
+%        entirely different.}
+%    is a sentence with nested notes.
+%
+%    \stopDoubleExample
+
+\stopSmallPrint
+
+\stopdescription
+
+\startdescription{\tex{endnote}}
+
+    仅在源文件中命令所在的位置打印注释锚点。注释的实际内容通过另一个命令 (\PlaceMacro{placenotes}\tex{placenotes[endnote]}) 插入到文档的另一个位置，该命令在其所在位置将插入文档（或相关章节或节）中{\em 所有}尾注的内容。
+
+\stopdescription
+
+\stopsubsection
+
+
+\startsubsection
+  [
+    reference=sec:localfootnotes,
+    title={局部注释},
+  ]
+  \PlaceMacro{startlocalfootnotes}\PlaceMacro{placelocalfootnotes}
+
+\tex{startlocalfootnotes} 环境意味着其中包含的脚注被视为{\em 局部}注释，这意味着它们的编号将被重置，并且注释的内容不会与其他注释一起自动插入，而只会插入到文档中找到 \tex{placelocalfootnotes} 命令的位置，该命令可能在该环境内，也可能不在。
+
+% JD 最初添加了此内容，但我不确定它是否增加了太多。而且它需要一些格式帮助（也许将其制作成 \ShowAndTypeset？）
+%% 例如，下面是一个在本书中使用的 \quotation{double example} 环境内部放置脚注的示例：
+%% 
+%% \startDoubleExample
+%% \switchtobodyfont[small]
+%% \setupnotation[footnote][width=-1cm] % 这会将脚注编号稍微右移
+%% \vbox{\starttyping
+%% \startlocalfootnotes
+%% Humpty Dumpty\footnote[humpty]{Probably the
+%% best-known English nursery rhyme character}
+%% sat on a wall, Humpty Dumpty\note[humpty]
+%% had a great fall.\\
+%% All the king's horses and
+%% all the king's men Couldn't put
+%% Humpty\note[humpty] together again
+%% \blank[3*line]\hrule
+%% \placelocalfootnotes
+%% \stoplocalfootnotes
+%% \stoptyping}
+%% 
+%% \startlocalfootnotes
+%% Humpty Dumpty\footnote[humpty]{Probably the best-known English nursery
+%% rhyme character} sat on a wall,\\ Humpty Dumpty\note[humpty] had a great
+%% fall.\\
+%% All the king's horses and all the king's men\\
+%% Couldn't put Humpty\note[humpty] together again
+%% \blank[3*line]\hrule
+%% {\placelocalfootnotes}
+%% \stoplocalfootnotes
+%% \stopDoubleExample
+%% 
+%% 注意 \tex{placelocalfootnotes} 格式化局部脚注的方式与通常格式化脚注的方式不同。此示例使用了显式命令来跳过一些空间 (\type{\blank[3*line]}) 并绘制一条水平线 (\type{\hrule})。如您所见，\type{hrule} 会穿过文本的整个宽度，这与普通脚注使用的短横线不同。
+
+\stopsubsection
+
+\startsubsection
+  [
+    reference=sec:definenote,
+    title={创建和使用自定义类型的注释},
+  ]
+  \PlaceMacro{definenote}
+
+我们可以使用 \tex{definenote} 命令创建特殊类型的注释。这在复杂文档中很有用，这些文档中有来自不同作者或用于不同目的的注释，通过不同的格式和不同的编号在图形上区分我们文档中的每种注释类型。
+
+\tex{definenote} 的语法如下：
+
+\type{\definenote[Name][Model][Configuration]}
+
+其中：
+
+\startitemize
+
+  \item {\tt Name} 是我们分配给新注释类型的名称。
+
+  \item {\tt Model} 是初始使用的注释模型。它可以是 {\tt footnote} 或 {\tt endnote}；在前一种情况下，我们的注释模型将像脚注一样工作，在后一种情况下像尾注一样工作，尽管要将它们插入文档中，我们不会使用 \PlaceMacro{placenotes}\tex{placenotes[endnote]}，而是使用 \tex{placenotes[Name]}（我们分配给这些注释类型的名称）。
+
+    \startSmallPrint
+
+        理论上，此参数是可选的，尽管在我的测试中，一些没有它创建的注释不可见，我没有耐心找出原因是什么。
+
+    \stopSmallPrint
+
+  \item {\tt Configuration} 是第二个可选参数，允许我们将新类型的注释与其模型区分开来：通过设置不同的格式，或不同的编号类型，或两者兼有。
+
+    \startSmallPrint
+
+        根据 \ConTeXt\ 命令的官方列表（参见 \in{Section}[sec:qrc-setup-en]），创建新注释类型时可以提供的设置基于稍后可以用 \tex{setupnote} 提供的设置。然而，正如我们稍后将看到的，实际上有两个可能的命令用于设置注释：\tex{setupnote} 和 \tex{setupnotation}。因此，我认为在创建注释类型时最好省略此参数，然后使用适当的命令设置我们的新注释。至少这样更容易解释。
+
+    \stopSmallPrint
+
+\stopitemize
+
+例如，以下内容将创建一个名为 \quotation{{\tt BlueNote}} 的新注释类型，它将类似于脚注，但其内容将以粗体和蓝色打印：
+
+\starttyping
+\definenote  [BlueNote] [footnote]
+\setupnotation
+  [BlueNote]
+  [color=blue, style=bf]
+\stoptyping
+
+一旦我们创建了一个新的注释类型，例如 {\tt BlueNote}，允许我们使用它的命令就可用。在我们的示例中，这将是 \tex{BlueNote}，其语法类似于 \tex{footnote}：
+
+\type{\BlueNote[Label]{Text}}
+
+\stopsubsection
+
+
+% TODO: (见下面的脚注) 计算 LMTX 中的选项数量。
+
+\startsubsection
+    [title=配置注释]
+\PlaceMacro{setupnote}\PlaceMacro{setupnotation}
+
+% TODO: 下面的脚注非常长。将其作为 \startSmallPrint 文本是否更好？
+
+注释（脚注或尾注、使用 \tex{definenote} 创建的注释以及使用 \tex{linenote} 设置的行注）的配置通过两个命令实现：\tex{setupnote} 和 \tex{setupnotation}\footnote{\tex{setupnote} 命令有 35 个{\em 直接}配置选项和从 \tex{setupframed} 继承的 45 个附加选项；\tex{setupnotation} 有 45 个直接配置选项和从 \PlaceMacro{setupcounter}\tex{setupcounter} 继承的另外 23 个选项。由于这些选项没有文档记录，尽管对于其中许多选项我们可以从名称猜出它们的用途，但我们需要验证我们的直觉是否正确。另外，考虑到这些选项中有许多允许许多值，并且都必须测试\unknown\ 您会看到，为了写出这个解释，我不得不进行相当多的测试；虽然做一次测试很快，但做很多测试既慢又无聊。因此，如果我说，除了我在正文中提到的两个通用注释配置命令（下面的解释将重点介绍它们）之外，还有四个其他可能的配置命令我将从我的解释中省略，希望读者能谅解我：
+
+  \startitemize
+
+    \item \PlaceMacro{setupnotes}\tex{setupnotes} 和
+      \PlaceMacro{setupnotations}\tex{setupnotations}：换句话说，与上面相同的名称，但是复数形式。wiki 说命令的单数和复数版本是同义的，我相信它。
+
+    \item \PlaceMacro{setupfootnotes}\tex{setupfootnotes} 和
+      \PlaceMacro{setupendnotes}\tex{setupendnotes}：这些应该分别是脚注和尾注的具体应用。也许基于这些命令来解释注释设置会更容易；然而，因为我用 \tex{setupfootnotes} 尝试的第一个选项 ({\tt numberconversion}) 没有起作用，尽管我知道这些命令的其他选项确实有效，但我懒得（在我已经不得不进行的众多测试中）添加必要的测试来写下以下内容。
+      \blank[small]
+      我确实相信（从一些随机测试来看），在这两个命令中有效的所有内容（但我的解释中省略了）在我确实给出解释的命令中也有效。
+
+  \stopitemize
+}。两者的语法相似：
+
+\starttyping
+\setupnote[NoteType][Configuration]
+\setupnotation[NoteType][Configuration]
+\stoptyping
+
+其中 {\tt NoteType} 指的是我们正在配置的注释类型（{\tt footnote}、{\tt endnote} 或我们自己创建的某种注释类型的名称），而 {\tt Configuration} 包含该命令的特定配置选项。
+
+问题是这两个命令的名称并没有很清楚地表明它们之间的区别或每个命令配置什么；此外，这些命令的许多选项没有文档记录这一事实也无济于事。经过大量测试，我无法得出任何结论让我理解为什么某些东西是用一个命令配置的，而另一些是用另一个命令配置的，\footnote{在 \goto{\ConTeXt\ wiki}[url(https://wiki.contextgarden.net/Unexpected\_behavior)] 上有一个页面，我是偶然发现的（因为它不是专门针对注释的），它表明区别在于 \tex{setupnotation} 控制要插入的注释文本，而 \tex{setupnote} 控制将要放置注释的环境(?) 但这与事实不一致，例如，注释文本的宽度（与其{\em 插入}有关）由 \tex{setupnote} 的 {\tt width} 选项控制，而不是由 \tex{setupnotation} 的同名选项控制。这里控制的是标记和注释文本之间的空间宽度。} 也许除了，因为我所做的选择使其工作，\tex{setupnotation} 总是影响注释文本或与注释文本一起打印的 ID，而 \tex{setupnote} 有一些影响插入到正文中的注释标记的选项。
+
+我现在将尝试整理我在对两个命令的不同选项进行一些测试后发现的内容。我将大部分选项放在一边，因为它们没有文档记录，我也无法就它们的用途或在什么条件下使用它们得出任何结论：
+
+\startitemize
+
+  \starthead {\bf 用于标记的 ID：}注释总是通过一个数字来标识。我们可以在这里配置的是：
+  \stophead
+
+  \startitemize
+
+    \item {\em 起始数字：}由 \tex{setupnotation} 中的 {\tt start} 控制。其值必须是一个整数，它使用此值开始计数注释。
+
+    \item {\em 编号系统：}取决于 \tex{setupnotation} 中的 {\tt numberconversion} 选项。其值可以是：
+
+      \startitemize[packed]
+
+        \item {\em 阿拉伯数字：}{\tt n}、{\tt N} 或 {\tt numbers}。
+
+        \item {\em 罗马数字：}{\tt I}、{\tt R}、{\tt Romannumerals}、{\tt i}、{\tt r}、{\tt romannumerals}。前三个是大写罗马数字，后三个是小写。
+
+        \item {\em 字母编号：}{\tt A}、{\tt Character}、{\tt Characters}、{\tt a}、{\tt character}、{\tt characters}，取决于我们想要大写字母（前三个选项）还是小写字母（其余选项）。
+
+        \item {\em 单词编号：}换句话说，我们写出表示数字的单词，例如，\quote{3} 变成 \quotation{three}。有两种方法可能；{\tt Words} 选项以大写形式写出单词，{\tt words} 以小写形式。
+
+        \item {\em 符号编号：}我们可以使用四组不同的符号，具体取决于所选选项：{\tt set~0}、{\tt set~1}、{\tt set~2} 或 {\tt set~3}。在 \at{page}[examples of conversion set] 上有一个每个选项使用的符号示例。
+
+      \stopitemize
+
+    \item {\em 决定重新开始注释编号的事件：}这取决于 \tex{setupnotation} 中的 {\tt way} 选项。当值为 {\tt bytext} 时，文档中的所有注释将按顺序编号，而不会重置编号。当值为 {\tt bychapter}、{\tt bysection}、{\tt bysubsection} 等时，每次更改章、节或小节时，注释计数器将重置，而当值为 {\tt byblock} 时，每次更改文档宏结构中的块时，它会重置编号（参见 \in{Section}[sec:macrostructure]）。{\tt bypage} 值使注释计数器在每次更改页面时重新启动。
+
+  \stopitemize
+
+  \starthead {\bf 配置注释标记：}
+  \stophead
+
+  \startitemize
+
+    \item 是否显示它：\tex{setupnotation} 中的 {\tt number} 选项。
+
+    \item 标记相对于注释文本的位置：\tex{setupnotation} 中的 {\tt alternative} 选项：它可以采用以下任何值：{\tt left}、{\tt inleft}、{\tt leftmargin}、{\tt right}、{\tt inright}、{\tt rightmargin}、{\tt inmargin}、{\tt margin}、{\tt innermargin}、{\tt outermargin}、{\tt serried}、{\tt hanging}、{\tt top}、{\tt command}。
+
+    \item 注释本身中标记的格式：\tex{setupnotation} 中的 {\tt numbercommand} 选项。
+
+    \item 正文中标记的格式：\tex{setupnote} 中的 {\tt textcommand} 选项。
+
+      \startSmallPrint
+
+          {\tt numbercommand} 和 {\tt textcommand} 选项必须由将标记内容作为参数的命令组成。这可以是我们自己定义的命令。然而，我发现简单的格式化命令（\tex{bf}、\tex{it} 等）也有效，即使它们不是带参数的命令。
+
+      \stopSmallPrint
+
+    \item 标记和文本之间的距离（在注释本身中）：\tex{setupnotation} 中的 {\tt distance} 和 {\tt width} 选项。我无法发现使用一个选项或另一个选项之间的区别（如果确实有区别的话）。
+
+    \item 是否存在允许在正文中的标记和注释本身的标记之间跳转的超链接：\tex{setupnote} 中的 {\tt interaction} 选项。值为 {\tt yes} 时将有链接，值为 {\tt no} 时将没有链接。
+
+  \stopitemize
+
+  \starthead {\bf 配置注释文本本身。} \stophead
+
+  我们可以影响以下方面：
+
+  \startitemize
+
+    \item 位置：这取决于 \tex{setupnote} 中的 {\tt location} 选项。
+
+      \startSmallPrint
+
+          原则上我们已经知道脚注位于页面底部（{\tt location=page}），尾注位于找到 \tex{placenotes[endnote]} 命令的位置（{\tt location=text}）。但是，我们可以调整此行为并设置例如 {\tt location=text}，这将使脚注类似于尾注，因此它们出现在文档中找到 \tex{placenotes[footnote]} 命令（或特定于脚注的命令 \tex{placefootnotes}）的位置。使用这种方法，我们可以例如将注释打印在它们所在的段落下方。
+
+      \stopSmallPrint
+
+    \item 注释之间的段落分隔：默认情况下，每个注释都打印在自己的段落中，但我们可以通过将 \tex{setupnote} 中的 {\tt paragraph} 选项设置为 \MyKey{yes} 来使同一页面上的所有注释打印在同一段落中。
+
+    \item 注释文本本身的书写样式：\tex{setupnotation} 中的 {\tt style} 选项。
+
+    \item 字体大小：\tex{setupnote} 中的 {\tt bodyfont} 选项。
+
+    \startSmallPrint
+
+      此选项仅适用于我们想要手动设置脚注字体大小的情况。这样做几乎从来都不是一个好主意，因为默认情况下，\ConTeXt\ 会调整脚注的字体大小，使其比正文小，但大小{\em 与}正文的字体大小{\em 成比例}。
+
+    \stopSmallPrint
+
+  \item 注释文本的左边距：\tex{setupnotation} 中的 {\tt margin} 选项。
+
+  \item 最大宽度：\tex{setupnote} 中的 {\tt width} 选项。
+
+  \item 列数：\tex{setupnote} 中的 {\tt n} 选项指定注释文本将位于两列或更多列中。\quote{\tt n} 值必须是一个整数。
+
+  \stopitemize
+
+  \item {\bf 注释之间或注释与文本之间的间距：}这里，我们有以下选项：
+
+    \startitemize
+
+      \item {\tt rule}，在 \tex{setupnote} 中，确定注释区域和带有正文的页面区域之间是否有一条线（规则）。其可能值为 {\tt yes}、{\tt on}、{\tt no} 和 {\tt off}。前两个启用规则，后两个禁用它。
+
+      \item {\tt before}，在 \tex{setupnotation} 中：在插入注释文本之前要运行的命令。用于插入额外的间距、注释之间的分割线等。
+
+% TODO: 我尝试用这个命令查看 after 的效果
+% \setupnotation[before={\blank},after={\hpopo}] % or after={ZZZ} or after={\hrule}
+% 虽然 before 有效，但我没有看到 after 的效果。它是如何工作的？
+
+      \item {\tt after}，在 \tex{setupnotation} 中：在插入注释文本之后要运行的命令。
+
+    \stopitemize
+
+\stopitemize
+
+\stopsubsection
+
+
+\startsubsection
+    [title={编译时临时排除注释}]
+    \PlaceMacro{notesenabledfalse}\PlaceMacro{notesenabledtrue}
+
+\tex{notesenabledfalse} 和 \tex{notesenabledtrue} 命令分别告诉 \ConTeXt\ 启用或禁用注释的编译。当文档有大量冗长的注释时，如果我们想获得一个不带注释的版本，此功能可能很有用。根据我个人的经验，例如，当我在校对博士论文时，我更喜欢第一次一口气读完，不带注释，然后进行第二次阅读，加入注释。
+
+\stopsubsection
+
+\stopsection
+
+
+\startsection
+  [
+    reference=sec:multiplecolumns,
+    title={多列段落},
+  ]
+
+将文本排版成多于一列是一种可以建立的可能性：
+
+\startitemize[a]
+
+  \item 作为页面布局的一般特性。
+
+  \item 作为某些构造的特性，例如结构化列表、脚注或尾注。
+
+  \item 作为应用于文档中特定段落的特性。
+
+\stopitemize
+
+在任何这些情况下，即使我们处理多于一列，大多数命令和环境也能完美工作。然而，存在一些限制，主要与浮动对象（参见 \in{Section}[sec:floating objects]）尤其是表格（\in{Section}[sec:tables]）有关，即使它们不是浮动对象。
+
+关于允许的列数，\ConTeXt\ 没有理论限制。但是，有两个物理限制必须考虑：
+
+\startitemize
+
+  \item 纸张宽度：无限数量的列需要无限的纸张宽度（如果文档要打印）或屏幕宽度（如果是打算在屏幕上显示的文档）。实际上，考虑到市售和用于制作书籍的纸张尺寸以及计算机设备屏幕的{\em 正常}宽度，由超过四或五列组成的文本很难合适地排布。
+
+  \item 计算机内存大小：\ConTeXt\ 参考手册指出，在{\em 正常}系统（既不是特别强大也不是特别资源有限）中，可以处理 20 到 40 列。
+
+\stopitemize
+
+在本节中，我将重点介绍多列机制在特殊段落或片段中的使用，因为：
+
+\startitemize
+
+  \item 多列作为页面布局选项已经讨论过（在 \in{Section}[sec:pages-other-matters] 的 \in{Subsection}[sec:pages-columns] 中）。
+
+  \item 某些构造（例如结构化列表或脚注）提供的将文本排版成多于一列的可能性，将在相关构造或环境的讨论中介绍。
+
+\stopitemize
+
+\stopcolumns
+
+
+\startsubsection
+  [title={\tex{startcolumns} 环境}]
+  \PlaceMacro{startcolumns}
+
+将多列片段插入文档的标准过程是使用 {\tt columns} 环境，其格式为：
+
+\type{\startcolumns[Configuration] ... \stopcolumns}
+
+其中 {\tt Configuration} 允许我们控制环境的许多方面。我们可以在每次调用环境时指示所需的配置，或者为所有对环境调用调整环境的默认操作；后者通过以下方式实现：
+
+\PlaceMacro{setupcolumns}\type{\setupcolumns[Configuration]}
+
+在这两种情况下，配置选项都是相同的。最重要的选项按其功能排序如下：
+
+\startitemize
+
+  \item {\bf 控制列数和列间距的选项：}
+
+    \startitemize
+
+      \item {\tt n}：控制列数。如果省略，将生成两列。
+
+      \item {\tt nleft}、{\tt nright}：这些选项用于双面文档布局（参见 \in{Section}[sec:pages-other-matters] 的 \in{Subsection}[sec:double-sided]），分别用于设置左（偶数）页和右（奇数）页上的列数。
+
+      \item {\tt distance}：指定列之间的间距。
+
+      \item {\tt separator}：确定用什么标记列之间的分隔。可以是 {\tt space}（默认值）或 {\tt rule}，在这种情况下，将在列之间生成一条线（规则）。如果在列之间建立了规则，则此规则又可以由以下两个选项配置：
+
+        \startitemize
+
+          \item {\tt rulecolor}：线条的颜色。
+
+          \item {\tt rulethickness}：线条的粗细。
+
+        \stopitemize
+
+      \item {\tt maxwidth}：指定列及其间间距可能占据的最大宽度。
+
+    \stopitemize
+
+  \item {\bf 控制列中文本分布的选项：}
+
+    \startitemize
+
+      \item {\tt balance}：默认情况下，\ConTeXt\ {\em 平衡}列，意思是它会在列之间分布文本，使它们具有大致相同的文本量。但是，我们可以将此选项设置为 \quotation{{\tt no}}，则文本将不会在上一列填满之前开始新的一列。
+
+      \item {\tt direction}：确定文本在列之间的分布方向。默认情况下，遵循自然阅读顺序（从左到右），但将此选项设置为 {\tt reverse} 值会导致从右到左。
+
+    \stopitemize
+
+    \starthead {\bf 影响此环境内文本排版的选项：}
+    \stophead
+
+    \startitemize
+
+      \item {\tt tolerance}：用多于一列书写文本意味着列内的行宽更小，并且正如在描述 \ConTeXt\ 用于构建行的机制时解释的那样（\in{Section}[sec:lines]），这使得找到插入换行的最佳点变得困难。此选项允许我们临时更改环境中的水平容差（参见 \in{Section}[sec:horizontaltolerance]），以便于文本的排版。
+
+      \item {\tt align}：控制环境内行的水平对齐。它可以采用以下任何值：{\tt right}、{\tt flushright}、{\tt left}、{\tt flushleft}、{\tt inner}、{\tt flushinner}、{\tt outer}、{\tt flushouter}、{\tt middle} 或 {\tt broad}。有关这些选项的含义，请参见 \in{Section}[sec:setupalign]。
+
+      \item {\tt color}：指定环境内文本的书写颜色。
+
+  \stopitemize
+
+\stopitemize
+
+另一种影响文本在列间分布的方式是 \tex{column} 命令。在正文中的任何位置使用此命令会指示 \ConTeXt\ 停止当前列并继续在下一列中排版。
+
+例如，下面的示例演示了如何将一些西班牙语文本（来自 ANSS 西班牙语原版）与英语翻译并排排版。英语部分被故意截断，以演示 \tex{column} 命令如何阻止正常的列平衡。（在这种情况下，完整的英语翻译将占用与西班牙语相同的行数。）
+
+\startbuffer
+\startnarrower
+  \startcolumns[distance=1cm,separator=rule]
+      纸张宽度：无限数量的列需要无限的纸张宽度（如果文档要打印）或屏幕宽度（如果是打算在屏幕上显示的文档）。
+   \column 
+      The width of the paper: An unlimited number of columns requires a
+      unlimited width of paper \unknown
+  \stopcolumns
+\stopnarrower
+\stopbuffer
+
+\need 5\baselineskip
+\typebuffer
+{\switchtobodyfont[small]
+\getbuffer
+}
+
+\stopsubsection
+
+\startsubsection
+    [title={并行段落}]
+    \PlaceMacro{defineparagraphs}\PlaceMacro{setupparagraphs}
+
+多列排版的一个特定版本是并行段落。在这种类型的构造中，文本分布在两列（通常，尽管有时超过两列）中，但不允许在它们之间自由流动，而是严格控制每列中显示的内容。这非常有用，例如，用于生成对比文本两个版本的文档，例如新修订的法律的新旧版本，或双语版本；或者用于为特定文本定义编写词汇表，其中要定义的文本出现在左侧，定义出现在右侧等。
+
+通常，表格机制用于处理这些类型的段落，但这是因为大多数文本处理器不如 \ConTeXt\ 强大，\ConTeXt\ 具有 \tex{defineparagraphs} 和 \tex{setupparagraphs} 命令。这些命令允许使用列机制构建并行段落，该机制虽然有局限性，但比表格机制更灵活。
+
+\startSmallPrint
+
+    据我所知，这些段落没有特殊名称。我称它们为\quotation{并行段落}，因为在我看来，这比 \ConTeXt\ 用来指代它们的术语更具描述性：\quotation{{\em paragraphs}}。
+
+\stopSmallPrint
+
+这里的基本命令是 \tex{defineparagraphs}，其语法为：
+
+\type{\defineparagraphs[Name][Configuration]}
+
+其中 {\tt Name} 是我们给此构造的名称，{\tt Configuration} 指定它将具有的特性，这些特性也可以稍后通过以下方式设置
+
+\type{\setupparagraphs[Name][Column][Configuration]}
+
+其中 {\tt Name} 是创建时给定的名称，{\tt Column} 是一个可选参数，允许我们配置特定的列，而 {\tt Configuration} 允许我们确定它在实践中的工作方式。
+
+例如：
+
+\starttyping
+\defineparagraphs
+  [MurciaFacts]
+  [n=3, before={\blank},after={\blank}]
+
+\setupparagraphs
+  [MurciaFacts][1]
+  [width=.1\textwidth, style=bold]
+
+\setupparagraphs
+  [MurciaFacts][2]
+  [width=.4\textwidth]
+\stoptyping
+
+上面的片段将创建一个名为 MurciaFacts 的三列环境，然后将第一列设置为占据行宽的 10% 并以粗体书写，将第二列设置为占据行宽的 40%。由于第三列未配置，它将占据剩余的宽度，即 50%。
+
+一旦创建了环境，我们就可以用它来写一个关于穆尔西亚的简短历史：
+
+\vbox{\starttyping
+  \startMurciaFacts
+    825
+  \MurciaFacts
+    City of Murcia founded.
+  \MurciaFacts
+    The origins of the city of Murcia are uncertain, but there is evidence
+    that it was ordered to be founded under the name of Madina (or Medina)
+    Mursiya in the year 825 by the Emir of al-Àndalus Abderramán II,
+    probably built over a much earlier settlement.
+  \stopMurciaFacts
+\stoptyping}
+
+\defineparagraphs
+  [MurciaFacts]
+  [n=3, before={\blank},after={\blank}]
+
+\setupparagraphs
+  [MurciaFacts][1]
+  [width=.1\textwidth, style=bold]
+
+\setupparagraphs
+  [MurciaFacts][2]
+  [width=.4\textwidth]
+
+\example{\startMurciaFacts
+    825
+  \MurciaFacts
+    穆尔西亚市建立。
+  \MurciaFacts
+    穆尔西亚市的起源尚不确定，但有证据表明，安达卢斯埃米尔阿卜杜勒拉赫曼二世于 825 年下令以 Madina（或 Medina）Mursiya 的名义建立它，很可能是在一个更早的定居点上建造的。
+  \stopMurciaFacts}
+
+如果我们想继续讲述穆尔西亚的故事，下一个事件将需要一个新的环境实例（\tex{startMurciaFacts}），因为使用此机制无法包含多个{\em 行}。（也就是说，这个特定的环境不允许我们继续另一行讲述例如 830 年发生的事情。）
+
+从刚刚给出的例子中，我想强调以下细节：
+
+\startitemize
+
+  \item 一旦使用例如命令 \tex{defineparagraphs[MaryPoppins]} 创建了一个环境，它就变成了一个正常的环境，以 \tex{startMaryPoppins} 开始，以 \tex{stopMaryPoppins} 结束。
+
+  \item 还会创建一个 \tex{MaryPoppins} 命令，在环境内部使用它来指示何时更改列。
+
+\stopitemize
+
+\startSmallPrint 
+
+    上面 \quotation{普通} \tex{startcolumns} 环境的例子本可以作为本\quotation{并行段落}节的例子。然而，介绍 \tex{column} 命令似乎是在正确的地方。\ConTeXt\ wiki 指出 \tex{column} 是 \tex{columnbreak} 命令的别名，这甚至可能是一个更容易记住的名称。请注意，该命令不是 \tex{columns}，与 \tex{defineparagraphs[...]} 创建的类似命令相比，这是一个轻微的不一致。
+
+\stopSmallPrint
+
+至于并行段落的配置选项（\tex{setupparagraphs}），据我所知，在本入门文档的这个阶段，并考虑到刚刚给出的例子，读者已经准备好弄清楚每个选项的用途。因此，下面我将仅指示选项的名称和类型，并在适当时给出可能的值。但是请记住，\tex{setupparagraphs [Name] [Configuration]} 设置影响整个环境的配置，而 \tex{setupparagraphs [Name] [NumColumn] [Configuration]} 将配置专门应用于所指示的列。
+
+\startitemize[columns, three, packed]\switchtobodyfont[small]
+
+  \item {\tt n}: 数字
+
+  \item {\tt before}: 命令
+
+  \item {\tt after}: 命令
+
+  \item {\tt width}: 尺寸
+
+  \item {\tt distance}: 尺寸
+
+  \item {\tt align}: 派生自 \\\tex{setupalign}
+
+  \item {\tt inner}: 命令
+
+  \item {\tt rule}: {\tt on} 或 {\tt off}
+
+  \item {\tt rulecolor}: 颜色
+
+  \item {\tt rulethickness}: 尺寸
+
+  \item {\tt style}: 样式命令
+
+  \item {\tt color}: 颜色
+
+\stopitemize
+
+\startSmallPrint
+
+    上面的选项列表并不完整；我从列表中排除了那些我通常不会在这里解释的选项。我还利用了我们在专门讨论列的这一节这一事实，以三列显示选项列表，尽管我没有用本节解释的任何命令来做到这一点；相反，使用了 {\tt itemize} 环境的 {\tt columns} 选项，下一节将专门介绍它。
+
+\stopSmallPrint
+
+\stopsubsection
+
+\stopsection
+
+
+\startsection
+  [
+    reference=sec:itemize,
+    title={结构化列表},
+  ]
+
+当信息以有序的方式呈现时，读者更容易掌握。但如果这种排列在视觉上也是可感知的，那么它就会向读者突出显示这里有一个结构化的文本。这就是为什么有某些{\em 构造}或{\em 机制}试图在视觉上组织文本，从而有助于其结构化。在 \ConTeXt\ 为此目的向作者提供的工具中，最重要的是 {\tt itemize} 环境，它用于开发我们可以称之为{\em 结构化列表}的内容。
+
+列表由一系列{\em 文本元素}（我将称之为{\em 条目}）组成，其中每个条目前面都有一个有助于通过将其与其余部分区分开来突出显示它的字符，我称之为\quotation{分隔符}。分隔符可以是数字、字母或符号。通常（但并非总是）{\em 条目}是段落，并且列表被格式化以确保每个元素的{\em 分隔符的可见性}；通常通过应用悬挂缩进来实现，这使得第一个单词或字符突出\footnote{在排版中，应用于段落除第一行之外的所有行的缩进称为{\em 悬挂缩进}，它使段落的第一个单词或字符易于找到。}。在嵌套列表的情况下，每个子列表的缩进逐渐增加。在 HTML 中，分隔符是数字或顺序递增的字符的列表称为{\em 有序列表}，这意味着列表的每个{\em 条目}将有一个不同的分隔符，允许我们通过其编号或标识符来引用每个元素；而对于列表中的每个条目都使用相同字符或符号的列表，则称为{\em 无序列表}。
+
+\ConTeXt\ 自动管理编号列表中分隔符的编号或字母顺序，以及嵌套列表所需的缩进。此外，在嵌套无序列表的情况下，\ConTeXt\ 还会根据其前面的符号，选择不同的字符或符号，以便一眼就能区分列表{\em 条目}的级别。
+
+\startSmallPrint
+
+    参考手册说列表的最大嵌套级别是四，但我猜那是在 2013 年，手册编写的时候。根据我的测试，对于{\em 有序}列表似乎没有限制（在我的测试中，我达到了 15 级嵌套）。而对于无序列表，似乎也没有限制，即无论我们包含多少嵌套，都不会产生错误；但是，对于无序列表，\ConTeXt\ 只对前九个嵌套级别应用默认符号。
+
+    无论如何，应该指出的是，在列表中过度使用嵌套可能会产生与我们的意图相反的效果，即读者会感到迷失，无法将每个条目定位在列表的总体结构中。因此，我个人认为，虽然列表是构建文本的强大工具，但几乎从来都不是一个好主意超过第三级嵌套；即使是第三级也只应在某些我们可以证明其合理性的情况下使用。
+
+\stopSmallPrint
+
+在 \ConTeXt\ 中编写列表的通用工具是 \tex{itemize} 环境，其语法如下：
+
+\PlaceMacro{startitemize}\type{\startitemize[Options][Configuration] ... \stopitemize}
+
+其中两个参数都是可选的。第一个允许使用已被 \ConTeXt\ 赋予明确含义的符号名称作为内容；第二个参数很少使用，允许为影响环境功能的某些变量分配特定值。
+
+\startsubsection
+  [
+    reference=sec:itemize_select-list-type,
+    title={选择列表类型和 {\em 条目}之间的分隔符},
+  ]
+
+\startsubsubsection
+  [title={无序列表}]
+
+默认情况下，{\tt itemize} 生成的列表是无序列表，其中分隔符将根据嵌套级别自动选择：
+
+\need 4\baselineskip
+
+\startitemize[packed, columns, two]\switchtobodyfont[small]
+
+  \sym{\convertnumber{set 0}{1}} 对于第一级嵌套。
+
+  \sym{\convertnumber{set 0}{2}} 对于第二级嵌套。
+
+  \sym{\convertnumber{set 0}{3}} 对于第三级嵌套。
+
+  \sym{\convertnumber{set 0}{4}} 对于第四级嵌套。
+
+  \sym{\convertnumber{set 0}{5}} 对于第五级嵌套。
+
+  \sym{\convertnumber{set 0}{6}} 对于第六级嵌套。
+
+  \sym{\convertnumber{set 0}{7}} 对于第七级嵌套。
+
+  \sym{\convertnumber{set 0}{8}} 对于第八级嵌套。
+
+  \sym{\convertnumber{set 0}{9}} 对于第九级嵌套。
+
+\stopitemize
+
+然而，我们可以明确指示想要使用与特定级别关联的符号，只需将级别编号作为参数传递即可。因此，\tex{startitemize[4]} 将生成一个无序列表，其中将使用 \triangleright\, 字符作为分隔符，而不管列表的嵌套级别如何。
+
+我们还可以使用 \PlaceMacro{definesymbol}\tex{definesymbol} 修改每个级别的预定符号：
+
+\type{\definesymbol[Level]{Symbol associated with the level}}
+
+例如
+
+\type{\definesymbol[1][\diamond]}
+
+将使无序列表的第一级使用 \diamond\, 符号。使用相同的命令，我们可以为高于九的嵌套级别分配一些符号。因此，例如
+
+\type{\definesymbol[10][\copyright]}
+
+将为第 10 级嵌套分配国际{\em 版权}符号：\copyright\,。
+
+\stopsubsubsection
+
+\startsubsubsection
+  [title=有序列表]
+
+要生成有序列表，我们需要告诉 \tex{startitemize} 我们想要的排序类型。它可以是：
+
+\startitemize[intro, packed, 2*broad, columns, three]
+\switchtobodyfont[small]
+
+  \sym{{\bf n}} 1, 2, 3, 4, \unknown
+
+  \sym{{\bf m}} {\os 1, 2, 3, 4, \unknown}
+
+  \sym{{\bf g}} \alpha, \beta, \gamma, \delta, \unknown
+
+  \sym{{\bf G}} \Alpha, \Beta, \Gamma, \Delta, \unknown
+
+  \sym{{\bf a}} a, b, c, d, \unknown
+
+  \sym{{\bf A}} A, B, C, D, \unknown
+
+  \sym{{\bf KA}} \cap{a, b, c, d, \unknown}
+
+  \sym{}
+
+  \sym{{\bf r}} i, ii, iii, iv, \unknown
+
+  \sym{{\bf R}} I, II, III, IV, \unknown
+
+  \sym{{\bf KR}} \cap{i, ii, iii, iv, \unknown}
+
+\stopitemize
+
+{\tt n} 和 {\tt m} 之间的区别在于用于表示数字的数字样式：{\tt n} 使用当前字体的数字，而 {\tt m} 使用的数字是通过 \tex{os}（\quotation{旧式}）命令获得的；\type{{\os 0 1 2 3 4 5 6 7 8 9}} 产生 {\os 0 1 2 3 4 5 6 7 8 9}。
+
+\stopsubsubsection
+
+\stopsubsection
+
+
+\startsubsection
+  [
+    reference=sec:itemize_item-type,
+    title={输入列表的条目},
+  ]
+
+通常，使用 \tex{startitemize} 创建的列表中的条目使用 \PlaceMacro{item}\tex{item} 命令引入；但是，\tex{item} 也有一个“环境版本”形式：\PlaceMacro{startitem}\tex{startitem ... \stopitem}。因此，以下示例：
+
+\startbuffer
+\startitemize[a, packed]
+\startitem 第一个元素 \stopitem
+\startitem 第二个元素 \stopitem
+\startitem 第三个元素 \stopitem
+\stopitemize
+\stopbuffer
+\ShowAndExecute
+
+产生的结果与以下完全相同
+
+\startbuffer
+\startitemize[a, packed]
+\item 第一个元素
+\item 第二个元素
+\item 第三个元素
+\stopitemize
+\stopbuffer
+\ShowAndExecute
+
+\tex{item} 或 \tex{startitem} 是用于将条目引入列表的{\em 通用}命令。除此之外，还有以下附加命令，用于当我们想要实现特殊结果时：
+
+\startitemize[3*broad]
+
+  \sym{\PlaceMacro{head}\tex{head}} 当我们想要避免在相关条目之后插入分页时，应使用此命令代替 \tex{item}。
+
+  \startSmallPrint
+
+      一种常见的构造是在列表元素下方立即包含一个嵌套列表或文本块，这样列表元素在某种意义上就充当了子列表或文本块的{\em 标题}。在这些情况下，该元素和后续段落之间的分页是不可取的。如果我们使用 \tex{head} 而不是 \tex{item} 来开始这些元素，\ConTeXt\ {\em 将尽力}（尽可能）不将此元素与下一个块分开。
+
+  \stopSmallPrint
+
+  \sym{\PlaceMacro{sym}\tex{sym}} \type{\sym{Text}} 命令开始一个条目，其中 \tex{sym} 的参数文本用作{\em 分隔符}，而不是通常的数字或符号。例如，此列表的条目以 \tex{sym} 而不是 \tex{item} 开始。
+
+  \sym{\PlaceMacro{sub}\tex{sub}} 此命令应仅在有序列表中使用（其中每个条目前面都有一个数字或按字母顺序排列的字母），它使其条目保留前一个条目的编号，并且为了指示编号是重复的并且这不是一个错误，在左侧打印 \quote{+} 符号。如果我们引用一个以前的列表，并对其提出修改建议，但为了清晰起见，应保持原始列表的编号，这可能很有用。
+
+  \sym{\PlaceMacro{mar}\tex{mar}} 此命令保持条目的编号，但在页边距中添加一个字母或字符（作为参数，放在花括号中传递给它）。我不太确定它有多大用处。
+
+\stopitemize
+
+还有两个用于引入条目的附加命令，它们的组合会产生非常{\em 有趣}的效果，并且如果我可以这么说的话，我认为最好用一个例子来解释它们。它们是 \PlaceMacro{ran}\tex{ran}（{\em range} 的缩写）和 \PlaceMacro{its}\tex{its}（{\em items} 的缩写）。第一个接受一个参数（放在花括号中），第二个重复列表中用作分隔符的符号 x 次（默认四次，但我们可以通过使用 \tex{startitemize} 的 {\tt items=} 选项来改变它）。以下示例显示了这两个命令如何协同工作以创建一个模拟问卷的列表。注意如何使用 {\tt width} 指定 \quotation{No \qquad Yes} 列的宽度，以及如何使用 {\tt distance} 指定复选框和问题之间的间隙。这在 \in{Section}[sec:itemize_arg2] 中有更详细的解释。
+
+\vbox{\starttyping
+阅读以下介绍后，回答以下问题：
+
+\startitemize[8, packed][width=8em, distance=2em, items=5]
+\ran{No \hss Yes}
+\its 我永远不会使用 \ConTeXt，它太难了。
+\its 我只会用它来写大书。
+\its 我会一直使用它。
+\its 我非常喜欢它，以至于我将给我的下一个孩子起名叫 \quotation{Hans}，以向 Hans Hagen 致敬。
+\stopitemize
+\stoptyping}
+
+
+\need5\baselineskip
+%\startlocalfootnotes
+\example{阅读本介绍后，回答以下问题：
+
+\startitemize[8, packed][width=8em, distance=2em, items=5]
+  \ran{No \hss Yes}
+  \its 我永远不会使用 \ConTeXt，它太难了。
+  \its 我只会用它来写大书。
+  \its 我会一直使用它。
+  \its 我非常喜欢它，以至于我将给我的下一个孩子起名叫 \quotation{Hans}，以向 Hans Hagen 致敬。
+\stopitemize
+%\placelocalfootnotes
+}
+%\stoplocalfootnotes
+
+可以通过给 \tex{its} 一个参数来更改单个条目的分隔符数量，如下例所示。
+
+\startbuffer
+    \startitemize[5,packed][width=8em, distance=1.5em, items=4]
+      \ran{A bit\hss A lot}
+      \its 我喜欢蛋糕。
+      \its 我喜欢馅饼。
+      \its[3] 我喜欢饼干。
+    \stopitemize
+\stopbuffer
+
+\typebuffer
+\example{\getbuffer}
+
+\stopsubsection
+
+
+\startsubsection
+  [
+    reference=sec:itemize_arg1,
+    title={基本列表配置},
+  ]
+
+回想一下，\tex{startitemize} 允许两个参数。我们已经看到第一个参数如何让我们选择我们想要的列表类型。但我们也可以用它来指示列表的其他特性；这是通过 \tex{startitemize} 在其第一个参数中的以下选项完成的：
+
+\startitemize
+
+  \item {\tt columns}：此选项确定列表由两列或更多列组成。在 columns 选项之后，必须将所需的列数写成用逗号分隔的单词：two、three、four、five、six、seven、eight 或 nine。如果 {\tt columns} 后面没有跟任何数字，则生成两列。
+
+% TODO: 这是真的吗？我在这里试了没起作用。
+
+  \item {\tt intro}：此选项尝试不通过换行将列表与其前面的段落分开。
+
+  \item {\tt continue}：在有序列表（数字或字母）中，此选项使列表延续上一个编号列表的编号。如果使用了 {\tt continue} 选项，则不必指示我们想要什么类型的列表，因为假定它将与最后一个编号列表相同。
+
+  \item {\tt packed}：是最常用的选项之一。它的使用会导致列表不同{\em 条目}之间的垂直空间尽可能减小。
+
+  \item {\tt nowhite:} 产生类似于 {\tt packed} 的效果，但更剧烈：它不仅减少了条目之间的垂直空间，还减少了列表与周围文本之间的垂直空间。
+
+  \item {\tt broad}：增加条目分隔符和条目文本之间的水平空间。可以通过将一个数字乘以 {\tt broad} 来增加空间，例如 \type{\startitemize[2*broad]}。
+
+% TODO: 这是真的吗？我在这里试了没起作用。
+
+  \item {\tt serried}：删除条目分隔符和文本之间的水平空间。
+
+  \item {\tt intext}：删除悬挂缩进。
+
+  \item {\tt text}：删除悬挂缩进并减少条目之间的垂直空间。
+
+  \item {\tt repeat}：在嵌套列表中，使子级别的编号{\em 重复}与前一级别相同的级别。这样，在第一级上，我们将有：1, 2, 3, 4；在第二级上：1.1, 1.2, 1.3 等。该选项必须在内部列表上指示，而不是在外部列表上。
+
+  \item {\tt margin, inmargin}：默认情况下，列表分隔符打印在左侧，但在文本区域本身内（\quotation{atmargin}）。选项 {\tt margin} 和 {\tt inmargin} 将分隔符移动到页边距。
+
+\stopitemize
+
+\stopsubsection
+
+
+\startsubsection
+  [
+    reference=sec:itemize_arg2,
+    title={附加列表配置},
+  ]
+
+\tex{startitemize} 中的第二个参数（也是可选的）允许对列表进行更详细和彻底的配置。
+
+\startitemize
+
+  \item {\tt before, after}：分别在开始或结束 itemize 环境之前或之后要运行的命令。
+
+  \item {\tt inbetween}：在两个 {\tt items} 之间运行的命令。
+
+  \item {\tt beforehead, afterhead}：在使用 \tex{head} 命令输入的条目之前或之后要运行的命令。
+
+  \item {\tt left, right}：要打印在分隔符左侧或右侧的字符。例如，要获得字母两边有括号的字母列表，我们可以写：
+
+    \type{\startitemize[a][left=(, right=)]}
+
+  \item {\tt stopper}：指示要写在分隔符后面的字符。仅在有序列表中有效。
+
+  \item {\tt width, maxwidth}：为分隔符保留的空间宽度，因此也是悬挂缩进的宽度。
+
+  \item {\tt factor}：表示分隔符和文本之间分隔因子的数字。
+
+  \item {\tt distance}：分隔符和文本之间距离的度量。
+
+  \item {\tt leftmargin, rightmargin, margin}：要添加到条目左侧（leftmargin）或右侧（rightmargin）的边距。
+
+  \item {\tt start}：项目编号开始的数字。
+
+  \item {\tt symalign, itemalign, align}：条目的对齐方式。允许与 \tex{setupalign} 相同的值；{\tt symalign} 控制分隔符的对齐，{\tt itemalign} 控制条目文本的对齐，{\tt align} 控制两者的对齐。
+
+  \item {\tt identing}：环境内段落第一行的缩进。参见 \in{Section}[sec:indentation]
+
+  \item {\tt indentnext}：指示环境之后的段落是否应该缩进。值为 {\tt yes}、{\tt no} 和 {\tt auto}。
+
+  \item {\tt items}：在使用 \tex{its} 输入的条目中，指示必须重复分隔符的次数。
+
+  \item {\tt style}, {\tt color}; {\tt headstyle}, {\tt headcolor}; {\tt marstyle}, {\tt marcolor}; {\tt symstyle}, {\tt symcolor}：这些选项对根据条目是分别使用 \tex{item}、\tex{head}、\tex{mar} 还是 \tex{sym} 命令引入的，来控制条目的样式和颜色。
+
+\stopitemize
+
+\stopsubsection
+
+
+\startsubsection
+  [
+    reference=sec:items command,
+    title={使用 \tex{items} 命令的简单列表},
+  ]
+  \PlaceMacro{items}
+
+对于非常简单的未编号列表（其中条目不太大），{\tt itemize} 环境的一种替代方案是 \tex{items} 命令，其语法为：
+
+\type{\items[Configuration]{Item 1, Item 2, ..., item n}}
+
+不同的列表项用逗号分隔。例如：
+
+\startbuffer
+图形文件可以具有
+（除其他外）以下
+扩展名：
+
+\items{png, jpg, tiff, gif}
+\stopbuffer
+\ShowAndExecute
+
+此命令支持的配置选项是 {\tt itemize} 选项的子集，除了两个特定于此命令的选项：
+
+\startitemize
+
+  \item {\tt symbol}：此选项确定将生成的列表类型。它支持与用于选择某种列表类型的 {\tt itemize} 相同的值。
+
+  \item {\tt n}：此选项指示从哪个项目编号开始有分隔符。
+
+\stopitemize
+
+\stopsubsection
+
+
+\startsubsection
+  [
+    reference=sec:setupitemize,
+    title={预设列表行为并创建我们自己的列表类型},
+  ]
+
+在前面的部分中，我们已经看到了如何指示我们想要的列表类型以及它应该具有的特性。但是每次调用列表时都这样做是低效的，并且通常会产生一个不连贯的文档，其中每个列表都有自己的外观，但不同的外观不符合任何标准。
+
+更可取的结果是：
+
+\startitemize
+
+  \item 在文档前言中预设 {\tt itemize} 环境和 \tex{items} 的{\em 正常}行为。
+
+  \item 创建我们自己的定制列表。例如：一个按字母顺序编号的列表（我们可以称之为 {\tt ListAlpha}），一个用罗马数字编号的列表（{\tt ListRoman}）等。
+
+\stopitemize
+
+我们通过 \tex{setupitemize} 和 \tex{setupitems} 命令实现第一点。第二点需要使用 \PlaceMacro{defineitemgroup}\tex{defineitemgroup} 或 \PlaceMacro{defineitems}\tex{defineitems} 命令。第一个将创建一个类似于 {\tt itemize} 的列表环境，第二个将创建一个类似于 \tex{items} 的命令。
+
+\stopsubsection
+
+\stopsection
+
+
+\startsection
+    [title={描述与枚举}]
+
+描述和枚举是两种构造，允许对展开、描述或定义某个短语或单词的段落或段落组进行一致的排版。
+
+\startsubsection
+    [title={描述}]
+
+对于描述，我们区分{\em 标题}及其解释或展开。我们可以使用以下方式创建新的描述：
+
+\PlaceMacro{definedescription}\type{\definedescription [Name] [Configuration]}
+
+其中 {\tt Name} 是此新构造的名称，{\tt Configuration} 控制我们的新结构的外观。在前述声明之后，我们将有一个新命令和一个使用我们选择的名称的环境。因此：
+
+\type{\definedescription [Concept]}
+
+将创建以下命令：
+
+\starttyping
+  \Concept{Title}
+  \startConcept {Title}  \stopConcept
+\stoptyping
+
+当标题的解释文本仅包含一个段落时，我们将使用该命令；对于标题描述占据多个段落的情况，则使用环境。当使用该命令时，紧随其后的段落将被视为标题的解释文本。但是当使用环境时，所有内容都将以适当的缩进进行格式化，以明确其与标题的关系。
+
+例如：
+
+\starttyping
+\definedescription
+  [Concept]
+  [alternative=left, width=1cm, headstyle=bold]
+
+\Concept{Contextualise}
+
+Place something in a certain context, or typeset a text with the typesetting
+system called \ConTeXt.  The ability to correctly contextualise in any situation
+is considered a sign of intelligence and good sense.
+
+\stoptyping
+
+这将产生以下结果：
+
+\startcolor[red]
+    
+\definedescription
+  [Concept]
+  [alternative=left, width=3cm, headstyle=bold]
+
+\Concept{语境化}
+
+将某物置于特定语境中，或使用名为 \ConTeXt 的排版系统排版文本。在任何情况下正确语境化的能力被视为智慧和良好判断力的标志。
+
+\stopcolor
+
+与 \ConTeXt 通常的情况一样，我们的新构造将具有的外观可以在创建时通过 {\tt Configuration} 参数指示，或者稍后通过 \tex{setupdescription} 指示：
+
+\PlaceMacro{setupdescription}\type{\setupdescription [Name] [Configuration]}
+
+其中 {\tt Name} 是我们新描述的名称，{\tt Configuration} 决定其外观。在不同的可能配置选项中，我将强调：
+
+\startitemize
+
+  \item {\tt alternative}：此选项从根本上控制构造的外观。它确定标题相对于其描述的位置。其可能值为 {\tt left}、{\tt right}、{\tt inmargin}、{\tt inleft}、{\tt inright}、{\tt margin}、{\tt leftmargin}、{\tt rightmargin}、{\tt innermargin}、{\tt outermargin}、{\tt serried} 和 {\tt hanging}。它们的名称足够清晰，可以让人了解结果，但如果有疑问，最好进行测试看看效果。
+
+  \item {\tt width}：控制用于书写标题的框的宽度。根据 {\tt alternative} 的值，该距离也将成为解释文本缩进的一部分。
+
+  \item {\tt distance}：控制标题和解释之间的距离。
+
+  \item {\tt headstyle}, {\tt headcolor}, {\tt headcommand}：这些影响标题本身的外观。使用 {\tt headcommand}，我们可以指示一个命令，标题文本将作为参数传递给该命令。例如：{\tt headcommand=\ttbs WORD} 将确保标题文本大写。
+
+  \item {\tt style}, {\tt color}：控制描述文本的外观。
+
+\stopitemize
+
+\stopsubsection
+
+
+\startsubsection
+    [title={枚举}]
+
+枚举是在多个级别上构建的编号文本元素。每个元素以一个标题开始，默认情况下，该标题由结构名称及其编号组成，尽管我们可以使用 {\tt text} 选项更改标题。它们与描述非常相似，但不同之处在于：
+
+\startitemize
+
+  \item 枚举中的所有元素共享相同的标题。
+
+  \item 因此它们通过编号相互区分。
+
+\stopitemize
+
+这种结构非常有用，例如，用于编写教科书中的公式、问题或练习，确保它们被正确编号并以一致的方式格式化。
+
+我们使用以下方式创建枚举
+
+\PlaceMacro{defineenumeration}\type{\defineenumeration [Name] [Configuration]}
+
+其中 {\em Name} 是新构造的名称，{\em Configuration} 控制其外观。
+
+因此，在以下示例中：
+
+\starttyping
+  \defineenumeration
+    [Exercise]
+    [alternative=top, before=\blank, after=\blank, between=\blank]
+\stoptyping
+
+我们创建了一个名为 {\em Exercise} 的新结构，并且与枚举一样，我们将有以下新命令可用：
+
+\starttyping
+  \Exercise
+  \startExercise  
+  \stopExercise
+\stoptyping
+
+该命令用于单段落的{\em 练习}，而环境用于多段落的{\em 练习}。但是由于枚举最多可以有四层深度，还将创建以下命令和环境：
+
+\starttyping
+  \subExercise
+  \startsubExercise
+  \stopsubExercise
+  \subsubExercise
+  \startsubsubExercise
+  \stopsubsubExercise
+  \subsubsubExercise
+  \startsubsubsubExercise
+  \stopsubsubsubExercise
+\stoptyping
+
+并且，为了控制编号，还有以下附加命令：
+
+% TODO: 下面的项目如果用 setExercise、resetExercise 和 nextExercise 会更清晰吗？
+
+\startitemize
+
+  \item \tex{setEnumerationName}：设置当前编号值。
+
+  \item \tex{resetEnumerationame}：将枚举计数器重置为零。
+
+  \item \tex{nextEnumerationName}：将枚举计数器增加一。
+
+\stopitemize
+
+枚举的外观可以在创建时确定，或者稍后使用 \tex{setupenumeration} 确定，其格式为：
+
+\PlaceMacro{setupenumeration}\type{\setupenumeration [Name] [Configuration]}。
+
+对于每个枚举，我们可以分别配置其每个级别。因此，例如，\tex{setupenumeration [subExercise] [Configuration]} 将影响名为 \quotation{Exercise} 的枚举的第二级。
+
+可以使用 \tex{setupenumeration} 配置的选项和值与 \tex{setupdescription} 中的类似。
+
+% TODO: 显示设置练习和一些示例。
+
+\stopsubsection
+
+\stopsection
+
+\startsection
+  [
+    reference=sec:FramesLines,
+    title={线条与框架},
+  ]
+
+% TODO 我不确定 ConTeXt 手册具体说了什么，但 JAL 是否混淆了手册关于“plain TeX 的能力”与 ConTeXt 的能力的说法？如果是这样，本段的开头需要重新措辞。
+% 另外，“graphic”可能让我困惑，因为我不确定这个词是否让人们想到线条和框架。
+
+\ConTeXt\ 参考手册中说，\TeX\ 具有强大的文本管理能力，但在管理图形信息方面非常弱。我不敢苟同：确实，在处理线条和框架方面，\ConTeXt（实际上是 \TeX）的可能性不像排版文本那样强大。但是要说系统在这方面很弱，我认为有点夸张。我不知道其他排版系统能为文档做的关于线条和框架的任何功能是 \ConTeXt\ 无法生成的。而且如果我们将 \ConTeXt\ 与 MetaPost 或 TiKZ（\ConTeXt\ 有一个用于此的扩展模块）结合起来，那么可能性只受限于我们的想象力。
+
+然而，在以下部分中，我将仅限于解释如何生成简单的水平线和垂直线，以及围绕单词、句子或段落的框架。
+
+\startsubsection
+    [title={简单线条}]
+
+绘制水平线的最简单方法是使用 \PlaceMacro{hairline}\tex{hairline} 命令，它生成一条占据正常文本行所有宽度的水平线。
+
+因为 \tex{hairline} 占据文本行的整个宽度，所以同一行上没有空间容纳任何文本。为了生成能够与文本共存的水平线，我们需要 \PlaceMacro{thinrule}\tex{thinrule} 命令。如果在段落之间使用，这第二个命令将使用该行的整个宽度；在这种情况下，它将产生与 \tex{hairline} 相同的效果。当在段落中使用时，\tex{thinrule} 将产生与 \tex{hfill} 相同的水平扩展（参见 \in{Section}[sec:horizontal space2]），但它不是用空白填充水平空间（如 \tex{hfill} 所做的那样），而是用一条线填充它。
+
+\startbuffer
+左边\thinrule\\
+\thinrule 右边\\
+两边\thinrule 都有\\
+\thinrule 居中\thinrule
+\stopbuffer
+
+\ShowAndExecute
+
+使用 \PlaceMacro{thinrules}\tex{thinrules} 命令，我们可以生成多条线。例如，\tex{thinrules[n=2]} 将生成两条连续的线，每条线都占据正常行的宽度。使用 \tex{thinrules} 生成的线也可以配置，要么在实际调用命令时，将配置作为其参数之一指示，要么通常使用 \tex{setupthinrules}。配置包括线条的粗细（{\tt rulethickness}）、颜色（{\tt color}）、背景色（{\tt background}）、行间距（{\tt interlinespace}）等。
+
+\startSmallPrint
+
+    我将省略一些选项的解释。读者可以在 {\tt setup-en.pdf} 中查阅它们（参见 \in{Section}[sec:qrc-setup-en]）。有些选项仅在细微差别上有所不同（即它们之间几乎没有区别），我认为让读者尝试去{\em 看到}区别，比我自己试图用语言表达要快。例如：我刚才说的线条粗细取决于 {\tt rulethickness} 选项。但它也受到 {\tt height} 和 {\tt depth} 选项的影响。
+
+\stopSmallPrint
+
+可以使用 \PlaceMacro{hl}\tex{hl} 和 \PlaceMacro{vl}\tex{vl} 命令生成较小的线。第一个生成水平线，第二个生成垂直线。两者都接受一个数字作为参数，允许我们指定线的长度。在 \tex{hl} 中，数字以 {\em ems} 为单位测量长度（在此命令中无需指定测量单位），而在 \tex{vl} 中，参数乘以当前文本行的高度以获得线长。
+
+因此 \tex{hl[3]} 生成一条 3 ems 长的水平线，而 \tex{vl[3]} 生成一条对应于三行高度的垂直线。请记住，线测量指示符必须放在方括号之间，而不是花括号之间。在这两个命令中，参数都是可选的。如果不输入，则假定值为 1。这是 \tex{vl[1]}：\vl[1]。
+
+\PlaceMacro{fillinline}\tex{fillinline} 是另一个用于创建精确长度水平线的命令。它支持更多配置，我们可以在其中指示（或使用 \PlaceMacro{setupfillinlines}\tex{setupfillinlines} 预设）宽度（{\tt width} 选项）以及一些其他特性。
+
+此命令的一个特点是，写在它右侧的文本将被放置在线的左侧，通过必要的空白将该文本与线分开以占据整行。例如：
+
+\starttyping
+\fillinline[width=6cm] 姓名
+\stoptyping
+
+将生成
+
+\startcolor[red]
+
+\fillinline[width=6cm] {姓名}
+
+\stopcolor
+
+\startSmallPrint
+
+    我怀疑这种奇怪的操作是由于此宏被设计用于编写表格，其中文本后面有一条水平线，必须在上面写东西\Conjecture。
+    % TODO: 我们想在英文版中包含这个吗？
+    % (这个解释对于西班牙语版本是有道理的。)
+    % 实际上，命令的名称 {\tt fillinline} 的意思是“填写行”。
+
+\stopSmallPrint
+
+除了线的宽度，我们还可以配置边距（{\tt margin}）、距离（{\tt distance}）、粗细（{\tt rulethickness}）和颜色（{\tt color}）。
+
+与 \tex{fillinline} 几乎相同的是 \tex{fillinrules}，尽管此命令允许我们插入多于一条线（\MyKey{n} 选项）：
+
+\type{\fillinrules [Configuration] {Text before rule} {Text after rule}}
+
+其中三个参数都是可选的。（要获得线后的文本，请使用两组花括号，其中第一组为空。）例如，行
+
+\type{\fillinrules[distance=1cm, separator=?, n=2]{To be} {or not to be}}
+
+\startcolor[red]
+\fillinrules[distance=0.5cm, separator=?, n=2]{生存} {还是毁灭}
+\stopcolor
+
+警告：在闭合方括号和第一个开放花括号之间放置一个空格会导致完全不同的结果：
+
+\startcolor[red]
+\fillinrules[distance=0.5cm, separator=?, n=2] {生存} {还是毁灭}
+\stopcolor
+
+\stopsubsection
+
+
+\startsubsection
+  [title={与文本关联的线条}]
+
+尽管我们刚刚看到的一些命令可以生成与同一行上的文本共存的线条，但这些命令实际上专注于绘制线条。要编写与特定文本关联的线条，\ConTeXt\ 有以下命令：
+
+\startitemize
+
+\item 生成文本之间的线条。
+
+\item 生成文本下方的线条（下划线）、文本上方的线条（上划线）或穿过文本的线条（删除线）。
+
+\stopitemize
+
+要生成文本之间的线条，通常的命令是 \PlaceMacro{textrule}\tex{textrule}。此命令绘制一条穿过页面整个宽度的线，并将它作为参数接受的文本写在左侧（但不在页边距处）。例如：
+
+\startbuffer
+\textrule{示例文本}
+\stopbuffer
+\ShowAndExecute
+
+\startSmallPrint
+
+    假定 \tex{textrule} 允许一个可选的第一参数，具有三个可能的值：{\tt top}、{\tt middle} 和 \Doubt{\tt bottom}。但是，经过一些测试，我无法找出这些选项产生什么效果。
+
+\stopSmallPrint
+
+类似于 \tex{textrule} 的是 \PlaceMacro{starttextrule}\tex{starttextrule} 环境，除了在环境开头插入带文本的线之外，它还在结尾插入一条水平线。此命令的格式为：
+
+\type{\starttextrule[Configuration]{Text on the line} ... \stoptextrule}
+
+% TODO: 为什么这里的下线之前有一个空行（或大的垂直空间）？
+
+\startbuffer
+\starttextrule{引言文本}
+一些文本将被设置在两条线之间。底线横跨页面。
+\stoptextrule
+\stopbuffer
+
+\ShowAndExecute
+
+\tex{textrule} 和 \text{starttextrule} 都可以使用 \PlaceMacro{setuptextrule}\tex{setuptextrule} 进行配置。
+
+要绘制文本下方、上方或穿过文本的线条，使用以下命令：
+
+\PlaceMacro{underbar}\PlaceMacro{underbars}\PlaceMacro{overbar}
+\PlaceMacro{overbars}\PlaceMacro{overstrike}\PlaceMacro{overstrikes}
+
+\startbuffer[buf1]
+  \underbar{文本单词}   
+  \underbars{文本单词}
+  \overbar{文本单词}
+  \overbars{文本单词}
+  \overstrike{文本单词}
+  \overstrikes{文本单词}
+\stopbuffer
+\startbuffer[buf2]
+\startlines
+  \getbuffer[buf1]
+\stoplines
+\stopbuffer
+
+% 在此示例中增加行距以使线条更易于查看。
+% 但抵消此示例与上方行之间的额外空间。
+% TODO：正确的 ConTeXt 方法是什么？
+% （部分问题在于，根据页面其余部分，此处的间隙大小会变化……我在 \stop 之后立即放置了一个 \page，-0.44ex 是正确的。）
+\start
+\godown[-1.5ex]\setupinterlinespace[line=3.55ex]
+\ShowAndExecute[buf1][buf2]
+\stop
+
+如我们所见，对于每种类型的线条（文本下方、上方或穿过），都有两个命令。命令的单数版本在作为参数接受的所有文本下方、上方或穿过绘制一条线，而命令的复数版本仅在线条下方、上方或穿过单词绘制，而不穿过空白。
+
+这些命令彼此不兼容；也就是说，其中两个不能应用于同一文本。如果我们尝试，最后一个将始终占上风。另一方面，\tex{underbar} 可以重复，为已经加下划线的文本加下划线：\type{\underbar{\underbar{two underbars}}} 输出 \underbar{\underbar{two underbars}}。
+
+% TODO：测试下面一点并重写。
+
+\startSmallPrint
+
+    参考手册指出，\tex{underbar} 会禁用构成其参数的文本中单词的断字。我不清楚该陈述是仅指 \tex{underbar} 还是指我们正在检查的六个命令。
+
+\stopSmallPrint
+
+\stopsubsection
+
+
+\startsubsection
+  [title={带框架的单词或文本}]
+
+要用框架（即一个框）包围文本，我们使用：
+
+\startitemize
+
+  \item \PlaceMacro{framed}\tex{framed} 或 \PlaceMacro{inframed}\tex{inframed} 命令，如果文本相对简短且不超过一行。
+
+  \item \PlaceMacro{startframedtext}\tex{startframedtext} 环境用于较长的文本。
+
+\stopitemize
+
+\tex{framed} 和 \tex{inframed} 的区别在于绘制框架的起始点。在 \tex{frame} 中，框架从一条称为基线的理想线向上绘制，字母坐落在基线上，但某些字母会向下延伸（像 \quote{j} 和 \quote{p} 这样的字母具有{\em 下行字母}，即延伸到基线以下的笔画）。在 \tex{inframed} 中，框架也从线上可能的最低点向上绘制。例如：
+
+\startbuffer
+这里有 \framed{两个} 不错的
+\inframed{框架}。
+\stopbuffer
+\ShowAndExecute
+
+\tex{framed} 和 \tex{inframed} 文本都可以使用 \PlaceMacro{setupframed}\tex{setupframed} 进行定制，而 \tex{startframedtext} 使用 \PlaceMacro{setupframedtext}\tex{setupframedtext} 进行定制。这两个命令的定制选项非常相似。它们允许我们指示框架的尺寸（{\tt height}、{\tt width}、{\tt depth}）、角部形状（{\tt framecorner}），可以是 {\tt rectangular} 或圆角（{\tt round}）、框架颜色（{\tt framecolor}）、线条粗细（{\tt framethickness}）、内容对齐（{\tt align}）、文本颜色（{\tt foregroundcolor}）、背景颜色（{\tt background} 和 {\tt backgroundcolor}）等。
+
+% TODO：我认为这里有一两个例子会很有用。
+
+对于 \tex{startframedtext}，还有一个看似奇怪的选项，{\tt frame=off}，它导致框架不被绘制（尽管它仍然存在，但不可见）。此选项在段落（或其他应保持在一起的材料）内不希望有分页的情况下很有用。由于段落周围的框架是不可分割的，将段落包含在 {\tt framedtext} 环境中（即使关闭了框架绘制选项）可确保段落内不插入分页。
+
+我们还可以使用 \PlaceMacro{defineframed}\tex{defineframed} 和 \PlaceMacro{defineframedtext}\tex{defineframedtext} 创建这些命令的定制版本。
+
+\stopsubsection
+
+\stopsection
+
+
+\startsection
+  [
+    reference=sec:buffer,
+    title={其他感兴趣的环境和构造},
+  ]
+
+  在 \ConTeXt\ 中还有许多环境我甚至没有提到，或者只是顺便提了一下。例如：
+
+\startitemize
+
+  \item {\tt\bf buffer}\PlaceMacro{startbuffer}\PlaceMacro{getbuffer}：{\em 缓冲区}是存储在内存中供以后重用的文本片段。一个{\em 缓冲区}在文档中的某处使用 \cmd{startbuffer[BufferName] ... \ttbs stopbuffer} 定义，并且可以在文档的其他地方根据需要多次使用 \tex{getbuffer[BufferName]} 检索。如果您检查本章的\quotation{源代码}，您会看到缓冲区经常在并排示例中使用，以便使用 \tex{typebuffer[BufferName]} 显示和使用 \tex{getbuffer[BufferName]} 排版的文本只需输入一次。
+
+  \item {\tt\bf chemical}\PlaceMacro{startchemical}：此环境允许我们在其中放置化学公式。如果说 \TeX\ 在许多其他事情中因其能够正确排版带有数学公式的文本而脱颖而出，那么 \ConTeXt\ 从一开始就试图将这种能力扩展到化学公式，并且它拥有这个环境，其中启用了用于编写化学公式的命令和结构。
+
+  \item {\tt\bf combination}\PlaceMacro{startcombination}：此环境允许我们将多个浮动元素（参见 \in{Section}[sec:floating objects]）组合在同一页面上。这对于在我们的文档中对齐不同的连接外部图像特别有用。
+
+  \item {\tt\bf formula}\PlaceMacro{startformula}：这是一个旨在排版数学公式的环境。
+
+  \item {\tt\bf hiding}\PlaceMacro{starthiding}：存储在此环境中的文本将不会被编译，因此不会出现在最终文档中。这对于暂时禁用源文件中某些片段的编译很有用。通过将一行或多行标记为注释也可以实现同样的效果。但是，当我们要禁用的片段相对较长时，比将源文件的数十行或数百行标记为注释更有效的是在片段开头插入 \tex{starthiding} 命令，在结尾插入 \tex{stophiding}。
+
+  \item {\tt\bf legend}\PlaceMacro{startlegend}：在数学上下文中，\TeX\ 应用不同的规则，使得不能书写任何普通文本。然而，有时公式会附带对其中所用元素的描述。为此，有一个 \tex{startlegend} 环境，允许我们在数学上下文中放置普通文本。
+
+  \item {\tt\bf linecorrection}\PlaceMacro{startlinecorrection}：通常，\ConTeXt\ 可以正确管理行之间的垂直空间，但偶尔一行可能包含导致其无法正确显示的内容。这主要发生在带有使用 \tex{framed} 框架的片段的行上。在这种情况下，此环境会调整行距，以便段落正确显示。
+
+  \item {\tt\bf mode}\PlaceMacro{startmode}：此环境旨在包含源文件中的片段，这些片段仅在激活相应模式时才会被编译。{\em 模式}的使用不是本入门文档的主题，但如果我们希望能够从单个源文件生成具有不同格式的文档的多个版本（例如，要打印的版本或针对屏幕阅读优化的版本），这是一个非常有趣的工具。与此环境互补的是 \PlaceMacro{startnotmode}\tex{startnotmode}，其中包含在 \tex{startnotmode[someMode]} 和 \tex{stopnotmode} 之间的源材料在模式 {\tt someMode} 未被激活时包含在文档中。
+
+    % TODO：在 fr2/02-03_BodyMatter_MainFlow/20_01_Markup_Others.tex 的第 229-266 行有一个很好的小例子。包含它（经许可）也许类似的东西。
+
+  \item {\tt\bf opposite}\PlaceMacro{startopposite}：此环境用于在左右页面的内容相关时排版文本。
+
+  \item {\tt\bf quotation}\PlaceMacro{startquotation}：一个与 {\tt narrower} 非常相似的环境（参见 \in{Section}[sec:narrower]），旨在插入中等长度的字面引用。此环境确保内部的文本被引用，并且增加边距，以便带有引用的段落能在页面上视觉上突出。但应注意，根据英文常见的块引用样式，不应有开头的引号和结尾的引号——这使得这个命令或环境的用处可能不如预期。
+
+  \item {\tt\bf standardmakeup}\PlaceMacro{startstandardmakeup}：此环境旨在生成带有文档标题的页面，这在有一定长度的学术文档中相对常见，例如博士论文、硕士论文等。
+
+\stopitemize
+
+要了解这些环境（或我未提及的其他环境）中的任何一个，我建议执行以下步骤：
+
+\startitemize[n]
+
+  \item 在 \ConTeXt\ 参考手册中查找有关该环境的信息。此手册并未提及所有环境；但它确实对上面列表中的每个项目都有所说明。
+
+  \item 编写一个使用该环境的测试文档。
+
+  \item 查阅 \ConTeXt\ 的官方命令列表（参见 \in{Section}[sec:qrc-setup-en]），了解相关环境的配置选项，然后测试它们以确切了解它们的作用。
+
+\stopitemize
+
+\stopchapter
+
+\stopcomponent
+
+%%% Local Variables:
+%%% mode: ConTeXt
+%%% eval: (auto-fill-mode 1)
+%%% coding: utf-8-unix
+%%% TeX-master: "../introCTX_eng.tex"
+%%% End:
+%%% vim:set filetype=context tw=75 : %%%

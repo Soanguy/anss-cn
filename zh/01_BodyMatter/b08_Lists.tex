@@ -1,0 +1,901 @@
+%%% 文件:      b08_Lists.tex
+%%% 作者:      Joaquín Ataz-López 等人
+%%% 开始:      2020年7月
+%%% 完成:      2020年7月
+%%% 内容:      最初本章计划作为第12章的一部分（文档元素与结构）。但我发现，
+%%%           一方面索引会影响整个文档，另一方面，如果将其包含在第12章中，
+%%%           该章会变得过长。本章在创纪录的时间内完成（三四天），
+%%%           这表明我开始对ConTeXt有了更深入的理解。
+%%%
+%%% 编辑工具:  Emacs + AUCTeX - 有时也用 vim + context-plugin
+%%%
+
+\startcomponent b08_Lists.tex
+
+\environment introCTX_env.tex
+
+\startchapter
+  [
+    reference=cap:toc,
+    title={目录与\hbox{索引}},
+    bookmark={目录与索引},
+  ]
+
+\TocChap
+
+目录和索引是文档的全局性方面。几乎所有文档都会有目录，而只有部分文档会有索引。对于许多语言（但不是英语）来说，目录和索引都归入“索引”（index）这个通用术语。对于英语读者来说，目录通常出现在开头（或者在某些情况下也出现在各章开头，如本文档所做的那样），而索引出现在末尾。
+
+这两者都涉及内部引用机制的具体应用，其解释包含在 \in{Section}[sec:references] 中。
+
+\startsection
+  [
+    reference=sec:content,
+    title=目录,
+  ]
+
+\startsubsection
+  [title=目录概观]
+
+在上一章中，我们研究了允许在编写文档时建立文档结构的命令。本节重点介绍目录和索引，它们在某种程度上“镜像”了文档的结构。目录对于了解整个文档（有助于将信息置于上下文中）以及查找特定段落的准确位置非常有用。结构非常复杂的书籍，有许多不同深度的章节和小节，似乎需要不同类型的目录，因为过于简略的目录（可能只包含前两三个层级）虽然有助于了解文档内容的整体概况，但对于定位特定段落却不太有用。另一方面，在非常详细的目录中，很容易只见树木不见森林，失去文档的整体观。这就是为什么有时结构特别复杂的书籍会包含多个目录：开头有一个不太详细的目录显示主要部分，每章开头有一个更详细的目录，最后可能还有一个索引。
+
+所有这些都可以由 \ConTeXt\ 相对容易地自动生成。我们可以：
+
+\startitemize
+
+  \item 在文档的任何位置生成完整或部分的目录。
+
+  \item 决定这两者的内容。
+
+  \item 极其细致地配置它们的外观。
+
+  \item 在目录中包含超链接，允许我们直接跳转到相应的章节。
+
+\stopitemize
+
+事实上，只要在文档中启用了交互功能，所有目录都默认包含最后这项实用性。这在 \in{Section}[sec:interactivity] 中讨论。
+
+在我看来，\ConTeXt\ 参考手册中对目录的解释有些令人困惑，我认为这是因为一次性引入了太多信息。\ConTeXt\ 构建目录的机制有很多部分，因此试图一次性解释所有部分的文本很难清晰，尤其是对于新手读者。相比之下，\goto{wiki}[url(https://wiki.contextgarden.net/Document_structure_and_headlines/Table_of_contents)] 上的解释基本上限于示例：对于学习“技巧”非常有用，但在我看来，对于理解机制及其工作原理是不够的。这就是为什么我决定在本介绍中使用的解释策略，首先假设一个并非严格正确（或不完全正确）的事情：即 \ConTeXt\ 中存在一个叫做“目录”的东西。以此为基础，解释生成目录的“正常”命令，当这些命令及其配置被熟知后，我认为是时候介绍那些迄今为止被省略的机制部分的信息了——尽管是在理论层面而非更实践层面。了解这些额外的“部分”使我们能够创建比我们称之为“正常”的目录（由之前解释的命令创建）更加定制化的目录；然而，在大多数情况下，我们不需要这样做。
+
+\stopsubsection
+
+
+\startsubsection
+  [
+    reference=sec:completecontent,
+    title=带标题的完全自动目录,
+  ]
+
+根据文档中编号章节（{\tt part}、{\tt chapter}、{\tt section} 等）生成自动目录（TOC）的基本命令是 \PlaceMacro{completecontent}\tex{completecontent} 和 \PlaceMacro{placecontent}\tex{placecontent}。这两个命令的主要区别在于，第一个命令会为目录添加一个“标题”；为此，它会在目录之前立即插入一个“未编号的章节”，其默认标题为“Table of Contents”（目录）。
+
+因此，\tex{completecontent}：
+
+\startitemize
+
+  \item 在它出现的位置插入一个名为“Table of Contents”（目录）的新未编号章节。
+
+    \startSmallPrint
+
+        我们回想一下，在 \ConTeXt\ 中，用于生成与章节同级别的未编号章节的命令是 \tex{title}（见 \in{Section}[sec:sectiontypes]）。因此，实际上 \tex{completecontent} 插入的不是“章节”（\tex{chapter}），而是一个“标题”（\tex{title}）。我之所以没有这样说，是因为我认为读者在此处使用未编号章节命令的名称可能会感到困惑，因为术语“标题”（Title）也有更广泛的含义，读者很容易不将其与我们所指的具体章节层级联系起来。
+
+    \stopSmallPrint
+
+  \item 这个“章节”（实际上是 \tex{title}）的格式与文档中其余未编号章节完全相同；默认情况下，这包括一个分页。
+
+  \item 目录紧接在标题之后打印。
+
+\stopitemize
+
+最初生成的目录是“完整的”，正如生成它的命令名称（\tex{completecontent}）所暗示的那样。但一方面，我们可以如 \in{Section}[sec:placecontent] 所述限制目录的深度；另一方面，由于此命令对其在源文件中的位置“敏感”（参见下文关于 \tex{placecontent} 的说明），如果 \tex{completecontent} 不在文档开头，则生成的目录可能不完整。在源文件的某些位置，该命令甚至可能被明显忽略。如果发生这种情况，解决方案是使用 \MyKey{criterium=all} 选项调用该命令。关于此选项，另请参见 \in{Section}[sec:placecontent]。
+
+要更改目录的默认标题，我们使用 \PlaceMacro{setupheadtext}\tex{setupheadtext} 命令，其语法为：
+
+  \type{\setupheadtext[语言][元素=名称]}
+
+其中 {\tt 语言} 是可选的，指的是 \ConTeXt\ 使用的语言标识符（见 \in{Section}[sec:langdoc]），{\tt 元素} 指的是我们要更改名称的元素（目录的情况下为 \MyKey{content}），{\tt 名称} 是我们想要赋予目录的标题。例如：
+
+  \type{\setupheadtext[en][content=Contents]}
+
+将确保由 \tex{completecontent} 生成的目录标题为“Contents”而不是“Table of Contents”。
+
+此外，\tex{completecontent} 允许与 \tex{placecontent} 相同的配置选项，关于其解释，我请读者参考（下一节）。
+
+\stopsubsection
+
+\startsubsection
+  [
+    reference=sec:placecontent,
+    title=无标题的自动目录,
+  ]
+
+用于插入无标题、根据文档章节命令自动生成的目录的通用命令是 \tex{placecontent}，其语法为：
+
+\type{\placecontent [选项]}
+
+原则上，目录将包含所有编号的章节，尽管我们可以使用 \PlaceMacro{setupcombinedlist}\tex{setupcombinedlist} 命令（我们将在后面讨论）来限制其深度。因此，例如：
+
+\type{\setupcombinedlist[content][list={chapter,section}]}
+
+会将目录的内容限制为章（chapter）和节（section）。
+
+此命令的一个特点是它对其在源文件中的位置敏感。这通过几个例子很容易解释，但如果我们想精确指定命令如何工作以及在每种情况下哪些标题包含在目录中，则要困难得多。所以让我们从例子开始：
+
+\startitemize
+
+  \item 放在文档开头、第一个章节命令（根据情况是 part、chapter 或 section）之前的 \tex{placecontent} 将生成完整的目录。
+
+    \startSmallPrint
+
+        我不太确定默认生成的目录是否“完整”，我相信它确实包含了足够多的章节层级，在大多数情况下是完整的；但我怀疑它不会超过第八级章节。无论如何，如上所述，我们可以通过以下方式调整目录达到的章节级别：
+
+        \type{\setupcombinedlist[content][list={chapter, section, subsection, ...}]}
+
+    \stopSmallPrint
+
+  \item 相反，位于 part、chapter 或 section 内部的同一个命令将专门生成该元素内容的目录，换句话说，即特定 part 的 chapters、sections 和其他更低层级，或特定 chapter 的 sections（和其他层级），或特定 section 的 subsections。
+
+\stopitemize
+
+至于技术性和详细的解释，为了正确理解 \tex{placecontent} 的默认操作，必须记住，各个 section 实际上是 \ConTeXt\ LMTX 的“环境”，以 \tex{startSectionType} 开始，以 \tex{stopSectionType} 结束，并且可以包含在其他更低级别的 section 命令中。因此，考虑到这一点，我们可以说 \tex{placecontent} 默认生成的目录将仅包含：
+
+\startitemize
+
+  \item 属于放置命令的“环境”（章节级别）的元素。这意味着放在 chapter 中的命令不会包含来自其他 chapters 的 sections 或 subsections。
+
+  \item 章节级别低于命令所在位置对应级别的元素。也就是说，如果命令位于 chapter 中，则仅包含 sections、subsections 和其他更低级别；但如果命令位于 section 中，则索引将被拆分以生成 subsection 级别的目录。
+
+\stopitemize
+
+此外，要生成目录，要求 \tex{placecontent} 位于其所在 chapter 的第一个 section 之前，或位于其所在 section 的第一个 subsection 之前，等等。
+
+\startSmallPrint
+
+    我不确定上面的解释是否清楚。也许用一个比之前的例子更详细的例子，我们可以更好地理解我的意思：让我们想象以下文档结构：
+
+\vbox{ \startitemize[packed]
+
+  \item 第 1 章
+
+    \startitemize[packed]
+
+    \item 第 1.1 节
+
+    \item 第 1.2 节
+
+      \startitemize[packed]
+
+      \item 第 1.2.1 小节
+
+      \item 第 1.2.2 小节
+
+      \item 第 1.2.3 小节
+
+      \stopitemize
+
+    \item 第 1.3 节
+
+    \item 第 1.4 节
+
+    \stopitemize
+
+  \item 第 2 章
+
+  \stopitemize}
+
+    因此：放在第 1 章之前的 \tex{placecontent} 将生成完整的目录，类似于 \tex{completecontent} 生成的目录但没有标题。但如果命令放在第 1 章内部且在第 1.1 节之前，目录将只是该章的目录；如果放在第 1.2 节的开头，目录将只是该节的内容。但是，如果命令放在例如第 1.1 节和第 1.2 节之间，它将被忽略。如果放在节的末尾或文档末尾，它也将被忽略。
+
+\stopSmallPrint
+
+当然，所有这些仅适用于命令不包含选项的情况。特别是，{\tt criterium} 选项将改变这种默认行为。
+
+在 \tex{placecontent} 允许的选项中，我将只解释其中两个，它们是设置目录最重要的选项，而且也是 \ConTeXt\ 参考手册中（部分）记录的选项。{\tt criterium} 选项，影响目录内容与命令在源文件中位置的关系；以及 {\tt alternative} 选项，影响要生成的目录的总体布局。
+
+\stopsubsection
+
+\startsubsection
+  [
+    reference=sec:criteriumlist,
+    title={要纳入目录的元素：{\tt criterium} 选项},
+  ]
+
+上面已经解释了 \tex{placecontent} 关于命令在源文件中位置的默认操作。{\tt criterium} 选项会改变此操作。除其他外，它可以采用以下值：
+
+\startitemize
+
+  \item {\tt all}：无论命令在源文件中的位置如何，目录都是完整的。
+
+  \item {\tt previous}：目录仅包含 \tex{placecontent} 之前的（我们所在层级的）章节命令。此选项适用于写在文档或相关章节末尾的目录。
+
+  \item {\tt part, chapter, section, subsection...}：表示目录应限于所指示的章节级别。
+
+  \item {\tt component}：在多文件项目中（见 \in{Section}[sec-projects]），它将仅生成找到 \tex{placecontent} 或 \tex{completecontent} 命令的“组件”（component）对应的目录。
+
+\stopitemize
+
+\stopsubsection
+
+\startsubsection
+  [
+    reference=sec:alternativelist,
+    title={目录的布局：{\tt alternative} 选项},
+  ]
+
+{\tt alternative} 选项控制目录的整体布局。其主要值可见于 \in{Table}[tbl:contentalternatives]。
+
+\placetable
+  [here]
+  [tbl:contentalternatives]
+  {\tfx 目录的格式化方式}
+{\switchtobodyfont[small]
+\starttabulate[|c|l|l|]
+\HL
+\NC {\bf alternative}
+\NC {\bf 目录条目的内容}
+\NC {\bf 注释}
+\NR
+\HL
+\NC a
+\NC 编号 -- 标题 -- 页码
+\NC 每个条目一行
+\NR
+\NC b
+\NC 编号 -- 标题 -- 空格 -- 页码
+\NC 每个条目一行
+\NR
+\NC c
+\NC 编号 -- 标题 -- 引导点 -- 页码
+\NC 每个条目一行
+\NR
+\NC d
+\NC 编号 -- 标题 -- 页码
+\NC 连续目录
+\NR
+\NC e
+\NC 标题
+\NC 带框
+\NR
+\NC f
+\NC 标题
+\NC 左对齐，
+\NR
+\NC\NC\NC 右对齐或居中
+\NR
+\NC g
+\NC 标题
+\NC 居中
+\NR
+\HL
+\stoptabulate}
+
+前四个替代值提供每个章节的所有信息（其编号、标题和起始页码），因此适用于纸质和电子文档。最后三个替代值仅提供标题信息，因此仅适用于电子文档，只要目录包含指向该章节的超链接（这在 \ConTeXt\ 中默认发生），就不需要知道章节开始的页码。
+
+此外，我相信要真正欣赏各种替代方案之间的差异，最好的办法是让读者生成一个测试文档，在其中详细分析它们。
+
+\stopsubsection
+
+\startsubsection
+  [
+    reference=sec:setuplist,
+    title=目录条目的格式,
+  ]
+  \PlaceMacro{setuplist}
+
+我们已经看到，\tex{placecontent} 或 \tex{completecontent} 的 {\tt alternative} 选项允许我们控制目录的总体“布局”，即每个标题将显示哪些信息，以及不同标题之间是否有换行分隔。对每个目录条目的最终调整是使用 \tex{setuplist} 命令完成的，其语法如下：
+
+\type{\setuplist[元素][配置]}
+
+其中 {\tt 元素} 指的是特定类型的章节。这可以是 {\tt part}、{\tt chapter}、{\tt section} 等。我们也可以同时配置多个元素，用逗号分隔。{\tt 配置} 有多达 54 种可能性，其中许多，像往常一样，没有明确记录；但这并不妨碍那些有记录的，或者那些不够清晰的，能够完全调整目录。
+
+我现在将解释最重要的选项，根据它们的用途进行分组，但在深入之前，让我们记住，根据 {\tt alternative} 的值，一个目录条目最多可以有三个不同的组成部分：章节编号、章节标题和页码。配置选项允许我们全局或单独配置各个组成部分：
+
+\startitemize
+
+  \item {\em 包含（或不包含）不同组成部分}：如果我们选择的替代方案除了标题之外还包括章节编号和页码（替代方案 \quote{{\tt a}}、\quote{{\tt b}}、\quote{{\tt c}} 或 \quote{{\tt d}}），则选项 {\tt headnumber=no} 或 {\tt pagenumber=no} 意味着对于我们正在配置的特定级别，不显示章节编号（{\tt headnumber}）或页码（{\tt pagenumber}）。
+
+  \item {\em 颜色和样式}：我们已经知道，目录中特定章节生成的条目（取决于替代方案）最多可以有三个不同的组成部分：章节编号、标题和页码。我们可以使用 {\tt style} 和 {\tt color} 选项共同指示这三个组成部分的样式和颜色，或者通过 {\tt numberstyle}、{\tt textstyle} 或 {\tt pagestyle}（用于样式）以及 {\tt numbercolor}、{\tt textcolor} 或 {\tt pagecolor}（用于颜色）为每个组成部分单独设置。
+
+    要控制每个条目的外观，除了样式本身之外，我们还可以对整个条目或其不同元素应用某些命令。为此，有 {\tt command}、{\tt numbercommand}、{\tt pagecommand} 和 {\tt textcommand} 选项。这里指示的命令可以是标准的 \ConTeXt\ 命令或我们自己创建的命令。章节编号、标题文本和页码将作为参数传递给 {\tt command} 选项，而章节标题将作为参数传递给 {\tt textcommand}，页码传递给 {\tt pagecommand}。因此，例如，以下指令将确保章节标题以（伪）小型大写字母书写：
+
+    \starttyping
+
+    \setuplist[section][textcommand=\Cap]
+
+    \stoptyping
+
+  \item {\em 与其他目录条目的分隔}：{\tt before} 和 {\tt after} 选项允许我们指示在排版目录条目之前（{\tt before}）和之后（{\tt after}）执行的命令。通常这些命令用于设置间距或前后条目之间的某些分隔元素。
+
+  \item {\em 元素的缩进}：使用 {\tt margin} 选项设置，它允许我们设置正在配置的级别的条目的左缩进量。
+
+  \item {\em 嵌入目录的超链接}：默认情况下，索引条目包含指向相关章节开始的文档页面的超链接。使用 {\tt interaction} 选项，我们可以禁用此功能（{\tt interaction=no}）或将超链接限制在索引条目的部分，可以是章节编号（{\tt interaction=number} 或 {\tt interaction=sectionnumber}）、章节标题（{\tt interaction=text} 或 {\tt interaction=title}）或页码（{\tt interaction=page} 或 {\tt interaction=pagenumber}）。
+
+\need3\baselineskip
+
+  \item {\em 其他方面}：
+
+  %TODO: 我在快速测试中没有看到 width 有任何作用。
+  % 而且 symbol 到底做什么？ 2026年3月维基对此保持沉默。
+
+    \startitemize
+
+      \item {\tt width}：指定章节编号和标题之间的分隔距离。可以是一个尺寸，或者是关键字 {\tt fit}，它设置章节编号的精确宽度。
+
+% TODO: 一个 symbol=one（或 two 或 three）作用的例子会很有启发性。
+
+      \item {\tt symbol}：允许将章节编号替换为“符号”。支持三个可能的值：{\tt one}、{\tt two} 和 {\tt three}。此选项的值为 {\tt none} 会从目录中移除章节编号。
+
+      \item {\tt numberalign}：指示编号元素的对齐方式；可以是 left、right、middle、flushright、flushleft。
+
+    \stopitemize
+    
+\stopitemize
+
+在目录的众多配置选项中，没有一个允许直接控制行距。默认情况下，行距将适用于整个文档。然而，通常目录中的行最好比文档的其余部分稍微“紧凑”一些。要实现这一点，我们应该将生成目录的命令（\tex{placecontent} 或 \tex{completecontent}）包含在一个设置了不同行距的组内。例如：
+
+\starttyping
+\start
+  \setupinterlinespace[small]
+  \placecontent
+\stop
+\stoptyping
+
+\stopsubsection
+
+
+\startsubsection
+  [
+    reference=sec:manual adjustments,
+    title=目录的手动调整,
+  ]
+
+我们已经解释了生成目录的两个基本命令（\tex{placecontent} 和 \tex{completecontent}）及其选项。使用这两个命令，目录是自动生成的，由文档中（或目录所指的文档块或段中）现有的编号章节构建而成。我现在将解释某些“设置”，使目录的内容不那么“自动”。这意味着：
+
+\startitemize
+
+  \item 也可能在目录中包含一些未编号的章节标题。
+
+  \item 可以手动向目录发送一个不对应于编号章节存在的特定条目。
+
+  \item 可以从目录中排除特定的编号章节。
+
+  \item 目录中反映的特定章节的标题可以不与文档正文中包含的标题完全相同。
+
+\stopitemize
+
+\stopsubsection
+
+% TODO: 子subsection标题的大小和粗度使它们看起来不服从于 subsections。 有读者同意吗？
+
+\startsubsubsection
+  [
+    reference=sec:toc with unnumbered secs,
+    title=在目录中包含未编号的章节,
+  ]
+
+\ConTeXt\ 构建目录的机制意味着所有编号章节都会自动包含在内，正如我已经说过的（见 \in{Section}[sec:title parts]），这取决于我们可以为每种章节类型使用 \tex{setuphead} 更改的两个选项（{\tt number} 和 {\tt incrementnumber}）。那里还解释了，一个 {\tt incrementnumber=yes} 且 {\tt number=no} 的章节类型将是一个内部编号但外部不编号的章节。
+
+因此，如果我们希望某个特定的未编号章节类型——例如 {\tt title}——包含在目录中，我们必须更改该章节类型的 {\tt incrementnumber} 选项的值，将其设置为 {\tt yes}，然后将该章节类型包含在目录要显示的章节类型中，这可以通过 \tex{setupcombinedlist} 完成，如上所述：
+
+\starttyping
+  \setuphead
+    [title]
+    [incrementnumber=yes]
+
+ \setupcombinedlist
+   [content]
+   [list={chapter, title, section, subsection, subsubsection}]
+\stoptyping
+
+然后，如果我们愿意，可以使用 \tex{setuplist} 以与任何其他条目完全相同的方式格式化此条目；例如：
+
+\type{\setuplist[title][style=bold]}
+
+{\bf 注意：} 刚刚解释的过程将包含我们文档中相关未编号章节类型的所有实例（在我们的示例中是 {\tt title} 类型的章节）。如果我们只想在目录中包含该章节类型的特定出现，最好使用下面解释的过程。
+
+\stopsubsubsection
+
+\startsubsubsection
+  [
+    reference=sec:manualtoc,
+    title=手动向目录添加条目,
+  ]
+
+从源文件中的任何位置，我们可以向目录提交一个条目（模拟一个实际上不存在的章节）或一个命令。
+
+要发送一个模拟实际上不存在的章节的条目，请使用 \PlaceMacro{writetolist}\tex{writetolist} 命令，其语法为：
+
+\type{\writetolist[章节类型][选项]{编号}{文本}}
+
+其中：
+
+\startitemize
+
+  \item 第一个参数指示此章节条目在目录中必须具有的级别：{\tt chapter}、{\tt section}、{\tt subsection} 等。
+
+% 我不确定这里的意思。如果手动提交的条目被省略，那我们讨论的是什么？
+
+  \item 第二个参数是可选的，允许以特定方式配置此条目。如果省略手动提交的条目，它将像第一个参数指示的级别的所有条目一样被格式化；尽管我必须指出，在我的测试中，我未能使其工作。
+
+    \startSmallPrint
+
+        无论是在 \ConTeXt\ 命令的官方列表中（见 \in{Section}[sec:qrc-setup-en]）还是在维基中，我们都被告知此参数允许与 \tex{setuplist} 相同的值，\tex{setuplist} 是允许我们格式化不同目录条目的命令。但是，我坚持认为，在我的测试中，我未能以任何方式更改手动发送的目录条目的外观。
+
+    \stopSmallPrint
+
+  \item 第三个参数应该反映发送到目录的元素的编号，但在我的测试中我也无法让它工作。
+
+  \item 最后一个参数包含要发送到目录的文本。
+
+\stopitemize
+
+例如，如果我们想将特定的未编号章节添加到目录中，但仅限于那一章节，这很有用。在 \in{Section}[sec:toc with unnumbered secs] 中，它解释了如何将整个类别的未编号章节添加到目录中；但如果我们只想将某个章节类型的特定出现添加到目录中，使用 \tex{writetolist} 命令更方便。因此，例如，如果我们希望文档中包含参考书目的章节是一个未编号的章节，但仍然包含在目录中，我们可以这样写：
+
+\starttyping
+\subject{Bibliography}
+\writetolist[section]{}{Bibliography}
+\stoptyping
+
+请注意，我们对章节使用了 {\tt section} 的未编号版本，即 {\tt subject}，但我们手动将其添加到索引中，就好像它是一个编号章节（{\tt section}）一样。
+
+另一个旨在手动影响目录的命令是 \PlaceMacro{writebetweenlist}\tex{writebetweenlist}，它用于从文档中的特定点向目录添加的不是条目本身，而是一个“命令”。例如，如果我们想在目录中的两个项目之间包含一条线，我们可以在文档中位于两个相关章节之间的任何位置写入以下内容：
+
+\type{\writebetweenlist[section]{\hrule}}
+
+\stopsubsubsection
+
+\startsubsubsection
+    [title=从目录中排除属于某个包含在目录中的章节类型的特定章节]
+
+% 原标题：从目录中排除属于某个包含在目录中的章节类型的特定章节
+
+目录是根据 \tex{setupcombinedlist} 的 {\tt list} 选项建立的“章节类型”构建的；因此，如果某个“章节类型”出现在目录中，则无法排除我们出于任何原因不希望在目录中出现的特定章节（属于该类型）。
+
+通常，如果我们不希望某个章节出现在那里，我们会使用它的“未编号等价物”，例如，用 {\tt title} 代替 {\tt chapter}，用 {\tt subject} 代替 {\tt section} 等。这些章节不会被发送到目录，也不会被编号。
+
+然而，如果出于任何原因，我们希望某个章节被编号但不出现在目录中，即使其他这种类型的章节出现了，我们可以使用一个“技巧”，即创建一个新的章节类型，它是相关章节的克隆。例如：
+
+\starttyping
+\definehead[MySubsection][subsection]
+\section{第一节}
+\subsection{第一小节}
+\MySubsection{第二小节}
+\subsection{第三小节}
+\stoptyping
+
+这将确保在插入 {\tt MySubsection} 类型的章节时，subsection 计数器会增加，因为此章节是 subsections 的“克隆”，但目录不会包含此类章节的标题或编号，因为默认情况下它不包含 {\tt MySubsection} 类型。
+
+\stopsubsubsection
+
+
+\startsubsubsection
+  [title=章节标题文本在目录中与文档正文中的标题不同]
+
+% TODO: 似乎 \nolists 不再存在（2026/03 维基这么说），
+% 所以本节被重写了。是否应该添加其他内容？
+
+
+如果我们不希望特定章节在目录中包含的标题与文档正文中显示的标题相同，可以使用以下方法。不要使用传统语法（\type{章节类型{标题}}）创建章节，而是使用 \tex{章节类型[选项]} 或 \tex{start章节类型[选项]}，并将我们希望写入目录的文本分配给 {\tt list} 选项（见 \in{Section}[sec:sectionsyntax]）。
+
+例如，如果一个章节标题很长，并且希望在目录中使用截断版本，可以如下实现：
+
+\starttyping
+\startsection
+  [
+    reference=sec:investigations,
+    title={发现为什么海水沸腾，猪如何获得飞行能力，以及蛇鲨是否真的能用斩首刀击败},
+    list={发现为什么海水沸腾等},
+  ]
+\stoptyping
+
+% 如果我们不希望特定章节在目录中包含的标题与文档正文中显示的标题相同，我们有两种方法可用：
+% 
+% \startitemize
+% 
+%   \item 不要使用传统语法（\type{SectionType{Title}}）创建章节，而是使用 \tex{SectionType[Options]}，或使用 \tex{startSectionType[Options]}，并将我们希望写入目录的文本分配给 {\tt list} 选项（见 \in{Section}[sec:sectionsyntax]）。
+% 
+%   \item 在文档正文中编写相关章节的标题时，使用 \tex{nolist} 命令：此命令使其作为参数使用的文本在目录中被省略号替换。例如：
+% 
+%     \starttyping
+% \chapter
+%   [title={An \nolist{approximate and slightly repetitive}
+%            introduction to the reality of the obvious}]
+%     \stoptyping
+% 
+%     将在文档正文中将章节标题排版为“An approximate and slightly repetitive introduction to the reality of the obvious”，但会将以下文本发送到目录：“An ... introduction to the reality of the obvious”。
+% 
+%     \startSmallPrint
+% 
+%         {\bf 注意：} 我刚才关于 \tex{nolist} 命令的陈述在 \ConTeXt\ 参考手册和 \goto{wiki}[url(https://wiki.contextgarden.net/Command/nolist)] 中都有说明。然而，对我来说，它会产生编译错误，告诉我 \tex{nolist} 命令未定义。
+% 
+%     \stopSmallPrint
+% 
+% \stopitemize
+
+\stopsubsubsection
+
+\stopsubsection
+
+\stopsection
+
+
+\startsection
+  [
+    reference=sec:lists,
+    title={列表、组合列表以及基于列表的目录},
+  ]
+
+在内部，对于 \ConTeXt\ 来说，目录只不过是一个“组合列表”（combined list），而组合列表，顾名思义，由简单列表组合而成。因此，\ConTeXt\ 构建目录的基本概念是列表。多个列表组合起来形成一个目录。默认情况下，\ConTeXt\ 包含一个名为 \MyKey{content} 的预定义组合列表，到目前为止我们检查的命令：\tex{placecontent} 和 \tex{completecontent}，正是使用这个列表。
+
+\startsubsection
+    [title=\ConTeXt\ 中的列表]
+
+% TODO: 未编号的东西呢？
+
+在 \ConTeXt\ 中，“列表”是一系列编号元素，我们需要记住三件事：
+
+\startitemize[n,packed]
+
+  \item 编号。
+
+  \item 名称或标题。
+
+  \item 找到它的页码。
+
+\stopitemize
+
+这不仅发生在编号章节上，也发生在文档的其他元素上，如图像、表格等。通常，对于那些有以 \tex{place} 开头的命令的元素，例如 \tex{placetable}、\tex{placefigure} 等，都是如此。
+
+在所有这些情况下，\ConTeXt\ 会自动生成一个列表，收集相关元素类型的各种出现、其编号、标题和页码。因此，例如，有一个章节列表，称为 {\tt chapter}，另一个节的列表，称为 {\tt section}；但也有一个表格列表（称为 {\tt table}）和另一个图形列表（称为 {\tt figure}）。\ConTeXt\ 自动生成的列表总是以它们存储的元素类型命名。
+
+如果我们创建一种新的编号章节类型，也会自动生成一个列表：创建新的编号章节将隐含地创建存储它们的列表。如果对于默认未编号的章节，我们设置了 {\tt incrementnumber=yes}（使其成为编号章节），我们也将隐含地创建一个以该名称命名的列表。
+
+除了隐式列表（由 \ConTeXt\ 自动定义）之外，我们还可以使用 \tex{definelist} 创建自己的列表，其语法为：
+
+\PlaceMacro{definelist}\type{\definelist[列表名称][配置]}
+
+\need3\baselineskip
+
+列表中的项目通过以下方式添加：
+
+\startitemize
+
+  \item 在 \ConTeXt\ 预定义的列表中，或者由于创建新的浮动对象而由它创建的列表中（见 \in{Section}[sec:definefloat]），每当向文档添加项目时，无论是通过使用章节命令还是通过使用其他类型列表的 \tex{placeWhatever} 命令，相应的条目都会自动插入到其列表中。例如：\tex{placefigure} 会将图像插入文档，但也会将相应的条目插入列表。
+
+  \item 在任何类型的列表中，都可以使用 \tex{writetolist[列表名称]} 手动添加，如 \in{Section}[sec:manual adjustments] 的 \in{Subsection}[sec:manualtoc] 中所述。同样在该节中解释的 \tex{writebetweenlist} 命令也可用。
+
+\stopitemize
+
+一旦创建了列表并包含了所有项目，与之相关的三个基本命令是 \tex{setuplist}、\PlaceMacro{placelist}\tex{placelist} 和 \PlaceMacro{completelist}\tex{completelist}。第一个允许我们配置列表的外观；后两个在文档中找到它们的位置插入相关列表。\tex{placelist} 和 \tex{completelist} 之间的区别类似于 \tex{placecontent} 和 \tex{completecontent} 之间的区别（见 \in{}[sec:completecontent] 和 \in{}[sec:placecontent]）。
+
+因此，例如：
+
+\type{\placelist[section]}
+
+将插入一个节的列表，如果文档的交互性已启用，并且如果在 \tex{setuplist} 中我们没有设置 {\tt interaction=no}，则包含指向它们的超链接。节的列表并不完全等同于基于节的目录：目录的概念通常还包括更低级别（subsection、subsubsection 等）。但节的列表将仅包含节本身。
+
+这些命令的语法是：
+
+\type{\placelist[列表名称][选项]}
+
+\type{\setuplist[列表名称][配置]}
+
+\tex{setuplist} 的选项已在 \in{Section}[sec:setuplist] 中解释，而 \tex{placelist} 的选项与 \tex{placecontent} 的选项相同（见 \in{Section}[sec:placecontent]）。
+
+\stopsubsection
+
+
+\startsubsection
+  [
+    reference=sec:variouslists,
+    title={图像、表格和其他项目的列表或索引},
+  ]
+
+从以上所述可以看出，由于 \ConTeXt\ 会自动创建使用 \tex{placefigure} 命令放置在文档中的图像的列表，因此在文档的特定位置生成图形列表或索引就像使用 \tex{placelist[figure]} 命令一样简单。如果我们想要生成一个带标题的列表（类似于使用 \tex{completecontent} 得到的结果），可以使用 \tex{completelist[figure]} 来完成。类似地，我们可以将 \tex{placelist} 和 \tex{completelist} 用于 \ConTeXt\ 中其他四种预定义的浮动对象类型：表格（\MyKey{table}）、图形（\MyKey{graphic}）、“间奏”（\MyKey{intermezzo}）和化学公式（\MyKey{chemical}）。
+
+对于每种预定义的列表类型，\ConTeXt\ 已经包含了一个生成无标题列表的命令（\PlaceMacro{placelistoffigures}\tex{placelistoffigures}、\PlaceMacro{placelistoftables}\tex{placelistoftables}、\PlaceMacro{placelistofgraphics}\tex{placelistofgraphics}、\PlaceMacro{placelistofintermezzi}\tex{placelistofintermezzi} 和 \PlaceMacro{placelistofchemicals}\tex{placelistofchemicals}），以及另一个生成带标题列表的命令（\PlaceMacro{completelistoffigures}\tex{completelistoffigures}、\PlaceMacro{completelistoftables}\tex{completelistoftables}、\PlaceMacro{completelistofgraphics}\tex{completelistofgraphics}、\PlaceMacro{completelistofintermezzi}\tex{completelistofintermezzi} 和 \PlaceMacro{completelistofchemicals}\tex{completelistofchemicals}），方式类似于 \tex{completecontent}。{\em 注意}：虽然英语中“intermezzo”的常见复数可能是“intermezzos”，但 \ConTeXt\ 的 \tex{placelistof...} 和 \tex{completelistof...} 命令使用 {\em intermezzi}。
+
+同样地，对于我们自己创建的浮动对象（见 \in{Section}[sec:definefloat]），\tex{placelistof<浮动对象名称>} 和 \tex{completelistof<浮动对象名称>} 命令将被自动创建。
+
+对于我们使用 \tex{definelist} 自己创建的列表，我们可以使用 \tex{placelist[列表名称]} 或 \tex{completelist[列表名称]} 来创建索引。
+
+\stopsubsection
+
+
+\startsubsection
+  [title=组合列表]
+
+组合列表，顾名思义，是组合来自不同先前定义列表的项目的列表。默认情况下，\ConTeXt\ 定义了一个名为 \MyKey{content} 的默认内容索引组合列表，但我们可以使用 \PlaceMacro{definecombinedlist}\tex{definecombinedlist} 创建其他组合列表，其语法为：
+
+\tex{definecombinedlist[名称][列表][选项]}
+
+其中：
+
+\startitemize
+
+  \item {\tt 名称} 是新的组合列表将拥有的名称。
+
+  \item {\tt 列表} 指的是要组合的列表名称，用逗号分隔。
+
+  \item {\tt 选项} 是列表的配置选项选择。这些选项可以在定义列表时指定，或者可能更可取的是在调用列表时指定。主要选项（已经解释过）是 {\tt criterium}（\in{Section}[sec:placecontent] 中的 \in{Subsection}[sec:criteriumlist]）和 {\tt alternative}（同一节中的 \in{Subsection}[sec:alternativelist]）。
+
+\stopitemize
+
+使用 \tex{definecombinedlist} 创建组合列表的一个副作用是，还会创建一个名为 \tex{place列表名称} 的命令，用于调用列表，即将其包含在输出文件中。例如：
+
+\tex{definecombinedlist[TOC]}
+
+将创建命令 \tex{placeTOC}；并且：
+
+\tex{definecombinedlist[content]}
+
+将创建命令 \tex{placecontent}。
+
+但是等等，“\tex{placecontent}”？这不就是用于创建“普通”目录的命令吗？确实！这意味着标准目录实际上是由 \ConTeXt\ 通过以下命令创建的：
+
+\starttyping
+\definecombinedlist
+  [content]
+  [part, chapter, section, subsection,
+    subsubsection, subsubsubsection,
+    subsubsubsubsection]
+\stoptyping
+
+一旦定义了组合列表，我们就可以使用 \tex{setupcombinedlist} 来配置（或重新配置）它，该命令允许使用已经解释过的选项 {\tt criterium}（见 \in{Subsection}[sec:criteriumlist]）和 {\tt alternative}（见 \in{Subsection}[sec:alternativelist]），以及用于“更改”组合列表中包含的列表的 {\tt list} 选项。
+
+\startSmallPrint
+
+    \ConTeXt\ 命令的官方列表（见 \in{Section}[sec:qrc-setup-en]）没有将 {\tt list} 选项列为 \tex{setupcombinedlist} 允许的选项之一，但在维基中该命令的几个示例中使用了它（而且，维基在专门介绍该命令的页面上也没有提到它）。我也检查过，该选项确实有效。
+
+\stopSmallPrint
+
+\stopsubsection
+
+\stopsection
+
+
+% TODO: 至少有一天，没有这个 \need，节标题会单独留在页面底部。
+% 可能 \subsection 的 "\need" 和 \section 的 "\need" 需要调整。
+% 或者也许总是在紧接着 \subsection 的 \section 之前使用 \need。
+\need 2.7in
+
+\startsection
+  [title=索引]
+
+\startsubsection
+  [title=生成索引]
+
+“主题索引”（subject index）通常位于文档末尾，由一系列重要术语组成，指示每个术语在文档中出现的页码。
+
+在手排书籍的时代，生成主题索引是一项复杂且繁琐的任务。页面顺序的任何更改都可能影响索引中的许多（如果不是全部）条目。因此，索引并不常见。如今，计算机排版程序的存在意味着，虽然这项任务可能仍然繁琐，但不再那么复杂，因为计算机程序很容易保持与每个索引条目关联的数据是最新的。
+
+要生成主题索引，我们需要：
+
+\startitemize[n]
+
+  \item 确定哪些单词、术语或概念将成为索引的一部分。这实际上是由作者（或其他同样熟悉文档主题的人）决定的任务。
+
+  \item 找到未来索引中每个条目在文档中出现的位置。然而，准确地说，当我们使用 \ConTeXt\ 工作时，不仅仅是“找到”源文件中讨论概念或问题的位置，我们“标记”这些位置，通过插入一个命令，该命令随后将用于自动生成索引。这是繁琐的部分。
+
+  \item 通过在文档中我们选择的位置放置一个命令来生成和格式化索引。后者使用 \ConTeXt\ 非常简单，只需要一个命令：\tex{placeindex}。
+
+\stopitemize
+
+% TODO: 这个 subsection 标题对我来说不是很清楚。
+% 我做了一个更改，但我认为更好的标题还在某处。
+%\subsubsection{索引条目的预先定义以及源文件中引用它们的点的标记}
+\subsubsection{定义索引条目并标记源文件中它们所指的点}
+
+基础工作在于第二步。诚然，计算机系统也简化了这一过程，因为我们可以进行全局文本搜索来定位源文件中讨论特定主题的位置。但我们也不应盲目依赖这种文本搜索：一个好的主题索引必须能够检测到讨论特定主题的每个位置，即使没有使用“标准”术语来指代它。此外，通常会有一些地方使用了特定术语，但并非以值得在索引中提及的说明性方式。
+
+为了“标记”源文件中的实际点，并将其与将出现在索引中的单词、术语或想法相关联，我们使用 \PlaceMacro{index}\tex{index} 命令，其语法如下：
+
+\type{\index[排序用文本]{索引条目}}
+
+其中 {\tt 排序用文本} 是一个可选参数，用于指示与索引条目本身不同的文本，以便按字母顺序排序，而 {\tt 索引条目} 是将出现在索引中的文本，与此标记相关联。我们还可以应用我们希望使用的格式化功能，如果文本中出现保留字符，必须按照 \ConTeXt\ 中的常规方式书写。
+
+\startSmallPrint
+
+% TODO: 嗯，在我用 LMTX 的测试中，\index{\TeX} 忽略了 \ 并将条目放在 't' 下。所以这个例子是假的。
+
+%  以不同于实际书写方式对索引条目进行字母排序的可能性非常有用。例如，考虑本文档，我可能想为所有引用 \tex{TeX} 命令的地方生成一个索引条目。命令 \type{\index{\TeX}} 将把 \tex{TeX} 列在符号下，而不是“TeX”的“t”下，因为发送到索引的术语以反斜杠开头。如果我们希望 \tex{TeX} 列在“t”下，我们可以写 \type{\index[tex]{\TeX}}。
+
+以不同于实际书写方式对索引条目进行字母排序的可能性非常有用。例如，考虑本文档，为所有引用 \tex{TeX} 命令的地方生成一个索引条目可能很有用。您可能尝试
+\starttyping
+\index{\TeX}
+\stoptyping 
+但这将创建一个（在“t”下的）索引条目，内容是“\TeX”，而不是“\type{\TeX}”。如果您实际上希望在索引中看到 \type{\TeX}，那么您可以尝试
+\starttyping
+\index{\backslash TeX}
+\stoptyping 
+但这会将索引条目放在“b”下。（\ConTeXt\ LMTX 在选择索引条目所列的字母时，会忽略任何前导的“\backslash”。）要让 \type{\TeX} 出现在“t”下，您可以使用
+\starttyping
+\index[tex]{\backslash TeX}
+\stoptyping
+
+\stopSmallPrint
+
+
+\iffalse
+% 示例测试留在这里供将来实验。
+\starttext
+
+\input knuth
+
+\index[dog]{dog+Labrador}
+\index[dog]{dog+Berner}
+\index[dog]{dog+Fuzzy}
+\index[dog]{Terrier}
+\index{dog}
+\index[cat]{mountain lion}
+\index{*mountain lion}
+\index[texxy]{\backslash TeXXy}
+\index{\backslash TeXXXy}
+\index{\TeX}
+\index{\backslash TeX}
+\index[texx]{\backslash ppTeX}
+\index[gravenhage]{’s Gravenhage} 
+\placeindex
+\stoptext
+\fi
+
+“索引条目”将是我们选择的任何内容。要使主题索引真正有用，我们在考虑文档读者最可能查找哪些概念时需要更加努力；因此，例如，将条目定义为“疾病，霍奇金氏”可能比定义为“霍奇金氏病”更好，因为更具包容性的术语是“疾病”。
+
+\startSmallPrint
+
+    % TODO: 这个（长）第二句在西班牙语 ANSS 中，但不在原始英文翻译中。
+    % 按照惯例，主题索引中的条目总是用小写字母书写，除非是专有名词。
+    % Martínez de Sousa 还建议，当使用逗号将最重要的词放在前面，并且该词以大写字母开头时，使用大写字母；如前面的例子：“霍奇金，病”（见《当前西班牙语的正字法和正字法》，第2版，Trea 出版社，2008年，第506页）。
+
+\stopSmallPrint
+
+如果索引有多个深度级别（最多支持三级），要将特定的索引条目关联到特定级别，使用“+”字符，如下所示：
+
+\starttyping
+\index{条目1+条目2}
+\index{条目1+条目2+条目3}
+\stoptyping
+
+在第一种情况下，我们定义了一个名为 \MyKey{条目2} 的第二级条目，它将是 \MyKey{条目1} 的子条目。在第二种情况下，我们定义了一个名为 \MyKey{条目3} 的第三级条目，它将是 \MyKey{条目2} 的子条目，而 \MyKey{条目2} 又是 \MyKey{条目1} 的子条目。例如：
+
+\starttyping
+My \index{dog}dog is a \index{dog+greyhound}greyhound called Rocket.
+He does not like \index{cat+stray}stray cats.
+\stoptyping
+
+\need 3\baselineskip
+
+值得注意上述内容的一些细节：
+
+\startitemize
+
+  \item \tex{index} 命令通常放在与其关联的单词“之前”，并且通常不与其用空格分隔。这是为了确保命令与它链接的单词在同一页上：
+
+    \startitemize
+
+      \item 如果有一个空格分隔它们，则 \ConTeXt\ 可能会选择该空格作为换行位置，这也可能最终成为分页位置，在这种情况下，\tex{index} 命令将在一页上，而与之关联的单词在下一页上。
+
+      \item 如果命令放在单词“之后”，则该单词可能会被连字过程打断音节，并且其两个音节之间的换行也可能是分页，在这种情况下，\tex{index} 条目将引用包含单词结尾的页面，而不是包含单词开头的页面。
+
+    \stopitemize
+
+  \item 第二级术语在 \tex{index} 命令的第二次和第三次使用中引入。
+
+% TODO: 最初这里是“cats”，我现在改成了“stray”。在西班牙语中，“stray”排在“cat”之后，所以这个例子在那里更好一点，对比“cat”和“cats”。
+% 一个更好的英语例子非常需要。
+
+  \item 还要注意，在 \tex{index} 命令的第三次使用中，虽然出现在文本中的词是“stray”，但将插入到索引中的术语是“cat”。
+
+  \item 最后：看看在两行中为主题索引编写了三个条目。我之前说过，标记源文件中的精确位置是繁琐的。我现在补充说，标记太多位置会适得其反。过于广泛的索引绝不一定比所有信息都相关、更简洁的索引更可取。这就是为什么我之前说过，决定哪些词将出现在索引中应该是作者有意识决定的结果。
+
+\stopitemize
+
+如果我们希望索引真正有用，用作同义词的术语必须在索引中归入一个主术语之下。但由于读者可能会按任何其他主术语搜索索引中的信息，索引中通常包含指向其他条目的条目。例如，在民法手册的主题索引中，我们很容易找到类似这样的内容：
+
+% TODO: 原文周围过多的空白。
+% before 和 after 的 \vskip 是可怕的 hack。要用正确的方式做。
+
+\startframedtext[frame=off,after=\vskip-15pt,before={\null\vskip-25pt}]
+  合同无效性\\
+  \qquad 参见 {\em 无效}。
+\stopframedtext
+
+我们不是使用 \tex{index} 命令来实现这一点，而是使用 \PlaceMacro{seeindex}\tex{seeindex}，其格式为：
+
+\type{\seeindex [排序用文本] {条目1} {条目2}}
+
+其中 {\tt 条目1} 是指向另一个条目的索引条目，而 {\tt 条目2} 是引用目标。对于我们之前的例子，我们会写：
+
+\starttyping
+\seeindex{合同无效性}{无效}
+\stoptyping
+
+在 \tex{seeindex} 中，我们也可以使用“+”符号来指示其花括号中两个参数中任何一个的子级别。
+
+\subsubsection{生成最终索引}
+
+一旦我们在源文件中标记了索引的所有条目，实际生成索引就使用 \PlaceMacro{placeindex}\tex{placeindex} 或 \PlaceMacro{completindex}\tex{completindex} 命令来执行。这两个命令（概念上）扫描源文件中的 \tex{index} 命令，并生成索引应具有的所有条目的列表，将术语与找到 \tex{index} 命令的位置对应的页码相关联。然后，它们按字母顺序对出现在索引中的术语列表进行排序，并合并相同术语出现多次的情况，最后，将正确格式化的结果插入到最终文档中。
+
+\tex{placeindex} 和 \tex{completeindex} 之间的区别类似于 \tex{content} 和 \tex{completecontent} 之间的区别（见 \in{Section}[sec:completecontent]）：\tex{placeindex} 仅限于生成索引并将其插入，而 \tex{completeindex} 在最终文档中插入一个名为“Index”（索引）的新章节，索引将在该章节内排版。
+
+\stopsubsection
+
+\startsubsection
+  [title=格式化主题索引]
+  \PlaceMacro{setupregister}
+
+主题索引是 \ConTeXt\ 称为“寄存器”（register）的更通用结构的特定应用；因此索引使用以下命令格式化：
+
+\type{\setupregister[index][配置]}
+
+使用此命令，我们可以：
+
+\startitemize
+
+    \starthead 确定索引及其不同元素的外观。即：
+    \stophead   %\head only doesn't work wikth LMTX
+
+% TODO: 真的不确定下一句话到底想说什么。
+%       原始的西班牙语并没有让我明白。 “and command”是什么意思？？
+
+    \startitemize
+        
+      \item 索引标题，通常是字母表中的字母，可以使用样式、颜色和命令进行修改。默认情况下，这些字母是小写的。使用 {\tt alternative=A} 可以将它们设置为大写。
+
+      \item 条目本身及其页码。外观取决于实际条目的 {\tt textstyle, textcolor, textcommand} 和 {\tt deeptextcommand} 选项，以及页码的 {\tt pagestyle, pagecolor} 和 {\tt pagecommand} 选项。使用 {\tt pagenumber=no} 我们也可以生成没有页码的主题索引（尽管我不知道这是否有用）。
+
+      \item {\tt distance} 选项测量条目名称和页码之间的分隔宽度；然而，它也测量子条目的缩进量。
+
+    \stopitemize
+
+    {\tt style}、{\tt textstyle}、{\tt pagestyle}、{\tt color}、{\tt textcolor} 和 {\tt pagecolor} 选项的名称足够清晰，我认为可以告诉我们每个选项的作用。关于 {\tt command}、{\tt pagecommand}、{\tt textcommand} 和 {\tt deeptextcommand}，我请读者参考 \in{Section}[sec:titlestyle] 中关于章节命令配置的类似命名选项的解释。
+
+  \item 设置索引的总体外观，其中包括在索引之前（{\tt before}）或之后（{\tt after}）执行的命令、需要的列数（{\tt n}）、列是否应该相等（{\tt balance}）、条目的对齐方式（{\tt align}）等。
+
+\stopitemize
+
+\stopsubsection
+
+
+\startsubsection
+    [title=创建其他索引]
+  \PlaceMacro{defineregister}\PlaceMacro{setupregister}
+
+我解释主题索引时，好像文档中只能有一个这样的索引；事实上，文档可以有任意多个索引。可以有一个个人姓名索引（一个“专名索引”），它收集文档中提到的人名并指示引用它们的位置；这是一种特定类型的索引。在法律文本中，我们也可以为《民法典》的提及创建一个特殊索引；或者，在像本文档这样的文档中，创建一个所解释宏的索引等。
+
+要在文档中创建一个额外的索引，我们使用 \tex{defineregister} 命令，其语法为：
+
+\type{\defineregister [索引名称] [配置]}
+
+其中 {\tt 索引名称} 是新索引将拥有的名称，而 {\tt 配置} 控制其工作方式。也可以稍后通过以下方式配置索引：
+
+\type{\setupregister [索引名称] [配置]}
+
+一旦创建了名为 {\tt 索引名称} 的新索引，我们就可以使用 \tex{索引名称} 命令来标记此索引将拥有的条目，方式类似于使用 \tex{index} 标记条目的方式。\tex{see索引名称} 命令也允许我们创建指向其他条目的条目。
+
+\need 4\baselineskip
+
+例如：我们可以在此文档中创建一个 \ConTeXt\ 命令的索引，使用命令：
+
+\type{\defineregister[macro]}
+
+这将创建 \tex{macro} 命令。这让我们可以将所有对 \ConTeXt\ 命令的引用标记为索引条目，然后使用 \tex{placemacro} 或 \tex{completemacro} 生成索引。
+
+\startSmallPrint
+
+    创建一个新索引会启用 \tex{索引名称} 命令来标记其条目，并创建相应的用于生成索引的 \tex{place索引名称} 和 \tex{complete索引名称} 命令。但后两个命令实际上是应用于相关索引的两个更通用命令的缩写。因此，\tex{place索引名称} 等同于 \tex{placeregister[索引名称]}，而 \tex{complete索引名称} 等同于 \tex{completeregister[索引名称]}。
+
+\stopSmallPrint
+
+\stopsubsection
+
+\stopsection
+
+\stopchapter
+
+\stopcomponent
+
+%%% 本地变量：
+%%% mode: ConTeXt
+%%% eval: (auto-fill-mode 1)
+%%% TeX-master: "../introCTX_eng.tex"
+%%% coding: utf-8-unix
+%%% End:
+%%% vim:set filetype=context tw=72 : %%%

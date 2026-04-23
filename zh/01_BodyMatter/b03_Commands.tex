@@ -1,0 +1,1010 @@
+%%% File:        b03_Commands.tex
+%%% Author:      Joaquín Ataz-López et al
+%%% Begun:       April 2020
+%%% Concluded:   April 2020
+
+% 内容：这是理解 ConTeXt 本质的核心章节。部分内容基于 TeX。
+%       保留字符的使用以及控制符号和控制词之间的区别。Knuth 强调了这种区别，
+%       但 ConTeXt 文档以及一般的 LaTeX 文档都没有这样做（尽管 Kopka 中简短提及过）。
+%       然而，我相信这种区别对于理解为什么在 TeX 中命令名不能混合字母和非字母很重要。
+%       关于命令的解释，我对「start-stop」结构的决策仍犹豫是否称之为「环境」。
+%       但有时 wiki 中也这么叫。另一方面，我对使用 \framed 命令作为示例来解释 \setup + \define 感到满意。
+%       在其他附加概念中，我也想介绍计数器，但我没有找到关于 ConTeXt 中主要计数器名称的任何文档。
+%       例如，我做了各种手动操作章节计数器的测试，结果……什么也没有！什么都没有。
+%       这些信息对于控制 ConTeXt 至关重要，应该在某个地方明确说明。
+
+%%% Edited with: Emacs + AUCTeX - And at times with vim + context-plugin
+%%%
+
+\environment ../introCTX_env.tex
+
+\startcomponent b03_Commands.tex
+
+\startchapter
+  [
+    reference=cap:commands,
+    title=\ConTeXt\ 的命令与其他基本概念,
+    bookmark=ConTeXt 的命令与其他基本概念,
+  ]
+
+\TocChap
+
+我们已经看到，在源文件中
+% TODO: 嗯？   以及我们未来格式化文档的实际内容中，我们会找到
+需要向 \ConTeXt\ 解释我们希望如何转换稿件的指令。这些指令可以称为 \quotation{命令}、\quotation{宏} 或 \quotation{控制序列}。
+
+\startSmallPrint
+
+  从 \ConTeXt\ 内部运作的角度来看（实际上是 \TeX\ 的运作），{\em 原语}和 {\em 宏} 之间存在区别。原语是一个无法分解为其他更简单指令的简单指令。宏是一个可以分解为其他更简单指令的指令，而这些更简单的指令又可能进一步分解为更简单的指令，依此类推。\ConTeXt\ 的大多数命令实际上都是复杂的宏。从程序员的角度来看，宏和原语之间的区别很重要。但从用户的角度来看，这个问题不那么重要：在这两种情况下，我们拥有的是指令，无需担心它们在底层如何运作。因此，\ConTeXt\ 文档通常从用户角度谈论 {\em 命令}，从程序员角度谈论 {\em 宏}。由于本入门书仅从用户角度出发，我将交替使用这两个术语，视它们为同义词。
+
+  % TODO：我认为严格来说，这一段（可能还有上面一段）可以重写。我想知道西班牙语原文是什么。但现在先这样……
+  {\em 命令} 是给 \ConTeXt\ 去做某事的指令；我们通过它们 {\em 控制} 程序的执行。\cap{Knuth}，\TeX\ 之父，使用术语 {\em 控制序列} 来指代原语和宏，我认为这是其中最准确的术语。当我认为区分 {\em 控制符号} 和 {\em 控制词} 很重要时，我会使用它。
+
+\stopSmallPrint
+
+\ConTeXt\ 的指令基本上有两种：保留字符和真正意义上的命令。
+
+\startsection
+  [
+    reference=sec:reserved characters,
+    title=\ConTeXt\ 的保留字符,
+  ]
+
+当 \ConTeXt\ 读取仅由文本字符组成的源文件时，由于它是一个文本文件，\ConTeXt\ 需要某种方式来区分哪些是要格式化的实际文本，哪些是它必须执行的指令。\ConTeXt\ 的保留字符正是使其能够进行这种区分的关键。原则上，\ConTeXt\ 会假定源文件中的每个字符都是要处理的文本，除非该字符是 11 个应被视为 {\em 指令} 的保留字符之一。
+
+只有 11 个指令？不，只有 11 个保留字符；但由于其中一个字符，即 \quotation{{\tt\backslash}} 字符，其功能是表示紧随其后的一个或多个字符是指令，那么实际上潜在的命令数量是无限的。\ConTeXt\ 有超过 5700 个命令；幸运的是，大多数人只需要了解其中非常小的一部分就能制作出漂亮的文档！
+% TODO：找出 LMTX 有多少命令。5700 这个数字来自
+% pdfgrep '\\' /usr/local/context/tex/texmf-context/doc/context/documents/general/qrcs/setup-en.pdf | grep -v inherit | wc
+%（累加了 Mark~II、Mark~IV 以及两个版本共有的命令）。
+
+保留字符如下：
+\godown[-6pt]  % JD：在我看来，没有这样的设置，这里空白太多。
+{
+  \switchtobodyfont[25pt]
+  \midaligned{\cmd{ \% \{ \} \# \lettertilde\ \| \$ \_ \letterhat\ \&}}
+}
+
+\ConTeXt\ 对它们的解释如下：
+
+% TODO：TeX 社区在英语中是否将 \ 称为 "escape character"？
+
+\semitable{\backslash}
+
+这个字符对我们来说是最重要的：它表示紧随其后的内容不能被解释为文本，而应被解释为指令。它被称为 \quotation{转义字符} 或 \quotation{转义序列}（尽管它与大多数键盘上的 \quotation{Esc} 键无关）。\footnote{在计算机术语中，影响后续字符解释的字符称为 {\em 转义字符}。相比之下，键盘上的 {\em 转义键} 之所以这么叫，是因为它生成 ASCII 码中的第 27 号字符，该字符在此 ASCII 编码中用作转义字符。如今，转义键的用途更多地与取消正在进行的操作的概念相关联。}
+
+\semitable{\%}
+
+百分号告诉 \ConTeXt，从该字符到行尾的内容是注释，不得处理或包含在最终的格式化文件中。在源文件中引入注释非常有用。注释可以帮助解释为什么以某种方式做了某事，这对于完成后的源文件非常有用，以便在日后修订时，有时我们记不起为什么做了某事；或者它也可以作为提醒自己的备忘录，提醒可能需要修改的内容。它甚至可以用来帮助定位源文件中某个错误的原因，因为通过在行首放置注释标记，我们可以将该行排除在编译之外，从而判断是否是那一行导致了错误；它也可以用来让我们在同一个宏的两个不同版本之间进行选择，从而在编译后得到不同的结果；或者阻止编译某个我们不确定的片段，但又不用从源文件中删除它，以防日后想恢复它\unknown\ 等等。一旦我们意识到源文件可以包含只有我们自己才能看到的文本，我们对这个字符的用途就只受限于我们自己的想象力了。我承认，当唯一的文本写作工具是文字处理器时，这是我最为怀念的功能之一。
+
+\semitable{\{}
+
+此字符开启一个 \quotation{组}。组是受某些特性影响的文本块。我们将在 \in{节}[sec:groups] 中讨论它们。
+
+\semitable{\}}
+
+此字符关闭先前用 {\tt \{} 开启的组。
+
+\semitable{\#}
+
+此字符用于定义宏。它指代宏的参数。参见本章的 \in{节}[sec:define]。
+
+\semitable{\lettertilde}
+
+此字符在文档中引入一个空白，以防止换行，这意味着由 \type{~} 字符分隔的两个单词将始终保留在同一行。你可能已经知道这个概念，称为 \quotation{不间断空格}。我们将在 \in{节}[sec:lettertilde] 中讨论这个指令及其使用位置。
+
+\semitable{\|}
+
+此字符用于表示由分隔元素连接的两个单词构成一个复合词，该复合词可以按音节分割第一个组成部分，但不能分割第二个组成部分。参见 \in{节}[sec:compound words]。
+
+\semitable{\$}
+
+此字符是数学模式的开关\footnote{\quote{\tt\$} 是 Knuth 在 \TeX\ 中选择的用于切换进入或退出数学模式的字符；然而，虽然在 \ConTeXt\ 中可以使用 {\tt \$} 切换进入或退出数学模式，但命令 \tex{im}（用于 \quotation{行内} 数学）和 \tex{startformula}\unknown\tex{stopformula}（用于 \quotation{显示} 数学）是（其中）推荐的用 \ConTeXt\ LMTX\null 排版数学的方式。在你的 \ConTeXt\ 发行版中，你应该能找到文件 {\tt mathincontext-paper.pdf}；该文档的第 1 章提供了排版数学的基础知识，文档的其余部分提供了 {\em 更} 多的细节。}。如果数学模式未启用，它会启用该模式；如果已启用，则会禁用它。在数学模式下，\ConTeXt\ 应用一些与普通模式不同的字体和规则，旨在优化数学公式的书写。尽管书写数学是 \ConTeXt\ 一个非常重要的用途，但我不会在本入门书中进一步展开。作为一个文科生，我对此力不从心！
+
+\semitable{\_}
+
+此字符（下划线）在数学模式中用于表示后面的内容是下标。例如，要得到 $x_1$，我们需要写 \type{$x_1$}。
+
+\semitable{\letterhat}
+
+此字符在数学模式中用于表示后面的内容是上标。例如，要得到 $(x+i)^{n^3}$，我们需要写 \type{$(x+i)^{n^3}$}。
+
+% TODO：JAL 关于 & 的段落对于 LMTX 来说似乎完全过时了。
+%       但我替换的段落正确吗？
+\semitable{&}
+
+\quote{\tt &} 字符在 Plain \TeX\null 的许多地方使用。然而，在 \ConTeXt\ LMTX 中，它似乎是特殊字符的唯一地方是当使用 \tex{starttable}\unknown\tex{stoptable} 制作表格时，用于分隔列条目。此外，这种制作表格的方式已不再推荐，因此你可能永远不会在 \ConTeXt\ LMTX 中看到 {\tt &} 不是它自身的情况。可以说，{\tt &} 在 LMTX 中不是一个保留字符，因为（除了在 \tex{starttable}\unknown\tex{stoptable} 环境中）你不需要在其前面加 \quote{\tt\backslash} 来使用它。
+% 已废弃？
+%% \ConTeXt\ 文档中说这是一个保留字符，但没有说明原因。在 Plain \TeX\ 中，这个字符基本上有两个用途：它在基本的表格环境中用于对齐列，并且在数学上下文中，使其后面的内容被视为普通文本。在入门手册 \quotation{\ConTeXt\ Mark~IV，一瞥} 中，虽然没有说明它的用途，但有在数学公式中使用它的示例，不过不是 Plain \TeX\ 中的那种类型，而是用于对齐 \Doubt 复杂函数中的列。由于我是一个文科生，我觉得我无法进行进一步的测试来确定这个保留字符的确切用途。
+
+可以推测，在选择哪些字符作为保留字符时，会选择大多数键盘上都有但在书面文本中不常用的字符。然而，尽管不常见，但总有可能其中一些字符会出现在我们的文档中；例如，当我们要写某物花费 100 美元 (\$100)，或者在西班牙，2018 年 65 岁以上驾驶者的百分比为 16\% 时。在这些情况下，我们不能直接写保留字符，而必须使用一个 {\em 命令}，该命令将在最终文档中正确地输出保留字符。每个保留字符对应的命令见 \in{表}[Reserved characters]。
+
+\placetable
+  [here]
+  [Reserved characters]
+  {\tfx 书写保留字符}
+{\starttabulate[|c|l|]
+  \HL
+  \NC {\bf 保留字符} \NC {\bf 生成它的命令}\NR
+  \HL
+  \NC{\tt
+    \backslash}\NC\PlaceMacro{backslash}\tex{backslash}\NR\macro{reserved characters+\backslash backslash}
+  \NC{\tt \%}\NC\cmd{\%}\NR\macro{reserved characters+\backslash \%}
+  \NC{\tt \{}\NC\cmd{\{}\NR\macro{reserved characters+\backslash \{}
+  \NC{\tt \}}\NC\cmd{\}}\NR\macro{reserved characters+\backslash \}}
+  \NC{\tt \#}\NC\cmd{\#}\NR\macro{reserved characters+\backslash \#}
+  \NC{\tt \lettertilde}\NC\PlaceMacro{lettertilde}\tex{lettertilde}\NR\macro{reserved characters+\backslash lettertilde}
+  \NC{\tt \|}\NC\cmd{\|}\NR\macro{reserved characters+\backslash \|}
+  \NC{\tt \$}\NC\cmd{\$}\NR\macro{reserved characters+\backslash \$}
+  \NC{\tt \_}\NC\cmd{\_}\NR\macro{reserved characters+\backslash \_}
+  \NC{\tt \letterhat}\NC\PlaceMacro{letterhat}\tex{letterhat}\NR\macro{reserved characters+\backslash letterhat}
+  \NC{\tt \&}\NC\cmd{\&}\macro{reserved characters+\backslash \&}\NR
+  \HL
+\stoptabulate}
+
+获取保留字符的另一种方法是使用 \tex{type} 命令。此命令将其作为参数的内容发送到最终文档，而不以任何方式处理它，因此也不对其进行解释。在最终文档中，从 \tex{type} 接收的文本将以计算机终端和打字机特有的等宽字体显示。
+
+% TODO：这里 \type{} 内部关于 {} 的规则正确吗？
+\startSmallPrint
+
+%  通常，我们会将要显示的文本放在花括号内作为 \tex{type} 的参数。然而，当此文本本身包含左花括号或右花括号时，我们必须使用两个相同的、不属于 \tex{type} 参数文本的字符来分隔文本。例如：\cmd{type*\{*}，或 \cmd{type+\}+}。
+
+  通常，我们会将要显示的文本放在花括号内作为 \tex{type} 的参数。然而，当此文本本身包含左花括号或右花括号时，我们必须更加小心；\tex{type} 会配对花括号，一旦它看到的右花括号数量与左花括号相等，它就结束了。例如，{\tf\type{\type{a{b}c}}} 输出 \type{a{b}c}，但 {\tf\type+\type{a}b{c}+} 输出 \type{a}b{c}；注意 \quote{\tt a} 后面的右花括号结束了 \tex{type} 命令，而 \type+b{c}+ 作为普通文本输出。（为什么这里的括号会消失将在后面解释。）当我们想逐字输出花括号时，使用其他字符来分隔 {\it 逐字} 文本更安全。例如：\cmd{type*\{*}，或 \cmd{type+\}+}。
+
+\stopSmallPrint
+
+如果我们错误地直接使用了保留字符（而不是用于其预期目的），因为我们忘记了它是保留字符而不能像普通字符一样使用，那么可能发生三种情况：
+
+\startitemize[n]
+
+  \item 最常见的是，编译时产生错误。
+
+  \item 我们得到意想不到的结果。这尤其在 \MyKey{\lettertilde} 和 \MyKey{\%} 时发生；在前一种情况下，最终文档中不会出现我们期望的 \MyKey{\lettertilde}，而是会插入一个空白；在后一种情况下，从 \MyKey{\%} 开始，同一行的所有内容将停止被处理。不当使用 \quotation{{\tt\backslash}} 也可能产生意想不到的结果，如果它或紧随其后的字符组成了一个 \ConTeXt\ 知道的命令。然而，更常见的是，不当使用 \quotation{{\tt\backslash}} 会产生编译错误。
+
+  \item 没有问题发生：这发生在两个主要用于数学的保留字符（{\tt _ ^}）以及 {\tt &} 上：如果在这些环境之外使用，它们会被视为普通字符。
+
+  \startSmallPrint
+
+    第 3 点是我的结论。事实上，我在 \ConTeXt\ 文档中任何地方都没有找到 \Conjecture{} 关于可以直接使用这些保留字符的说明；然而，在我的测试中，当这样做时，我没有看到任何错误；这与例如在 \LaTeX\ 中不同。
+
+  \stopSmallPrint
+
+\stopitemize
+
+\stopsection
+
+\startsection
+  [
+    title=命令本身,
+    reference=sec:commands themselves,
+  ]
+
+命令本身总是以 \quotation{{\tt\backslash}} 字符开头。根据转义序列之后的内容，可以区分为：
+
+\startitemize[a]
+
+  \item {\bf 控制符号。} 控制符号以转义序列（\quotation{{\tt\backslash}}）开头，并且仅由一个非字母字符组成，例如 \quotation{\tex{,}}、\quotation{\tex{1}}、\quotation{\tex{'}} 或 \quotation{\type{\%}}。任何严格意义上不是字母的字符或符号都可以是控制符号，包括数字、标点符号、符号甚至空格。在本文档中，为了表示空格（空白）当需要强调其存在时，我使用的符号是 \textvisiblespace。实际上，\quotation{\cmd{\textvisiblespace}}（反斜杠后跟一个空格）是一个常用的控制符号，我们很快就能看到。
+
+  % TODO：为什么这个段落前面有这么多额外的空间？
+  \startSmallPrint\reference[note:invisible space]{}
+
+    空白或空格是一个 \quotation{不可见} 字符，这在像本文这样的文档中是一个问题，因为有时我们需要明确指定源文件中要写什么。{\sc Knuth} 已经意识到了这个问题，并在他的 \quotation{《\TeX\ 书》} 中开创了使用 \quotation{\textvisiblespace} 符号表示重要空格的惯例。因此，例如，如果我们想表明源文件中的两个单词需要用两个空格分隔，那么我们会写 \quotation{word1\textvisiblespace\textvisiblespace word2}。
+    
+  \stopSmallPrint
+
+  \item {\bf 控制词。} 如果反斜杠后面的字符是一个（严格意义上的）字母，则该命令将是一个 {\em 控制词}。这类命令数量最多，其特点是命令名称只能由大写和/或小写字母组成；不允许使用数字、标点符号或任何其他类型的符号。另一方面，请记住，\ConTeXt\ 区分大小写，这意味着 \tex{mycommand} 和 \tex{MyCommand} 命令是不同的。但是 \tex{MyCommand1} 和 \tex{MyCommand2} 将被视为同一命令的两种用法，因为 \quote{1} 和 \quote{2} 不是字母，因此不是命令名称的一部分。
+
+  \startSmallPrint
+
+    \ConTeXt\ 参考手册中没有关于命令名称的规则，\Conjecture\suite- 中包含的其他 \quotation{手册} 中也没有。我在上一段中陈述的是基于 \TeX\ 中发生的情况得出的结论（此外，在 \TeX\ 中，像带重音元音这样不出现在英语字母表中的字符不被视为 \quotation{字母}）。这条规则可以很好地解释命令名称后空白的吸收问题。
+
+  \stopSmallPrint
+
+\stopitemize
+
+当 \ConTeXt\ 读取源文件并找到一个转义字符（\quotation{{\tt\backslash}}）时，它知道后面会跟着一个命令。然后它读取转义序列后面的第一个字符。如果该字符不是字母，则意味着该命令是一个控制符号，并且仅由这第一个符号组成。但另一方面，如果转义序列后的第一个字符是字母，那么 \ConTeXt\ 将继续读取每个字符，直到找到第一个非字母字符，然后它就知道命令名称已经结束。这就是为什么作为控制词的命令名称不能包含非字母字符。
+
+当命令名称末尾的 \quotation{非字母} 是空格时，假定该空格不是要处理的文本的一部分，而是专门插入以指示命令名称结束的位置，因此 \ConTeXt\ 会丢弃这个空格。这会产生一个令 \ConTeXt\ 初学者感到惊讶的效果，因为当相关命令的效果是在最终文档中写入某些内容时，命令的输出会与下一个单词连接在一起。例如，源文件中的以下两个句子
+
+{\switchtobodyfont[small]
+\starttyping
+Knowing \TeX helps with learning \ConTeXt.
+Knowing \TeX, although not essential, helps with learning \ConTeXt
+\stoptyping
+}
+
+分别产生以下结果：
+
+{
+\tfx\color[red]{Knowing \TeX helps with learning \ConTeXt.\\ %
+Knowing \TeX, although not essential, helps with learning \ConTeXt.%
+}\footnote{{\bf 注意：} 在本入门中，为了说明某个问题，有时会同时写出源代码片段及其编译结果，此时遵循两个惯例：有时代码和编译结果并排放置在两栏段落中；其他时候，代码用 \color[purple]{深紫红色} 书写（本文档通常用此颜色表示 \ConTeXt\ 命令），编译结果用红色表示。}}
+
+注意，在第一种情况下，单词 \quotation{\TeX} 与后面的单词连接在一起，而在第二种情况下则没有。这是因为，在源文件的第一种情况下，命令名 \tex{TeX} 之后的第一个 \quotation{非字母} 是一个空格，该空格被抑制，因为 \ConTeXt\ 假定它只是为了指示命令名称的结束；而在第二种情况下，后面是一个逗号，由于逗号不是空格，因此没有被抑制。
+
+另一方面，仅仅添加一个额外的空格并不能解决这个问题，例如，写
+
+\color[darkmagenta]{{\tt Knowing \backslash
+        TeX\textvisiblespace\textvisiblespace helps with
+        learning \backslash ConTeXt}}\footnote{关于 \quotation{\textvisiblespace} 符号，请回想 \at{page}[note:invisible space] 的注释。}
+
+也解决不了问题，因为 \ConTeXt\ 的一条规则（我们将在 \in{节}[sec:spaces] 中看到）是，一个空格会 \quotation{吸收} 它后面的所有空格和制表符。因此，当我们遇到这个问题时（幸运的是不常发生），我们必须确保命令名称后的第一个 \quotation{非字母} 不是空格。有两个候选：
+
+\startitemize[1]
+
+  \item 保留字符 \MyKey{\{\}}。如前所述，保留字符 \MyKey{\{} 开启一个组，\MyKey{\}} 关闭一个组，因此序列 \MyKey{\{\}} 引入了一个空组。空组对最终文档没有影响，但它帮助 \ConTeXt\ 知道它前面的命令名称已经结束。或者，我们也可以在相关命令周围创建一个组，例如写 \quotation{\{\tex{TeX}\}}。无论哪种方式，结果都是 \tex{TeX} 之后的第一个 \quotation{非字母} 不是空格。
+
+  \item 控制符号 \quotation{\cmd{\textvisiblespace}}（反斜杠后跟一个空格，见 \at{page}[note:invisible space] 的注释）。此控制符号的效果是在最终文档中插入一个空格。为了正确理解 \ConTeXt\ 的逻辑，花点时间看看当 \ConTeXt\ 遇到一个控制词（例如 \tex{TeX}）后跟一个控制符号（例如 \quotation{\cmd{\textvisiblespace}}）时会发生什么，可能是值得的：
+
+  \startitemize[2, packed]
+
+    \item \ConTeXt\ 遇到 \backslash\ 字符后跟一个 \quote{T}，并且知道这个反斜杠出现在控制词之前，它会继续读取字符，直到遇到一个 \quotation{非字母}，当遇到引入下一个控制符号的 \backslash\ 字符时，就会发生这种情况。
+
+    \item 一旦它知道命令名称是 \tex{TeX}，它就运行该命令并在最终文档中打印 \TeX。然后它返回到停止读取的位置，检查第二个反斜杠后面的字符。
+
+    \item 它检查发现是一个空格，即一个 \quotation{非字母}，这意味着控制序列恰好就是那个，因此它可以运行它。它运行了，并插入了一个空格。
+
+    \item 最后，它再次返回到停止读取的位置（作为控制符号的空格），并从那里继续处理源文件。
+
+  \stopitemize
+
+\stopitemize
+
+我已经比较详细地解释了这个机制，因为空格的消除常常令新手感到惊讶。然而，应该注意的是，这个问题相对较小，因为控制词通常不直接打印到最终文档，而是影响格式和外观。相比之下，控制符号很常见地向最终文档打印内容。
+
+\startSmallPrint
+
+  还有第三种避免空格问题的方法，即（以 \TeX\ 风格）定义一个类似的命令，并在命令名称的末尾包含一个 \quotation{非字母}。例如，以下序列：
+
+  \type{\def\txt-{\TeX}}
+
+将创建一个名为 \tex{txt} 的命令，该命令的作用与命令 \tex{TeX} 完全相同，并且只有在后面跟一个连字符时才能正常工作：\tex{txt-}。这个连字符在技术上不是命令名称的一部分，但除非名称后面有连字符，否则此命令将无法工作。为什么会这样与定义 \TeX\ 宏的机制有关，这里解释起来太复杂了。但它确实有效：一旦定义了这个命令，每次我们使用 \tex{txt-} 时，\ConTeXt\ 会将其替换为 \tex{TeX}，同时删除连字符，但在内部使用它来知道命令名称已经结束，因此紧随其后的空格不会被删除。
+
+这个 \quotation{技巧} 对于 \tex{define} 命令（这是 \ConTeXt\ 专门用于定义宏的命令）将无法正常工作。
+
+\stopSmallPrint
+
+\stopsection
+
+\startsection
+  [title=命令的作用范围]
+
+\startsubsection
+  [
+    reference=sec:command scope,
+    title=需要或不需要指明作用范围的命令,
+  ]
+
+许多 \ConTeXt\ 命令，尤其是那些影响字体格式特性（粗体、斜体、小型大写字母等）的命令，不带任何参数，因为它们并非设计为仅应用于特定文本。它们仅限于 {\em 开启} 某项功能（粗体、斜体、无衬线体、某种字体大小等）。
+
+此类命令的效果可以通过两种方式终止。一种方式是遇到另一个禁用它或启用与其不兼容的另一个功能的命令。例如，命令 \tex{bf} 启用粗体，文本的粗体可以通过遇到一个 {\em 不兼容} 的命令（例如 \tex{tf} 或 \tex{it}）来终止。
+
+限制此类命令范围的另一种方法是在 {\em 组} 内执行它们（参见 \in{节}[sec:groups]）；这些命令的效果在它们所在的组关闭时终止。因此，为了使这些命令只影响一部分文本，通常的做法是生成一个包含该命令和我们希望它影响的文本的组。通过将文本放在花括号之间来创建一个组。因此，以下文本
+
+% TODO：修复此示例，使其不突出到右边距。
+\startDoubleExample
+
+\starttyping
+In {\it The \TeX Book}, {\sc Knuth}
+explained everything you need to know
+about \TeX.
+\stoptyping
+
+\column
+
+In {\it The \TeX Book}, {\sc Knuth} explained everything you need to know
+about \TeX.
+
+\stopDoubleExample
+
+创建了两个组，一个用于指定 \tex{it}（斜体）命令的范围，另一个用于指定 \tex{sc}（小型大写字母）命令的范围。
+
+与这类命令相反，还有其他命令，由于它们产生的效果或其他原因，需要明确指示它们将应用于哪些文本。在这些情况下，要受命令影响的文本被放在紧跟在命令 {\em 之后} 的花括号内。作为例子，我们可以提到 \tex{framed}：此命令在其所取参数的文本周围绘制一个框架，因此
+
+{\tfx\type{\framed{Tweedledum and Tweedledee}}}
+
+将产生\blank
+
+\example{\framed{Tweedledum and Tweedledee}}
+
+注意，虽然在第一组命令（那些不需要参数的命令）中，有时也使用花括号来指定作用域；但括号对于命令的工作不是必需的。该命令被设计为从其出现的位置开始应用。因此，当使用括号确定其应用范围时，命令被放在 {\em 这些括号之内}，这与第二组命令不同，在第二组命令中，框定命令要应用的文本的括号出现在命令 {\em 之后}。
+
+对于 \tex{framed} 命令，很明显它产生的效果需要一个参数——要应用该效果的文本。在其他情况下，命令属于哪种类型取决于程序员。因此，例如，\tex{it} 和 \tex{color} 命令的作用非常相似：它们将某种特性（格式或颜色）应用于文本。但决定将前者编程为不带参数，而将后者编程为带参数的命令。
+
+\stopsubsection
+
+\startsubsection
+  [title=需要明确指示开始和结束位置的命令（环境）]
+
+有些命令确定其作用范围的方式不是使用花括号，而是明确指示它们开始应用的点以及效果停止的点。因此，这些命令成对出现：一个指示命令何时启用，另一个指示此操作何时必须停止。使用 \quotation{start} 后跟命令名称表示操作的开始，使用 \quotation{stop} 后跟命令名称表示结束。例如，命令 \MyKey{itemize} 变为 \tex{startitemize} 表示 {\em 列表项} 的开始，\tex{stopitemize} 表示其结束。
+
+在 \ConTeXt\ 官方文档中，这些命令对没有特殊的名称。参考手册和入门书只是称它们为 \quotation{start \unknown\ stop}。有时它们被称为 {\em 环境}，这是 \LaTeX\ 对类似结构的称呼，尽管这样做的缺点是，在 \ConTeXt\ 中，术语 \quotation{环境} 用于其他东西（一种特殊类型的文件，我们将在 \in{节}[sec-projects] 中讨论多文件项目时看到）。即便如此，由于术语“环境”很清晰，并且上下文可以很容易地区分我们是在谈论 {\em 环境命令} 还是 {\em 环境文件}，我将使用这个术语。
+
+因此，环境由一个开启或开始它的命令和另一个关闭或结束它的命令组成。如果源文件包含一个开启环境的命令，但随后没有关闭，通常会产生一个错误。\footnote{但并不总是；这取决于所讨论的环境以及文档其余部分的情况。\ConTeXt\ 在这方面与 \LaTeX\ 不同，后者严格得多。} 另一方面，这类错误更难发现，因为错误可能发生在距离开启命令很远的地方。有时 \MyKey{.log} 文件会向我们显示未正确关闭的环境开始的行；但其他时候，环境未关闭意味着 \ConTeXt\ 误解了某个段落，而不是在那个有问题的环境中，这意味着 \MyKey{.log} 文件对我们查找问题所在没有太大帮助。
+
+环境可以嵌套，这意味着可以在现有环境内开启另一个环境，但在嵌套环境的情况下，环境需要在其被开启的环境内部关闭。换句话说，环境关闭的顺序必须与它们开启的顺序一致。我相信下面的例子应该能清楚地说明这一点：
+
+{\switchtobodyfont[small]
+\startframedtext
+\starttyping
+\startSomething
+  ...
+  \startSomethingElse
+    ...
+    \startAnotherSomethingElse
+      ...
+    \stopAnotherSomethingElse
+  \stopSomethingElse
+\stopSomething
+\stoptyping
+\stopframedtext
+}
+
+在示例中，您可以看到 \MyKey{AnotherSomethingElse} 环境是在 \MyKey{SomethingElse} 环境内部开启的，因此也需要在其内部关闭。否则，在编译文件时会产生错误。我们可以说环境需要 \quotation{正确嵌套}。
+
+通常，被设计为 {\em 环境} 的命令是实现某些更改的命令，这些更改旨在应用于不小于段落的文本单元。例如，更改边距的 \MyKey{narrower} 环境仅在段落级别应用时才有意义；类似地，\MyKey{framedtext} 环境为一个或多个段落添加框架。后一个环境可以帮助我们理解为什么有些命令被设计为环境，而另一些被设计为单个命令：如果我们想给一个或多个单词（都在同一行）加框，我们会使用命令 \tex{framed}，但如果我们想给整个段落（或多个段落）加框，那么我们会使用 \MyKey{framedtext} 环境。
+
+另一方面，位于特定环境内的文本通常构成一个 {\em 组}（参见 \in{节}[sec:groups]），这意味着如果在环境内发现一个激活命令（属于那些应用于之后所有文本的命令，例如 \tex{it}），此命令将仅应用直到找到它的环境结束；事实上，\ConTeXt\ 有一个未命名的 {\em 环境}，以 \tex{start} 命令开始（后面没有其他文本；只有 {\em start}。这就是为什么我称之为 {\em 未命名环境}），并以 \tex{stop} 命令结束。我怀疑这唯一的目的是创建一个组。
+
+\startSmallPrint
+
+  我没有在 \Conjecture\ConTeXt\ 文档中的任何地方读到环境的效果之一是对其内容进行分组，但这是我对许多预定义环境进行测试的结果，尽管我必须承认我的测试不够详尽。我只是随机选择了一些环境进行了检查。然而，我的测试表明，这样的陈述（如果正确的话）仅适用于某些预定义环境：那些用 \tex{definestartstop} 命令创建的环境（在 \in{节}[sec:startstop] 中解释）不会创建任何组，除非在定义新环境时我们包含了创建组所需的命令（参见 \in{节}[sec:groups]）。
+
+  我还假设我称之为 {\em 未命名} 的环境（\tex{start}）只是为了创建一个组：它确实创建了一个组，但它是否有其他用途我不知道。这是参考手册中未记录的命令之一。
+
+\stopSmallPrint
+
+\stopsubsection
+
+\stopsection
+
+\startsection
+  [
+    title=命令的操作选项,
+    reference=sec:command options,
+  ]
+
+\startsubsection
+  [title=可以以多种不同方式工作的命令]
+
+许多命令可以以不止一种方式工作。在这种情况下，总有一种预定的工作方式，可以通过在命令名称后的括号中指示所需操作的参数来改变。
+
+我们在上一节提到的 \tex{framed} 命令中找到了一个很好的例子。此命令在其所取参数的文本周围绘制一个框架。默认情况下，框架的高度和宽度与其应用的文本相同；但我们可以指定不同的高度和宽度。因此，我们可以看到默认 \tex{framed} 的工作方式：
+
+\startDoubleExample
+
+  \type{\framed{Tweedledum}}
+
+  \column
+
+  \framed{Tweedledum}
+
+\stopDoubleExample
+
+与定制版本的工作方式之间的区别：
+
+\startDoubleExample
+
+\starttyping
+\framed
+  [width=3cm, height=1cm]
+  {Tweedledum}
+\stoptyping
+
+\column
+
+\framed
+  [width=3cm, height=1cm]
+  {Tweedledum}
+
+\stopDoubleExample
+
+在第二个示例中，我们在方括号内为包围其参数文本的框架指定了特定的宽度和高度。在这些括号内，不同的配置选项用逗号分隔；两个或多个选项之间的空格甚至换行（只要不是双换行）都不予考虑，因此，例如，同一命令的以下四个版本产生完全相同的结果：
+
+{\switchtobodyfont[small]
+\startframedtext
+\starttyping
+\framed[width=3cm,height=1cm]{Tweedledum}
+
+\framed[width=3cm,    height=1cm]{Tweedledum}
+
+\framed
+  [width=3cm, height=1cm]
+  {Tweedledum}
+
+\framed
+  [width=3cm,
+    height=1cm]
+  {Tweedledum}
+
+\stoptyping
+\stopframedtext
+}
+
+许多人可能会发现最后一个版本最容易阅读：我们一眼就能看出有多少选项以及它们是如何使用的。在这样一个只有两个选项的示例中，这可能看起来不那么重要；但在选项列表很长的情况下，如果每个选项在源文件中都占一行，那么更容易 {\em 理解} 源文件要求 \ConTeXt\ 做什么，并且在必要时也更容易发现潜在的错误。因此，最后一种（或类似的）编写命令的格式是用户 \quote{首选} 的。
+
+关于配置选项的语法，请参见后面的（\in{节}[sec:syntax]）。
+
+\stopsubsection
+
+\startsubsection
+  [title=配置其他命令工作方式的命令（\cmd{setupSomething}）]
+
+我们已经看到，支持多种工作方式的命令总是有一种默认的工作方式。如果这些命令之一在我们的源文件中被多次调用，而我们想为所有这些调用更改默认值，那么与其每次调用命令时更改这些选项，不如更改默认值更方便、更高效。为此，几乎总是有一个可用的命令，其名称以 \tex{setup} 开头，后跟我们想要更改其默认选项的命令名称。
+
+我们在本节中一直用作示例的 \tex{framed} 命令仍然是一个很好的例子。因此，如果我们在文档中使用了大量框架，但它们都需要精确的尺寸，那么最好重新配置 \tex{framed} 的工作方式，使用 \tex{setupframed} 来完成。因此
+
+\need 4\baselineskip
+{\switchtobodyfont[small]
+\starttyping
+\setupframed
+  [
+    width=3cm,
+    height=1cm
+  ]
+\stoptyping
+}
+
+将确保从那时起，每次我们调用 \tex{framed} 时，默认情况下它将生成一个宽 3 厘米、高 1 厘米的框架，而无需每次都明确指示。
+
+\ConTeXt\ 中大约有 300 个命令允许我们配置其他命令的工作方式。因此，我们可以配置框架（\tex{framed}）、列表（\MyKey{itemize}）、章节标题（\tex{chapter}）、节标题（\tex{section}）等的默认工作方式。
+
+\stopsubsection
+
+\startsubsection
+  [title=设置可配置命令的定制版本（\cmd{defineSomething}）]
+
+继续以 \tex{framed} 为例，很明显，如果我们的文档使用几种不同类型的框架，每种都有不同的尺寸，那么理想情况下，我们可以 {\em 预定义} \tex{framed} 的不同配置，并将它们与特定名称关联起来，以便根据需要选择使用其中之一。我们可以在 \ConTeXt\ 中使用 \tex{defineframed} 命令来完成，其语法为：
+
+\type{\defineframed[名称][配置]}
+
+其中 {\em 名称} 是分配给要配置的特定类型框架的名称；而 {\em 配置} 是与该名称关联的特定配置。
+
+这一切的效果是，指定的配置与我们已经建立的名称相关联，该名称在所有意图和目的上都将作为一个新命令工作，并且我们可以在任何原本可以使用原始命令（\tex{framed}）的上下文中使用它。
+
+这种可能性不仅存在于 \tex{framed} 命令的具体情况，也存在于许多具有 \tex{setup} 可能性的命令。\tex{defineSomething} + \tex{setupSomething} 的组合是一种赋予 \ConTeXt\ 极致灵活性和强大功能的机制。如果我们详细检查 \tex{defineSomething} 命令的作用，我们会看到：
+
+\startitemize[packed]
+
+  \item 首先，它克隆一个支持多种配置的特定命令。
+
+  \item 然后，它将该克隆与一个新命令的名称关联起来。
+
+  \item 最后，它为克隆设置一个预定的配置，与原始命令的配置方式不同。
+
+\stopitemize
+
+在我们给出的示例中，我们在创建特殊框架的同时对其进行了配置。但我们也可以先创建它，稍后再配置它，因为如前所述，一旦克隆被创建，它就可以在原始命令可以使用的任何地方使用。因此，例如，如果我们创建了一个名为 \MyKey{MySpecialFrame} 的框架，我们可以使用 \tex{setupframed} 来配置它，指示要配置的实际框架。在这种情况下，\tex{setup} 命令将接受一个新参数，即要配置的框架的名称：
+
+{\switchtobodyfont[small]
+\vbox{\starttyping
+\defineframed[MySpecialFrame]
+
+\setupframed
+  [MySpecialFrame]
+  [ ... ]
+\stoptyping
+}}
+
+\stopsubsection
+
+\stopsection
+
+% TODO：startsection 应该在接近页面底部时执行 \page，正如我写这个时下一节那样。
+% TODO：为什么这会导致 "ERROR: Missing ) inserted for expression"？
+% \testpagesync[4cm]  % \testpage[4cm] 在这里也会崩溃。
+% 当我的 \need 宏工作时？
+\need 4cm
+
+\startsection
+  [
+    reference=sec:syntax,
+    title=命令语法和选项概要，以及调用时方括号和花括号的使用,
+  ]
+  % 本节特别献给 LaTeX 用户，以便他们理解此类括号的不同用法。
+
+总结我们到目前为止所看到的内容，在 \ConTeXt\ 中
+
+\startitemize
+
+  \item 真正意义上的命令总是以 \quotation{{\tt\backslash}} 字符开头。
+
+  \item 有些命令可以带一个或多个参数。
+
+  \item 告诉命令 {\em 如何} 工作或以某种方式影响其工作的参数，放在方括号内。
+
+  \item 告诉命令必须作用于哪部分文本的参数，放在花括号内。\footnote{可以定义以其他方式界定其参数的命令，但标准的 \ConTeXt\ LMTX 命令不常这样做。}
+
+   % \sym（对于 \items）就是这样一个例子，如果 JD 理解它在做什么的话。
+
+  \startSmallPrint
+
+    当命令仅作用于一个字母时，例如 \tex{buildtextcedilla} 命令（仅举例，如加泰罗尼亚语中常用的 \quote{ç}），参数周围的花括号可以省略：该命令将应用于第一个非空格的字符。
+
+  \stopSmallPrint
+
+  \item 有些参数可以是可选的，在这种情况下我们可以省略它们。但我们绝不能改变命令所期望的参数顺序。
+
+\stopitemize
+
+方括号之间的参数可以由一个或多个选项组成。选项可以是多种类型：
+\startitemize
+\item 由单个单词组成的选项。例如，前面我们看到如何使用 \type{\setuppapersize[S5]} 指定文档的纸张大小。在这种情况下，\MyKey{S5} 是一个单一的 \quotation{单词} 选项。
+\item 由单个 \quotation{单词} 组成，但带有可选重复次数的选项。例如，\ConTeXt\ 有一个 \tex{blank} 命令（用于在输出文档中放置垂直空间），它可以接受像 \tex{blank[2*line]} 这样的选项，以插入类似于两行所用空间量的空间。这种类型的选项实际上只是第一种类型的特例。
+\item 为 \quotation{变量} 或 \quotation{键} 设置值的选项。例如，前面我们看到 \type{\framed[width=3cm,height=1cm]{Tweedledum}}，其中选项将 \type{width} 设置为 3cm，将 \type{height} 设置为 1cm。
+\stopitemize
+
+有些命令可以同时接受 \quotation{键=值} 类型和 \quotation{单词}（包括重复）类型的参数。重要的是要记住，这两种类型的参数不能放在同一组方括号内。如果某个命令同时提供这两种类型的参数，可以使用两组方括号。前面，我们看到
+\starttyping
+    \setuphead      % 章节的格式
+      [chapter]
+      [style=\bfc]
+\stoptyping 
+这显示了 \tex{setuphead} 命令使用一个单词选项 \type{chapter} 和一个键值选项 \type{style=\bfc}。此示例表明值选项可以是命令（\tex{bfc} 命令切换到非常大的粗体字体，正如您在章节标题中看到的那样）。
+
+当给定类型（即单词或键值）有多个选项时，相同类型的选项用逗号分隔。这允许键值选项写得比较长；例如，本节标题是使用以下选项设置的：
+\type{title={命令语法和选项概要，以及调用时方括号和花括号的使用},}。在这种情况下，因为标题中包含一个 \quote{\tt ,}，整个标题必须用花括号括起来，以表示 \quote{\tt ,} 是值的一部分，而不是分隔两个键值对的逗号。
+
+分隔选项的逗号后面可以跟任意数量的空格和/或单个换行。然而，对于键值选项，任何出现在后面 \quote{\tt ,} 或终止符 \quote{\tt ]} 之前的空白 %[
+都会成为该键值的一部分。在许多情况下，这是不希望的，并且在编译文档时可能导致意外结果。总之，除非空格确实是最后一个值的一部分，否则绝不要紧挨着逗号前面放置空格。
+ 
+\stopsection
+
+
+\startsection
+  [
+    title=\ConTeXt\ 命令的官方列表,
+    reference=sec:qrc-setup-en
+  ]
+  % 本节仅为了能够在每次提到命令的“官方列表”时引用它而编写。
+
+在 \ConTeXt\ 文档中，有一份特别重要的文档，其中列出了所有命令，指明了每个命令期望的参数数量、类型，以及所设想的各种选项及其允许的值。这份文档名为 \MyKey{setup|-|en.pdf}，并为每个新版本的 \ConTeXt\ 自动生成。它可以在名为 \MyKey{tex/texmf|-|context/doc/context/documents/general/qrcs} 的目录中找到。
+
+\startSmallPrint
+
+  实际上，\MyKey{qrc} 有七个版本的这份文档，对应于拥有 \ConTeXt\ 界面的每种语言：德语、捷克语、法语、荷兰语、英语、意大利语和罗马尼亚语。对于每种语言，该目录中有两份文档：一份名为 \MyKey{setup-LangCode}（其中 LangCode 是两个字母的国际语言标识代码），第二份文档名为 \MyKey{setup-mapping-LangCode}。第二份文档包含按字母顺序排列的命令列表，并指示命令 {\em 原型}，但没有关于每个参数可能值的进一步信息。
+
+\stopSmallPrint
+
+这份文档对于学习使用 \ConTeXt\ 至关重要，因为我们可以从中了解某个命令是否存在；考虑到 {\sc 命令}（或 {\sc 环境}）+ setup{\sc 命令} + define{\sc 命令} 的组合，这一点尤其有用。例如，如果我知道使用 \tex{blank} 命令引入空行，我可以找出是否存在一个名为 \tex{setupblank} 的命令允许我配置它，以及另一个允许我为空行设置定制配置的命令（\tex{defineblank}）。
+
+\startSmallPrint
+
+  因此，\MyKey{setup-en.pdf} 有助于学习 \ConTeXt。但我更希望
+% TODO：那份文档是否列出了 MkII、MkIV 和 LMTX 的命令？参见上面 5700 的计数。
+%, 首先，它能告诉我们一个命令是仅适用于 Mark~II 还是 Mark~IV，尤其是，如果
+  它能不仅告诉我们每个命令允许的参数类型和数量，还能告诉我们这些参数的用途，那就更好了。这将大大减少 \ConTeXt\ 文档的缺陷。有些命令允许一些可选参数，我甚至在本入门书中都没有提到，因为我不知道它们的用途，而且由于它们是可选的，也没有必要提及。这令人非常沮丧。
+
+% TODO：这似乎是引用 wiki 的好地方。但是是吗？
+
+\stopSmallPrint
+
+\stopsection
+
+
+\startsection
+  [
+    reference=sec:definingcommands,
+    title=定义新命令,
+  ]
+
+\startsubsection
+  [
+    reference=sec:define,
+    title=定义新命令的通用机制,
+  ]
+\PlaceMacro{define}
+
+我们刚刚看到，使用 \tex{defineSomething}，我们可以克隆一个已存在的命令并开发其新版本。从那时起，新版本将在所有意图和目的上作为一个新命令工作。
+
+除了这种可能性（仅适用于某些特定命令，当然不少，但并非全部），\ConTeXt\ 还有一个定义新命令的通用机制，该机制非常强大，但在某些用途上也相当复杂。在像这样面向初学者的文本中，我认为最好从其最简单的用途开始介绍。最简单的用途是将文本片段与一个单词关联起来，以便每次该单词出现在源文件中时，都被替换为链接的文本。这将使我们一方面节省大量打字时间，另一方面，作为一个额外优势，它减少了打字时出错的可能性，同时确保相关文本始终以相同的方式书写。
+
+让我们想象一下，例如，我们正在写一篇关于拉丁语文本头韵的论文，其中经常引用拉丁语句子 \quotation{{\em O Tite tute Tati tibi tanta tyranne tulisti}}（哦，提图斯·塔提乌斯，你这个暴君，你给自己带来了这么多！）。这是一个相当长的句子，其中有两个单词是专有名词，以大写字母开头，而且，让我们承认，无论我们多么热爱拉丁语诗歌，我们很容易在写它时 \quotation{犯错}。在这种情况下，我们可以在源文件的导言区中放入：
+
+{\tfx \type{\define\Tite{\quotation{O Tite tute Tati tibi tanta tyranne tulisti}}}}
+
+基于这样的定义，每次命令 \tex{Tite} 出现在我们的源文件中，它都会被指示的句子替换，并且也会像原始定义中那样放在引号内，这使我们能够确保该句子出现的方式始终保持一致。我们也可以将其写成斜体、更大的字体大小\unknown\ 任何我们想要的。重要的是我们只需要写一次，并且在整个文本中，它将按照所写的方式被复制，次数不限。我们也可以创建两个版本的命令，称为 \tex{Tite} 和 \tex{tite}，具体取决于句子是否需要使用大写字母。替换文本可以是纯文本，也可以包含命令，或者形成数学表达式（至少对我来说，数学表达式中更容易打错）。例如，如果表达式 $(x_1,\ldots,x_n)$ 需要经常出现在我们的文本中，我们可以创建一个命令来表示它。例如
+
+\type{\define\xvec{$(x_1,\ldots,x_n)$}}
+
+这样，每当 \tex{xvec} 出现在文本中时，它就会被替换为与之关联的表达式。
+
+\tex{define} 命令的一般语法如下：
+
+\type{\define[参数个数]\命令名称{替换文本}}
+
+% {\ttx \color[maincolor]{\backslash define[{\em
+%         参数个数}]\backslash {\em 命令名称}\{{\em
+%       替换文本}\}}}
+
+其中
+
+\startitemize[packed]
+
+  \item {\tt\bf 参数个数} 指的是新命令将带有的参数数量。如果不需要任何参数，如到目前为止的示例所示，则可以省略。
+
+  \item {\tt\bf 命令名称} 指的是新命令将使用的名称。这里，关于命令名称的一般规则适用。名称可以是一个非字母的单个字符，或者一个或多个不包含任何 \quotation{非字母} 字符的字母。
+
+  \item {\tt\bf 替换文本} 包含每次在源文件中找到新命令名称时将替换它的文本。
+
+\stopitemize
+
+在定义中为新命令提供参数的可能性赋予了这种机制极大的灵活性，因为它允许根据所取参数定义可变的替换文本。
+
+例如：让我们想象一下，我们想写一个命令来生成商业信件的开头。一个非常简单的版本可能是：
+
+{\switchtobodyfont[small]
+\starttyping
+\define\LetterHeading{
+  \rightaligned{Peter Smith}\par
+  \rightaligned{Consultant}\par
+  Maryborough, \date\par
+  Dear Sir,\par
+  }
+\stoptyping
+}
+
+但最好有一个命令版本，可以在信头中写入收件人的姓名。这需要使用一个参数将收件人的姓名传递给新命令。这将需要重新定义命令如下：
+
+{\switchtobodyfont[small]
+\starttyping
+\define[1]\LetterHeading{
+  \rightaligned{Peter Smith}\par
+  \rightaligned{Consultant}\par
+  Maryborough, \date\par
+  Dear Mr #1,\par
+  }
+\stoptyping
+}
+
+注意我们在定义中引入了两个更改。首先，在关键字 \tex{define} 和新命令名称之间，我们在方括号内包含了一个 \quote{1}（[1]）。这告诉 \ConTeXt\ 我们正在定义的命令将带有一个参数。其次，在命令定义的最后一行，我们写了 \quotation{{\tt Dear Mr \#1,}}，使用了保留字符 \MyKey{\#}。这表示在替换文本中 \MyKey{\#1} 出现的位置，将插入第一个（在这种情况下也是唯一的）参数的内容。如果它有两个参数，\MyKey{\#1} 将指代第一个参数，\MyKey{\#2} 指代第二个参数。为了在源文件中调用该命令，在命令名称之后，参数必须包含在花括号内，每个参数有自己的花括号。因此，我们刚刚定义的命令应该以如下方式在源文件文本中调用：
+
+\type{\LetterHeading{收件人姓名}}
+
+% {\ttx \color[maincolor]{\backslash LetterHeading\{{\em 收件人姓名}\} }}
+
+例如：\cmd{LetterHeading\{Anthony Moore\}}。
+
+我们还可以进一步改进上述函数，因为它假设信件将寄给男性（它写的是 \quotation{Dear Sir}），所以也许我们可以包含另一个参数来区分男性和女性收件人。例如：
+
+{\switchtobodyfont[small]
+\starttyping
+\define[2]\LetterHeading{
+  \rightaligned{Peter Smith}\par
+  \rightaligned{Consultant}\par
+  Maryborough, \date\par
+  #1\ #2,\par
+  }
+\stoptyping
+}
+
+这样，该函数可以例如通过以下方式调用
+
+{\tfx\type{\LetterHeading{Dear Ms}{Eloise Merriweather}}}
+
+尽管这不是很优雅（从编程的角度来看）。最好为第一个参数定义符号值（男/女；0/1；m/f），以便宏本身根据该值选择适当的文本。但解释如何实现这一点需要深入更多细节，我认为初学者读者在现阶段无法理解。
+
+\stopsubsection
+
+\startsubsection
+  [
+    reference=sec:startstop,
+    title=创建新环境,
+  ]
+
+\PlaceMacro{definestartstop}
+
+为了创建新环境，\ConTeXt\ 提供了 \tex{definestartstop} 命令，其语法如下：
+
+\type{\definestartstop[名称][选项]}
+
+% {\ttx \color[maincolor]{\backslash definestartstop[{\em 名称}][{\em 选项}]}}
+
+% TODO：找出此选项的作用（如果有的话）。
+
+\startSmallPrint
+
+  在 \tex{definestartstop} 的 {\em 官方} 定义中（参见 \in{节}[sec:qrc-setup-en]），还有一个我上面没有列出的额外参数，因为它是可选的，而且我未能找出 \Doubt 它的用途。\ConTeXt\ 入门 \quotation{一瞥} 和不完整的参考手册都没有解释它。我曾假设这个参数（必须在名称和配置之间输入）可能是某个现有环境的名称，作为新环境的初始模型，但我的测试表明这个假设是错误的。我查阅了 \ConTeXt\ 邮件列表，没有看到这个可能参数的任何用法。
+
+\stopSmallPrint
+
+其中
+
+\startitemize
+
+  \item {\bf 名称} 是新环境将使用的名称。
+
+  \item {\bf 选项} 允许我们配置新环境的行为。我们可以使用以下值来配置它：
+
+  \startitemize
+
+    \item {\tt before} —— 进入环境之前必须运行的命令。
+
+    \item {\tt after} —— 离开环境之后必须运行的命令。
+
+    \item {\tt style} —— 新环境文本将使用的样式。
+
+    \item {\tt setups} —— 使用 \PlaceMacro{startsetups}\tex{startsetups ... \stopsetups} 创建的一组命令。此命令及其用法不在本入门书中解释。
+
+    \item {\tt color, inbetween, left, right} —— 未记录的选项，我未能使 \Doubt 它们工作。我们可以根据名称假设某些选项的作用，例如 {\tt color}，但从我做的更多测试来看，为该选项指定某些值，我没有看到环境内部有任何变化。
+
+  \stopitemize
+
+\stopitemize
+
+环境定义的一个示例如下：
+
+{\switchtobodyfont[small]
+\starttyping
+\definestartstop
+  [TextWithBar]
+  [before=\startmarginrule\noindentation,
+    after=\stopmarginrule,
+    style=\ss\sl,
+  ]
+
+\starttext
+
+The first two fundamental laws of human stupidity state unambiguously
+that:
+
+\startTextWithBar
+
+  \startitemize[n,broad]
+
+    \item Always and inevitably we underestimate the number of stupid
+    individuals in the world.
+
+    \item The probability that a given person is stupid is independent
+    of any other characteristic of the same person.
+
+  \stopitemize
+
+\stopTextWithBar
+
+\stoptext
+\stoptyping
+}
+
+结果将是：
+
+\definestartstop
+  [TextWithBar]
+  [before=\startmarginrule\noindentation,
+    after=\stopmarginrule,
+    style=\ss\sl,
+  ]
+
+\startframedtext[frame=off]
+
+  \color[red]{人类愚蠢的第一条基本定律明确指出：
+
+\startTextWithBar
+
+\startitemize[n,broad]
+
+  \item 我们总是且不可避免地低估世界上愚蠢个体的数量。
+
+  \item 一个人愚蠢的概率独立于该人的任何其他特征。
+
+\stopitemize
+
+\stopTextWithBar}
+\stopframedtext
+
+% TODO 待修复……这是真的吗？如果是，为什么字体更改没有继续？
+
+如果我们希望新环境成为一个组（\in{节}[sec:groups]），以便在其内部发生的任何对 \ConTeXt\ 正常工作的改变在离开环境时消失，我们必须在 \MyKey{before} 选项中包含 \PlaceMacro{bgroup}\tex{bgroup} 命令，并在 \MyKey{after} 选项中包含 \PlaceMacro{egroup}\tex{egroup} 命令。
+
+\stopsubsection
+
+\stopsection
+
+\startsection
+  [title=其他基本概念]
+
+除了命令之外，还有其他概念对于理解 \ConTeXt\ 工作方式的逻辑至关重要。其中一些，由于其复杂性，不适合在入门书中介绍，因此本文档将不予讨论；但现在有两个概念应该加以研究：组和尺寸。
+
+\startsubsection
+  [reference=sec:groups, title=组]
+
+{\em 组} 是源文件中一个明确定义的片段，\ConTeXt\ 将其用作 {\em 工作单元}（稍后将解释其含义）。每个组都有一个开始和一个结束，需要明确指示。组通过以下方式之一开始：
+
+\startitemize[packed]
+
+  \item 使用保留字符 \MyKey{\{} 或命令 \PlaceMacro{bgroup}\tex{bgroup}。
+
+  \item 使用命令 \PlaceMacro{begingroup}\tex{begingroup}。
+
+  \item 使用命令 \PlaceMacro{start}\tex{start}。
+
+  \item 通过开启某些环境（\tex{startSomething} 命令）。
+
+  \item 通过使用保留字符 \quote{\$} 开始数学环境。
+
+\stopitemize
+
+并通过以下方式之一关闭：
+
+\startitemize[packed]
+
+  \item 使用保留字符 \MyKey{\}} 或命令 \PlaceMacro{egroup}\tex{egroup}。
+
+  \item 使用命令 \PlaceMacro{endgroup}\tex{endgroup}。
+
+  \item 使用命令 \PlaceMacro{stop}\tex{stop}。
+
+  \item 通过关闭环境（\tex{stopSomething} 命令）。
+
+  \item 通过离开数学环境（使用保留字符 \quote{\$}）。
+
+\stopitemize
+
+某些命令也会自动生成一个组，例如 \tex{hbox}、\tex{vbox}，以及一般来说，与创建 {\em 盒子} 相关的命令\footnote{{\em 盒子} 概念也是 \ConTeXt\ 的核心概念，但其解释未包含在本入门书中。}。除了后一种情况（由某些命令自动生成的组）之外，关闭组的方式必须与开启组的方式一致。这意味着用 \MyKey{\{} 开始的组必须用 \MyKey{\}} 关闭，用 \tex{begingroup} 开始的组必须用 \tex{endgroup} 关闭。此规则只有一个例外，即用 \MyKey{\{} 开始的组可以用 \tex{egroup} 关闭，用 \tex{bgroup} 开始的组可以用 \MyKey{\}} 关闭；实际上，这意味着 \MyKey{\{} 和 \tex{bgroup} 是完全同义且可互换的，\MyKey{\}} 和 \tex{egroup} 也是如此。
+
+\startSmallPrint
+  命令 \PlaceMacro{bgroup}\tex{bgroup} 和 \PlaceMacro{egroup}\tex{egroup} 的设计目的是让用户能够定义一对命令，其中一个命令开启一个组，另一个命令关闭该组。因此，由于 \TeX\ 语法的内部原因，这些组不能使用花括号开启和关闭，因为这会在源文件中产生不平衡的花括号，并且在编译时总是会抛出错误。
+
+  相比之下，命令 \PlaceMacro{begingroup}\tex{begingroup} 和 \PlaceMacro{endgroup}\tex{endgroup} 不能与花括号或 \tex{\bgroup ... \egroup} 命令互换，因为用 \tex{begingroup} 开始的组必须用 \tex{endgroup} 关闭。后两个命令旨在允许更深入的错误检查。通常，普通用户不必使用它们。
+\stopSmallPrint
+
+我们可以有嵌套的组（一个组内的另一个组），在这种情况下，组关闭的顺序必须与它们开启的顺序一致：任何子组必须在其开始的组内关闭。也可以有空组，用 \MyKey{\{\}} 生成。空组原则上对最终文档没有影响，但它可能有用，例如，用于指示命令名称的结束。
+
+组的主要效果是封装其内容：通常，在组内进行的定义、格式和值分配，一旦离开该组就会被 \quotation{遗忘}。这样，如果我们希望 \ConTeXt\ 暂时改变其正常工作方式，最有效的方法是创建一个组，并在该组内改变其工作方式。因此，当我们离开该组时，之前的所有值和格式都将恢复。我们在提到像 \tex{it}、\tex{bf}、\tex{sc} 等命令时已经看到了一些这样的例子。但这不仅发生在格式命令上：组在某种程度上 {\em 隔离} 了其内容，因此，在 \ConTeXt\ 不断管理的众多内部变量中的任何一个发生的任何更改，将仅在我们处于发生该更改的组内时保持有效。同样，在组内定义的命令在组外将不可知。
+
+因此，如果我们处理以下示例
+
+\starttyping
+\define\A{B}
+\A
+{
+  \define\A{C}
+  \A
+}
+\A
+\stoptyping
+
+我们将看到，第一次运行命令 \tex{A} 时，结果与其初始定义（\quote{B}）相对应。然后我们创建了一个组，并在其中重新定义了命令 \tex{A}。如果我们现在在组内运行它，该命令将给出新的定义（在我们的示例中是 \quote{C}），但是当我们离开重新定义了命令 \tex{A} 的组时，如果再次运行它，它将再次输出 \quote{B}。在组内进行的定义一旦我们离开该组就被 \quotation{遗忘}了。
+
+组的另一个可能用途涉及那些专门设计应用于其后所写字符的命令或指令。在这种情况下，如果我们希望命令应用于多个字符，我们必须将希望命令或指令应用的字符括在一个组中。因此，例如，保留字符 \MyKey{\letterhat}，正如我们已经知道的，当在数学环境中使用时，它会将后面的字符转换为上标；因此，例如，如果我们写 \MyKey{\$4^2x\$}，我们将得到 \quotation{$4^2x$ }。但是如果我们写 \MyKey{\$4^\{2x\}\$}，我们将得到 \quotation{$4^{2x}$}。
+
+最后，分组的第三个用途是告诉 \ConTeXt，组内包含的内容必须被视为一个整体。这就是为什么之前（\in{节}[sec:syntax]）提到，在某些情况下，最好将某些命令选项的内容放在花括号内。
+
+\stopsubsection
+
+
+\startsubsection
+  [reference=sec:dimensions, title=尺寸]
+
+尽管我们可以完美地使用 \ConTeXt\ 而不必担心尺寸，但如果不加以考虑，我们将无法充分利用所有配置可能性。因为（在很大程度上）\TeX\ 及其衍生品所达到的排版完美性在于系统内部对尺寸的高度关注。字符有尺寸；单词之间、行之间或段落之间的间距有尺寸；行有尺寸，边距、页眉和页脚也有尺寸。对于我们能想到的页面上的几乎每个元素，都会有一个或多个相关的尺寸。
+
+在 \ConTeXt\ 中，尺寸由一个十进制数后跟测量单位表示。可以使用的单位\footnote{事实上，\ConTeXt\ LMTX 中还定义了其他单位，但为了避免在本入门书中涉及过多细节，这里不列出它们。}见 \in{表}[tbl:measurements]。
+
+\placetable
+  [here]
+  [tbl:measurements]
+  {\ConTeXt\ 中的测量单位}
+{\starttabulate[|l|c|l|]
+  \NC {\bf 名称} \NC {\bf \ConTeXt\ 中的名称}\NC {\bf 等价关系}\NR
+\NC 英寸\NC in\NC 1 in $=$ 2.54 cm\NR
+\NC 厘米\NC cm\NC 2.54 cm $=$ 1 英寸\NR
+\NC 毫米\NC mm\NC 10 mm $=$ 1 cm\NR
+\NC 点\NC pt\NC 72.27 pt $=$ 1 英寸\NR
+\NC 大点\NC bp\NC 72 bp $=$ 1 英寸\NR
+\NC 缩放点\NC sp\NC 65536 sp $=$ 1 点\NR
+\NC 十二点活字\NC pc\NC 1 pc $=$ 12 点\NR
+\NC 迪多点\NC dd\NC 1157 dd $=$ 1238 点\NR
+\NC 西塞罗\NC cc\NC 1 cc $=$ 12 迪多点\NR
+\NC\NC em\NR
+\NC\NC ex\NR
+\stoptabulate
+}
+
+% 以下显示了本文档所用字体的大小。
+% \setbox0=\hbox{M}
+% M 的宽度是 \the\wd0
+% 
+% \setbox0=\hbox{m}
+% m 的宽度是 \the\wd0 
+% 
+% \setbox0=\hbox to 1em{\hss}
+% 1 em 的宽度是 \the\wd0
+% 
+% \setbox0=\hbox{--}
+% -- 的宽度是 \the\wd0 
+% 
+% \setbox0=\hbox{---}
+% --- 的宽度是 \the\wd0
+%
+% 以上输出：
+% M 的宽度是 10.99796pt 
+% m 的宽度是 9.99051pt
+% 1 em 的宽度是 11.99341pt
+% – 的宽度是 5.9967pt
+% — 的宽度是 11.99341pt
+% 还有
+% N 的宽度是 8.99506pt
+% n 的宽度是 6.66833pt
+
+\in{表}[tbl:measurements] 中的前三个单位是标准长度单位；第一个在英语世界的某些地区使用，第二个和第三个在英语世界内外都使用。其余单位来自排版领域。最后两个，我没有给出等价关系，是基于当前字体的相对测量单位。一 \quotation{em} 等于所谓的 em-dash（\quotation{---}）的宽度，在此处使用的字体中，它比 \quotation{M} 大约宽 1pt。一 \quotation{ex} 等于一个 \quotation{x} 的高度。使用与字体大小相关的度量允许创建 \ConTeXt\ 源材料（包括用户定义的宏），其中尺寸可以根据当前字体改变大小，因此即使更改字体或大小，也能保持良好的外观。这就是为什么通常推荐使用这些单位。
+
+除了极少数例外，我们可以使用任何我们偏好的测量单位，因为 \ConTeXt\ 会在内部进行转换。但是，每当指示一个尺寸时，必须指示测量单位，即使我们想指示 \quotation{0} 的测量值，也必须提供一个单位，例如 \quote{0pt} 或 \quote{0cm}。在数字和单位名称之间，可以留或不留空格。如果单位有小数部分，我们可以使用小数点分隔符，可以是句点 \quote{.} 或逗号 \quote{,}。
+
+测量值通常用作某些命令的选项。但只要我们知道内部变量的名称，我们也可以直接为 \ConTeXt\ 的某些内部测量值赋值。例如，普通段落第一行的缩进在内部由 \ConTeXt\ 使用一个名为 \PlaceMacro{parindent}\tex{parindent} 的变量控制。通过明确地给这个变量赋值，我们将改变 \ConTeXt\ 从那时起使用的测量值。因此，例如，如果我们想消除第一行的缩进，我们只需要在源文件中写：
+
+\type{\parindent=0pt}
+
+我们也可以写 \tex{parindent 0pt}（不带等号）或 \tex{parindent0pt}（测量名称与其值之间没有空格），但使用等号可能使意图更明显。
+
+然而，直接给内部测量值赋值被认为是 \quotation{不优雅的}。通常，建议使用控制该变量的命令，并在源文件的导言区中这样做。相反的技术会导致源文件非常难以调试，因为并非所有配置命令都在同一个地方，并且很难在排版特性上获得一定的一致性。
+
+\ConTeXt\ 使用的某些尺寸是 \quotation{弹性的}：也就是说，根据上下文，它们可以采用指定范围内的值。这些测量值使用以下语法赋值：
+
+\type{\测量名称 plus 最大增量 minus 最大减量}
+
+% {\tt\backslash {\em 测量名称} plus {\em 最大增量} minus {\em 最大减量}}
+
+例如
+
+\type{\parskip 3pt plus 2pt minus 1pt}
+
+通过这条指令，我们告诉 \ConTeXt\ 给 \PlaceMacro{parskip}\tex{parskip}（表示段落之间的垂直距离）分配一个 {\em 正常} 测量值 3 点，但如果页面排版需要，该测量值可以大到 5 点（3 加 2）或小到 2 点（3 减 1）。在这些情况下，将由 \ConTeXt\ 在给定页面上选择分隔段落的距离，介于最小 2 点和最大 5 点之间。
+
+使用具有拉伸和收缩能力的尺寸有利有弊。如上所述，当 \ConTeXt\ 将单词排列成行，或者因为当前页已满而必须开始新页时，这种灵活性可以帮助 \ConTeXt\ 做出选择，避免难看或不方便的断行或断页。但是（例如）赋予 \tex{parskip} 一些拉伸和/或收缩能力意味着段落之间的间隙可能会改变，有些人可能不喜欢这样。最终，设计文档 \quotation{外观} 的人将不得不根据自己的偏好做出决定。
+
+\stopsubsection
+
+\stopsection
+
+\startsection
+  [title=\ConTeXt\ 的自学方法]
+
+  % 在最后一刻添加的章节，当我意识到自己已经深受 ConTeXt 精神的熏陶，能够猜到某些命令的存在时。
+
+\ConTeXt\ 庞大的命令和选项数量确实令人望而生畏，并可能给我们一种永远无法学好用好它的感觉。这种印象是错误的，因为 \ConTeXt\ 的优点之一是其处理所有结构的方式统一：学好少数几个结构，并或多或少知道其余结构的用途，当我们需要某些额外功能时，学会使用它将相对容易。因此，我认为这本入门书是一种 {\em 训练}，它将使我们做好准备，进行自己的研究。
+
+要用 \ConTeXt\ 创建一个文档，可能只需要了解以下五件事（我们可以称之为 \ConTeXt\ {\em 五大要点}）：
+
+\startitemize[n]
+
+% ??  \item 知道如何创建任何源文件或项目；
+  \item 知道如何创建源文件或项目；这在本书的 \in{章}[cap:sourcefile] 中有所解释。
+
+  \item 设置文档的主字体，并了解更改字体和颜色的基本命令（\in{章}[sec:fontscol]）。
+
+  \item 了解用于结构化文档内容的基本命令，例如章、节、小节等。这些都在 \in{章}[cap:structure] 中解释。
+
+  \item 也许要知道如何处理 {\em itemize} 环境，这在 \in{节}[sec:itemize] 中有一些详细的解释。
+
+  \item \unknown\ 仅此而已。
+
+\stopitemize
+
+对于其余部分，我们只需要知道它是可能的。当然，如果人们不知道某个工具的存在，就不会使用它。其中许多工具在本入门书中有所解释；但最重要的是，我们可以反复观察 \ConTeXt\ 在面对某种类型的结构时是如何行动的：
+
+\startitemize
+
+  \item 首先，会有一个命令允许它这样做。
+
+  \item 其次，几乎总是有一个命令允许我们配置和预设任务将如何执行；一个名称以 \tex{setup} 开头的命令，通常与基本命令名称相同。
+
+  \item 最后，通常可以创建一个新命令来执行类似的任务，但使用不同的配置。
+
+\stopitemize
+
+要查看这些命令是否存在，请查阅命令的官方列表（参见 \in{节}[sec:qrc-setup-en]），该列表还会告诉我们这些命令支持的配置选项。尽管乍一看这些选项的名称可能看起来 {\em 神秘}，但我们很快就会看到，有许多选项在许多命令中重复出现，并且在所有命令中以相同或非常相似的方式工作。如果我们对某个选项的作用或工作方式有疑问，生成一个文档并测试它就足够了。我们也可以查阅丰富的 \ConTeXt\ 文档。正如自由软件世界中常见的那样，\suite- 在其发行版中包含了几乎所有文档的源代码。像 \MyKey{grep}（用于 GNU Linux 和类似系统）这样的实用程序可以帮助我们搜索我们有疑问的命令或选项是否在任何这些源文件中使用，以便我们手头有一个示例。
+
+这就是学习 \ConTeXt\ 的设想方式：本入门书详细解释了我强调的五个（实际上是四个）方面，以及更多内容：当我们阅读时，脑海中会形成对序列的清晰画面：{\em 执行任务的命令} --- {\em 配置前一个命令的命令} --- {\em 允许我们创建类似命令的命令}。我们还将学习 \ConTeXt\ 的一些主要结构，并发现它们的用途。
+
+\stopsection
+
+\stopchapter
+
+\stopcomponent
+
+%%% Local Variables:
+%%% mode: ConTeXt
+%%% eval: (auto-fill-mode 1)
+%%% TeX-master: "../introCTX_eng.tex"
+%%% coding: utf-8-unix
+%%% End:
+%%% vim:set filetype=context tw=72 : %%%

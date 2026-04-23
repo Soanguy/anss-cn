@@ -1,0 +1,533 @@
+%%% File:       Symbols.tex
+%%% Author:     Joaquín Ataz-López
+%%% Begun:      April 2020
+%%% Concluded:  July 2020
+%%% Contents:   本附录最初是专门讨论源文件编写章节的一部分。我开始在其中加入用于生成通常无法从键盘输入的字符的命令。但我很快意识到：A) 我没有可靠的在 ConTeXt 中起作用的字符生成命令；B) 即使列表不完整，列出我个人验证过的命令也是值得的。
+%%% 但随着列表的增长，原本放置这些内容的章节会变得不成比例。因此，我决定将它们全部放在一个附录中，这样更容易查找。我只在正文中保留了生成变音符号和希腊字母的命令，其余的都放在附录中。这里的所有命令我都亲自验证过。不过，我也意识到，它们的分类方式可能有待商榷：这主要是因为我数学不好。
+%%%
+%%% Edited: Emacs + AUCTeX - And at times vim + context-plugin
+%%%
+
+\environment introCTX_env.tex
+
+\startcomponent Symbols.tex
+
+\startchapter
+  [
+    reference=app:symbols,
+    title={生成数学和非数学符号的命令},
+  ]
+
+在下面的表格中，您将找到生成各种符号的命令，这些命令都经过了我本人的逐一验证；其中大部分（但不是全部）适用于数学环境。
+
+我知道这些排列方式很可能有待改进。问题在于，我本人更偏向文科背景，不知道其中许多符号在数学中的用途；有时我甚至不确定它们是否真的是数学符号。这就是为什么我将一组我相当确定不用于数学的符号单独列出，而对于其余的符号，我根据某些可识别的形状（三角形、正方形、星号、菱形、箭头、点）进行分组。其余的符号，{\em 大概}是用于数学的，我按生成它们的命令的字母顺序排列。
+
+此外，这些表格并不详尽。我相信还有更多可以用 \ConTeXt\ 生成的符号，尽管我还没有找到任何收集了所有这些符号的文档或网页。这里收集的符号，大部分是在 \TeX\ 或 \LaTeX\ 中有效，并且我已经验证在 \ConTeXt\ 中也有效的符号。其中许多符号在 \LaTeX\ 或 plain \TeX\ 中仅在数学模式下有效（例如，放在一对 \quote{\tt \$} 之间）。在 \ConTeXt\ 中，如下列表格所示，只有在极少数情况下才需要这样做。
+
+{\smallbodyfont
+
+\subsubsubject{货币及法律用途符号}
+
+{\setuptabulate[bodyfont=pagella]
+\starttabulate[|l|l|l|l|l|l|]
+\HL
+\NC\copyright\NC{\tt\textbs copyright}
+\NC\registered\NC{\tt\textbs registered}
+\NC\textcent\NC{\tt\textbs textcent}
+\NR
+\NC\textcircledP\NC{\tt\textbs textcircledP}
+\NC\textcurrency\NC{\tt\textbs textcurrency}
+\NC\textdollar\NC{\tt\textbs textdollar}
+\NR
+\NC\textdong\NC{\tt\textbs textdong}
+\NC\texteuro\NC{\tt\textbs texteuro}
+\NC\textflorin\NC{\tt\textbs textflorin}
+\NR
+\NC\textsterling\NC{\tt\textbs textsterling}
+\NC\textyen\NC{\tt\textbs textyen}
+\NC\trademark\NC{\tt\textbs trademark}
+\NR
+\HL
+\stoptabulate}
+
+\page[preference]
+
+\subsubsubject{三角形、圆形、正方形及其他形状}
+
+\starttabulate[|l|l|l|l|l|l|]
+\HL
+\NC\triangle\NC{\tt\textbs triangle}
+\NC\bigcirc\NC{\tt\textbs bigcirc}
+\NC\square\NC{\tt\textbs square}
+\NR
+\NC\triangleleft\NC{\tt\textbs triangleleft}
+\NC\circ\NC{\tt\textbs circ}
+\NC\blacksquare\NC{\tt\textbs blacksquare}
+\NR
+\NC\triangleright\NC{\tt\textbs triangleright}
+\NC\bullet\NC{\tt\textbs bullet}
+\NC\boxdot\NC{\tt\textbs boxdot}
+\NR
+\NC\triangledown\NC{\tt\textbs triangledown}
+\NC\circledast\NC{\tt\textbs circledast}
+\NC\boxminus\NC{\tt\textbs boxminus}
+\NR
+\NC\blacktriangledown\NC{\tt\textbs blacktriangledown}
+\NC\circledcirc\NC{\tt\textbs circledcirc}
+\NC\boxplus\NC{\tt\textbs boxplus}
+\NR
+\NC\blacktriangleleft\NC{\tt\textbs blacktriangleleft}
+\NC\circleddash\NC{\tt\textbs circleddash}
+\NC\boxtimes\NC{\tt\textbs boxtimes}
+\NR
+\NC\blacktriangleright\NC{\tt\textbs blacktriangleright}
+\NC$\bigoplus$\NC{\tt\$\textbs bigoplus\$}
+\NC\ast\NC{\tt\textbs ast}
+\NR
+\NC\blacktriangle\NC{\tt\textbs blacktriangle}
+\NC$\bigotimes$\NC{\tt\$\textbs bigotimes\$}
+\NC\maltese\NC{\tt\textbs maltese}
+\NR
+\NC\triangleq\NC{\tt\textbs triangleq}
+\NC\oplus\NC{\tt\textbs oplus}
+\NC\star\NC{\tt\textbs star}
+\NR
+\NC\diamond\NC{\tt\textbs diamond}
+\NC\ominus\NC{\tt\textbs ominus}
+\NC\clubsuit\NC{\tt\textbs clubsuit}
+\NR
+\NC\lozenge\NC{\tt\textbs lozenge}
+\NC\otimes\NC{\tt\textbs otimes}
+\NC\heartsuit\NC{\tt\textbs heartsuit}
+\NR
+\NC\blacklozenge\NC{\tt\textbs blacklozenge}
+\NC\oslash\NC{\tt\textbs oslash}
+\NC\spadesuit\NC{\tt\textbs spadesuit}
+\NR
+\NC\diamondsuit\NC{\tt\textbs diamondsuit}
+\NC\odot\NC{\tt\textbs odot}
+\NC\varnothing\NC{\tt\textbs varnothing}
+\NR
+\HL
+\stoptabulate
+
+\subsubsubject{箭头：}
+
+\starttabulate[|l|l|l|l|l|l|]
+\HL
+\NC\leftarrow\NC{\tt\textbs leftarrow, \textbs gets}
+\NC\rightarrow\NC{\tt\textbs rightarrow, \textbs to}
+\NC\leftrightarrow\NC{\tt\textbs leftrightarrow}
+\NR
+\NC\nleftarrow\NC{\tt\textbs nleftarrow}
+\NC\nrightarrow\NC{\tt\textbs nrightarrow}
+\NC\Leftrightarrow\NC{\tt\textbs Leftrightarrow}
+\NR
+\NC\longleftarrow\NC{\tt\textbs longleftarrow}
+\NC\longrightarrow\NC{\tt\textbs longrightarrow}
+\NC\longleftrightarrow\NC{\tt\textbs longleftrightarrow}
+\NR
+\NC\Lleftarrow\NC{\tt\textbs Lleftarrow}
+\NC\Rrightarrow\NC{\tt\textbs Rrightarrow}
+\NC\Longleftrightarrow\NC{\tt\textbs Longleftrightarrow}
+\NR
+\NC\nLeftarrow\NC{\tt\textbs nLeftarrow}
+\NC\nRightarrow\NC{\tt\textbs nRightarrow}
+\NC\leftrightharpoons\NC{\tt\textbs leftrightharpoons}
+\NR
+\NC\Lsh\NC{\tt\textbs Lsh}
+\NC\Rsh\NC{\tt\textbs Rsh}
+\NC\leftrightsquigarrow\NC{\tt\textbs leftrightsquigarrow}
+\NR
+\NC\mapsfrom\NC{\tt\textbs mapsfrom}
+\NC\mapsto\NC{\tt\textbs mapsto}
+\NC\nLeftrightarrow\NC{\tt\textbs nLeftrightarrow}
+\NR
+\NC\longmapsfrom\NC{\tt\textbs longmapsfrom}
+\NC\longmapsto\NC{\tt\textbs longmapsto}
+\NC\nleftrightarrow\NC{\tt\textbs nleftrightarrow}
+\NR
+\NC\Mapsfrom\NC{\tt\textbs Mapsfrom}
+\NC\Mapsto\NC{\tt\textbs Mapsto}
+\NC\rightleftarrows\NC{\tt\textbs rightleftarrows}
+\NR
+\NC\Longmapsfrom\NC{\tt\textbs Longmapsfrom}
+\NC\Longmapsto\NC{\tt\textbs Longmapsto}
+\NC\rightleftharpoons\NC{\tt\textbs rightleftharpoons}
+\NR
+\NC\leftarrowtail\NC{\tt\textbs leftarrowtail}
+\NC\rightarrowtail\NC{\tt\textbs rightarrowtail}
+\NC\updownarrow\NC{\tt\textbs updownarrow}
+\NR
+\NC\twoheadleftarrow\NC{\tt\textbs twoheadleftarrow}
+\NC\twoheadrightarrow\NC{\tt\textbs twoheadrightarrow}
+\NC\Updownarrow\NC{\tt\textbs Updownarrow}
+\NR
+\NC\circlearrowleft\NC{\tt\textbs circlearrowleft}
+\NC\circlearrowright\NC{\tt\textbs circlearrowright}
+\NC\updownarrows\NC{\tt\textbs updownarrows}
+\NR
+\NC\curvearrowleft\NC{\tt\textbs curvearrowleft}
+\NC\curvearrowright\NC{\tt\textbs curvearrowright}
+\NC\uparrow\NC{\tt\textbs uparrow}
+\NR
+\NC\hookleftarrow\NC{\tt\textbs hookleftarrow}
+\NC\hookrightarrow\NC{\tt\textbs hookrightarrow}
+\NC\Uparrow\NC{\tt\textbs Uparrow}
+\NR
+\NC\leftharpoondown\NC{\tt\textbs leftharpoondown}
+\NC\rightharpoondown\NC{\tt\textbs rightharpoondown}
+\NC\upuparrows\NC{\tt\textbs upuparrows}
+\NR
+\NC\leftharpoonup\NC{\tt\textbs leftharpoonup}
+\NC\rightharpoonup\NC{\tt\textbs rightharpoonup}
+\NC\twoheaduparrow\NC{\tt\textbs twoheaduparrow}
+\NR
+\NC\leftleftarrows\NC{\tt\textbs leftleftarrows}
+\NC\rightrightarrows\NC{\tt\textbs rightrightarrows}
+\NC\upharpoonleft\NC{\tt\textbs upharpoonleft}
+\NR
+\NC\looparrowleft\NC{\tt\textbs looparrowleft}
+\NC\looparrowright\NC{\tt\textbs looparrowright}
+\NC\upharpoonright\NC{\tt\textbs upharpoonright}
+\NR
+\NC\swarrow\NC{\tt\textbs swarrow}
+\NC\searrow\NC{\tt\textbs searrow}
+\NC\downarrow\NC{\tt\textbs downarrow}
+\NR
+\NC\nwarrow\NC{\tt\textbs nwarrow}
+\NC\nearrow\NC{\tt\textbs nearrow}
+\NC\Downarrow\NC{\tt\textbs Downarrow}
+\NR
+\NC\leftsquigarrow\NC{\tt\textbs leftsquigarrow}
+\NC\leadsto\NC{\tt\textbs leadsto, \textbs rightsquigarrow}
+\NC\downdownarrows\NC{\tt\textbs downdownarrows}
+\NR
+\NC$\iff$\NC{\tt\$\textbs iff\$}
+\NC\twoheaddownarrow\NC{\tt\textbs twoheaddownarrow}
+\NC\downharpoonleft\NC{\tt\textbs downharpoonleft}
+\NR
+\NC$\implies$\NC{\tt \$\textbs implies\$}
+\NC\NC
+\NC\downharpoonright\NC{\tt\textbs downharpoonright}
+\NR
+\HL
+\stoptabulate
+
+\subsubsubject{标点符号}
+
+\starttabulate[|l|l|l|l|l|l|]
+\HL
+\NC\because\NC{\tt\textbs because}
+\NC\cdot\NC{\tt\textbs cdot}
+\NC\cdotp\NC{\tt\textbs cdotp}
+\NR
+\NC\cdots\NC{\tt\textbs cdots}
+%%LMTX kaks on this line: \NC\centerdot\NC{\tt\textbs centerdot}
+%% For that matter, what is the difference between \cdot and \cdotp ?
+\NC\colon\NC{\tt\textbs colon}
+\NC\ddots\NC{\tt\textbs ddots}
+\NR
+\NC\dots\NC{\tt\textbs dots}
+\NC\ldotp\NC{\tt\textbs ldotp}
+\NC\ldots\NC{\tt\textbs ldots}
+\NR
+\NC\textellipsis\NC{\tt\textbs textellipsis}
+\NC\therefore\NC{\tt\textbs therefore}
+\NC\vdots\NC{\tt\textbs vdots}
+\NR
+\NC\quotedblbase\NC{\tt\textbs quotedblbase}
+\NC\quotedbl\NC{\tt\textbs quotedbl}
+\NR
+\HL
+\stoptabulate
+
+\subsubsubject{主要用于数学的符号：}
+
+\starttabulate[|l|l|l|l|l|l|]
+\HL
+\NC\aleph\NC{\tt\textbs aleph}
+\NC\amalg\NC{\tt\textbs amalg}
+\NC\angle\NC{\tt\textbs angle}
+\NR
+\NC\approx\NC{\tt\textbs approx}
+\NC\approxeq\NC{\tt\textbs approxeq}
+\NC\asymp\NC{\tt\textbs asymp}
+\NR
+\NC\backsim\NC{\tt\textbs backsim}
+\NC\textbs\NC{\tt\textbs backslash}
+\NC\barwedge\NC{\tt\textbs barwedge}
+\NR
+\NC\between\NC{\tt\textbs between}
+\NC$\bigcap$\NC{\tt\$\textbs bigcap\$}
+\NC$\bigcup$\NC{\tt\$\textbs bigcup\$}
+\NR
+\NC$\bigsqcup$\NC{\tt\$\textbs bigsqcup\$}
+\NC$\biguplus$\NC{\tt\$\textbs biguplus\$}
+\NC$\bigvee$\NC{\tt\$\textbs bigvee\$}
+\NR
+\NC$\bigwedge$\NC{\tt\textbs bigwedge}
+\NC\bot\NC{\tt\textbs bot}
+\NC\bowtie\NC{\tt\textbs bowtie}
+\NR
+\NC\Bumpeq\NC{\tt\textbs Bumpeq}
+\NC$\cap$\NC{\tt\$\textbs cap\$}
+\NC\Cap\NC{\tt\textbs Cap}          % TODO: 这应该是什么符号？？？
+\NR
+\NC\circeq\NC{\tt\textbs circeq}
+\NC\complement\NC{\tt\textbs complement}
+\NC\cong\NC{\tt\textbs cong}
+\NR
+\NC$\coprod$\NC{\tt\$\textbs coprod\$}
+\NC\cup\NC{\tt\textbs cup}
+\NC\Cup\NC{\tt\textbs Cup}
+\NR
+\NC\curlyeqprec\NC{\tt\textbs curlyeqprec}
+\NC\curlyeqsucc\NC{\tt\textbs curlyeqsucc}
+\NC\curlyvee\NC{\tt\textbs curlyvee}
+\NR
+\NC\curlywedge\NC{\tt\textbs curlywedge}
+\NC\dashv\NC{\tt\textbs dashv}
+\NC\dagger\NC{\tt\textbs dagger, dag}
+\NR
+\NC\ddagger\NC{\tt\textbs ddagger, ddag}
+\NC\diamondsuit\NC{\tt\textbs diamondsuit}
+\NC\div\NC{\tt\textbs div}
+\NR
+\NC\divideontimes\NC{\tt\textbs divideontimes}
+\NC\doteq\NC{\tt\textbs doteq}
+\NC\doteqdot\NC{\tt\textbs doteqdot}
+\NR
+\NC\dotplus\NC{\tt\textbs dotplus}
+\NC\ell\NC{\tt\textbs ell}
+\NC\emptyset\NC{\tt\textbs emptyset}
+\NR
+\NC\eqcirc\NC{\tt\textbs eqcirc}
+\NC\eqslantgtr\NC{\tt\textbs eqslantgtr}
+\NC\eqslantless\NC{\tt\textbs eqslantless}
+\NR
+\NC\equiv\NC{\tt\textbs equiv}
+\NC\eth\NC{\tt\textbs eth}
+\NC\exists\NC{\tt\textbs exists}
+\NR
+\NC\exists!\NC{\tt\textbs exists!}
+\NC\fallingdotseq\NC{\tt\textbs fallingdotseq}
+\NC\flat\NC{\tt\textbs flat}
+\NR
+\NC\forall\NC{\tt\textbs forall}
+\NC\frown\NC{\tt\textbs frown}
+\NC\geq\NC{\tt\textbs geq, \textbs ge}
+\NR
+\NC\geqslant\NC{\tt\textbs geqslant}
+\NC\gg\NC{\tt\textbs gg}
+\NC\ggg\NC{\tt\textbs ggg}
+\NR
+\NC\gnapprox\NC{\tt\textbs gnapprox}
+\NC\gneqq\NC{\tt\textbs gneqq}
+\NC\gnsim\NC{\tt\textbs gnsim}
+\NR
+\NC\gtrapprox\NC{\tt\textbs gtrapprox}
+\NC\gtrdot\NC{\tt\textbs gtrdot}
+\NC\gtreqless\NC{\tt\textbs gtreqless}
+\NR
+\NC\gtreqqless\NC{\tt\textbs gtreqqless}
+\NC\gtrless\NC{\tt\textbs gtrless}
+\NC\gtrsim\NC{\tt\textbs gtrsim}
+\NR
+\NC\hbar\NC{\tt\textbs hbar}
+\NC\heartsuit\NC{\tt\textbs heartsuit}
+\NC\hslash\NC{\tt\textbs hslash}
+\NR
+\NC$\iiiint$\NC{\tt\$\textbs iiiint\$}
+\NC\Im\NC{\tt\textbs Im}
+\NC\imath\NC{\tt\textbs imath}
+\NR
+\NC$\in$\NC{\tt\$\textbs in\$}
+\NC\infty\NC{\tt\textbs infty}
+\NC$\int$\NC{\tt\$\textbs int\$}
+\NR
+\NC\intercal\NC{\tt\textbs intercal}
+\NC\jmath\NC{\tt\textbs jmath}
+\NC\land\NC{\tt\textbs land}
+\NR
+\NC\leftthreetimes\NC{\tt\textbs leftthreetimes}
+\NC\leq\NC{\tt\textbs leq, \textbs le}
+\NC\leqq\NC{\tt\textbs leqq}
+\NR
+\NC\leqslant\NC{\tt\textbs leqslant}
+\NC\lessapprox\NC{\tt\textbs lessapprox}
+\NC\lessdot\NC{\tt\textbs lessdot}
+\NR
+\NC\lesseqgtr\NC{\tt\textbs lesseqgtr}
+\NC\lesseqqgtr\NC{\tt\textbs lesseqqgtr}
+\NC\lessgtr\NC{\tt\textbs lessgtr}
+\NR
+\NC\lesssim\NC{\tt\textbs lesssim}
+\NC\ll\NC{\tt\textbs ll}
+\NC\lll\NC{\tt\textbs lll}
+\NR
+\NC\lnapprox\NC{\tt\textbs lnapprox}
+\NC\lneq\NC{\tt\textbs lneq}
+\NC\lneqq\NC{\tt\textbs lneqq}
+\NR
+\NC\lnsim\NC{\tt\textbs lnsim}
+\NC\lor\NC{\tt\textbs lor}
+\NC\ltimes\NC{\tt\textbs ltimes}
+\NR
+\NC\measuredangle\NC{\tt\textbs measuredangle}
+\NC\models\NC{\tt\textbs models}
+\NC\mp\NC{\tt\textbs mp}
+\NR
+\NC\multimap\NC{\tt\textbs multimap}
+\NC\nVDash\NC{\tt\textbs nVDash}
+\NC\nabla\NC{\tt\textbs nabla}
+\NR
+\NC\natural\NC{\tt\textbs natural}
+\NC\ncong\NC{\tt\textbs ncong}
+\NC\neq\NC{\tt\textbs neq}
+\NR
+%LMTX kaks on this: \NC\neg\NC{\tt\textbs neg o \textbs lnot}
+\NC $\neg$\NC{\tt\$\textbs neg\$ {\rm 或} \$\textbs lnot\$}
+\NC\nexists\NC{\tt\textbs nexists}
+\NC\ngeq\NC{\tt\textbs ngeq}
+\NR
+\NC\ngtr\NC{\tt\textbs ngtr}
+\NC\ni\NC{\tt\textbs ni}
+\NC\nleq\NC{\tt\textbs nleq}
+\NR
+\NC\nless\NC{\tt\textbs nless}
+\NC\nmid\NC{\tt\textbs nmid}
+\NC\not\approx\NC{\tt\textbs not\textbs approx}
+\NR
+\NC\not\equiv\NC{\tt\textbs not\textbs equiv}
+\NC\not\sim\NC{\tt\textbs not\textbs sim}
+\NC\not\simeq\NC{\tt\textbs not\textbs simeq}
+\NR
+\NC\notin\NC{\tt\textbs notin}
+\NC\nparallel\NC{\tt\textbs nparallel}
+\NC\nprec\NC{\tt\textbs nprec}
+\NR
+\NC\nsim\NC{\tt\textbs nsim}
+\NC\nsubseteq\NC{\tt\textbs nsubseteq}
+\NC\nsucc\NC{\tt\textbs nsucc}
+\NR
+\NC\nsupseteq\NC{\tt\textbs nsupseteq}
+\NC\ntriangleleft\NC{\tt\textbs ntriangleleft}
+\NC\ntrianglelefteq\NC{\tt\textbs ntrianglelefteq}
+\NR
+\NC\ntriangleright\NC{\tt\textbs ntriangleright}
+\NC\ntrianglerighteq\NC{\tt\textbs ntrianglerighteq}
+\NC\nvdash\NC{\tt\textbs nvdash}
+\NR
+\NC\nvDash\NC{\tt\textbs nvDash}
+\NC$\oint$\NC{\tt\$\textbs oint\$}
+\NC\parallel\NC{\tt\textbs parallel}
+\NR
+\NC\partial\NC{\tt\textbs partial}
+\NC\perp\NC{\tt\textbs perp}
+\NC\perthousand\NC{\tt\textbs perthousand}
+\NR
+\NC\pm\NC{\tt\textbs pm}
+\NC\prec\NC{\tt\textbs prec}
+\NC\preccurlyeq\NC{\tt\textbs preccurlyeq}
+\NR
+\NC\preceq\NC{\tt\textbs preceq}
+\NC\precnsim\NC{\tt\textbs precnsim}
+\NC\precsim\NC{\tt\textbs precsim}
+\NR
+\NC\prime\NC{\tt\textbs prime}
+\NC$\prod$\NC{\tt\textbs prod}
+\NC\propto\NC{\tt\textbs propto}
+\NR
+\NC\Re\NC{\tt\textbs Re}
+\NC\rightthreetimes\NC{\tt\textbs rightthreetimes}
+\NC\risingdotseq\NC{\tt\textbs risingdotseq}
+\NR
+\NC\rtimes\NC{\tt\textbs rtimes}
+\NC\sharp\NC{\tt\textbs sharp}
+\NC\sim\NC{\tt\textbs sim}
+\NR
+\NC\simeq\NC{\tt\textbs simeq}
+\NC\smile\NC{\tt\textbs smile}
+\NC\sphericalangle\NC{\tt\textbs sphericalangle}
+\NR
+\NC\sqcap\NC{\tt\textbs sqcap}
+\NC\sqcup\NC{\tt\textbs sqcup}
+\NC\sqsubset\NC{\tt\textbs sqsubset}
+\NR
+\NC\sqsubseteq\NC{\tt\textbs sqsubseteq}
+\NC\sqsupset\NC{\tt\textbs sqsupset}
+\NC\sqsupseteq\NC{\tt\textbs sqsupseteq}
+\NR
+\NC\subset\NC{\tt\textbs subset}
+\NC\Subset\NC{\tt\textbs Subset}
+\NC\subseteq\NC{\tt\textbs subseteq}
+\NR
+\NC\subsetneq\NC{\tt\textbs subsetneq}
+\NC\succ\NC{\tt\textbs succ}
+\NC\succcurlyeq\NC{\tt\textbs succcurlyeq}
+\NR
+\NC\succeq\NC{\tt\textbs succeq}
+\NC\succnsim\NC{\tt\textbs succnsim}
+\NC\succsim\NC{\tt\textbs succsim}
+\NR
+\NC$\sum$\NC{\tt\textbs sum}
+\NC\supset\NC{\tt\textbs supset}
+\NC\Supset\NC{\tt\textbs Supset}
+\NR
+\NC\supseteq\NC{\tt\textbs supseteq}
+\NC\supsetneq\NC{\tt\textbs supsetneq}
+\NC\surd\NC{\tt\textbs surd}
+\NR
+\NC\textpm\NC{\tt\textbs textpm}
+\NC\times\NC{\tt\textbs times}
+\NC\top\NC{\tt\textbs top}
+\NR
+\NC\triangle\NC{\tt\textbs triangle}
+\NC\uplus\NC{\tt\textbs uplus}
+\NC\vDash\NC{\tt\textbs vDash}
+\NR
+\NC\Vdash\NC{\tt\textbs Vdash}
+\NC\vee\NC{\tt\textbs vee o \textbs lor}
+\NC\veebar\NC{\tt\textbs veebar}
+\NR
+\NC\Vert\NC{\tt\textbs Vert}
+\NC\Vvdash\NC{\tt\textbs Vvdash}
+\NC\wedge\NC{\tt\textbs wedge o \textbs land}
+\NR
+\NC\wp\NC{\tt\textbs wp}
+\NC\wr\NC{\tt\textbs wr}
+\NR
+\HL
+\stoptabulate
+
+\subsubsubject{其他符号}
+\starttabulate[|l|l|l|l|l|l|]
+\HL
+\NC\P\NC{\tt\textbs P}
+\NC\S\NC{\tt\textbs S}
+% 不带参数时，\celsius 会在下一列输出 ${}^\sup\circ$C。嗯。
+\NC\celsius{0} \NC{\tt\textbs celsius\{0\}}
+\NR
+\NC\checkmark\NC{\tt\textbs checkmark}
+\NC\mho\NC{\tt\textbs mho}
+\NC\ohm\NC{\tt\textbs ohm}
+\NR
+\NC\textdegree\NC{\tt\textbs textdegree}
+\NC\textnumero\NC{\tt\textbs textnumero}
+\NC\textvisiblespace\NC{\tt\textbs textvisiblespace}
+\NR
+\HL
+\stoptabulate
+}
+
+\stopchapter
+
+\stopcomponent
+
+%%% Local Variables:
+%%% mode: ConTeXt
+%%% eval: (auto-fill-mode 1)
+%%% TeX-master: "../introCTX_eng.tex"
+%%% coding: utf-8-unix
+%%% End:

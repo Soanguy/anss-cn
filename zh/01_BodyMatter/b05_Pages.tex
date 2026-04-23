@@ -1,0 +1,872 @@
+%%% File:       b05_Pages.tex
+%%% Author:     Joaquín Ataz-López et al
+%%% Begun:      May 2020
+%%% Concluded:  May 2020
+%%% Contents:   本章混合了两部分内容：页面布局（文档的整体外观）和与分页相关的命令（特定外观，可能属于第11章）。其内容主要基于2013年的参考手册，尽管我也参考了wiki。
+%%%
+%%% Edited with: Emacs + AUCTeX - And at times with vim + context-plugin
+%%%
+
+\environment ../introCTX_env.tex
+
+\startcomponent b05_Pages.tex
+
+\startchapter
+    [
+        reference=cap:pages,
+        title=页面与文档分页,
+        bookmark=页面与文档分页,
+    ]
+
+\TocChap
+
+\ConTeXt\ 将源文档转换为正确格式化的 {\em 页面}。这些页面的外观、文本和空白的分布方式以及它们包含的元素，都是良好排版的基础。本章致力于讨论所有这些问理，以及一些与分页相关的其他事项。
+
+\startsection
+    [
+        reference=sec:papersize,
+        title=页面尺寸,
+    ]
+
+\startsubsection
+    [
+        reference=sec:pagesize,
+        title=设置页面尺寸,
+    ]
+\PlaceMacro{setuppapersize}
+
+默认情况下，\ConTeXt\ 假定文档为 A4 尺寸，这是欧洲标准。我们可以使用 \tex{setuppapersize} 设置不同的尺寸，这是一个典型的命令，通常出现在文档导言区中。该命令的{\em 常规}语法是：
+
+\type{\setuppapersize[逻辑页面][物理页面]}
+
+其中两个参数都采用符号名称。\footnote{回想一下，在 \in{节}[sec:syntax] 中，我指出 \ConTeXt\ 命令所接受的选项基本上有两种：符号名称（其含义已被 \ConTeXt\ 知晓）或我们必须显式赋予某个值的变量。} 第一个参数（我称之为 {\em 逻辑页面}）表示排版时要考虑的页面尺寸；第二个参数（{\em 物理页面}）表示要打印的页面尺寸。通常两种尺寸相同，此时第二个参数可以省略；然而，有时两种尺寸可能不同，例如，当以 8 页或 16 页为一印张打印书籍时（一种常见的印刷技术，大约在 1960 年代之前尤其常用于学术书籍）。在这些情况下，\ConTeXt\ 允许我们区分这两种尺寸；如果我们希望在一张纸上打印多个页面，我们还可以使用 \tex{setuparranging} 命令（本入门不解释）指示要遵循的折页方案。
+
+对于排版尺寸，我们可以指定造纸工业（或我们自己）使用的任何预定义尺寸。这包括：
+
+\startitemize
+  \item ISO-216 定义的 A、B 和 C 系列中的任何尺寸（从 A0 到 A10，从 B0 到 B10，从 C0 到 C10），通常在欧洲使用。
+
+  \item 任何美国标准尺寸：letter、ledger、tabloid、legal、folio、executive。
+
+  \item ISO-217 标准定义的任何 RA 和 RSA 尺寸。
+
+  \item 瑞士 SIS-014711 标准定义的 G5 和 E5 尺寸（用于博士论文）。
+
+  \item 信封：北美标准定义的任何尺寸（9 号信封到 14 号信封）或 ISO-269 标准定义的任何尺寸（C6/C5、DL、E4）。
+
+  \item CD，用于 CD 封面。
+
+  \item S3--S6、S8、SM 和 SW，用于不打算打印而是屏幕显示的文档的屏幕尺寸。
+
+\stopitemize
+
+与纸张尺寸一起，使用 \tex{setuppapersize} 我们可以指示页面方向：\quotation{纵向}（垂直）或 \quotation{横向}（水平）。
+
+% TODO：阐明 JAL 在下一段中关于当前 LMTX 行为的内容。
+
+\startSmallPrint
+
+  根据 \ConTeXt\ wiki，\tex{setuppapersize} 允许的其他选项有 \MyKey{rotated}、\MyKey{90}、\MyKey{180}、\MyKey{270}、\MyKey{mirrored} 和 \MyKey{negative}。在我自己的测试中，我只注意到使用 \MyKey{rotated} 时有一些明显的变化，它会翻转页面，尽管不完全是翻转。数值选项本应产生相应的旋转度数，可以单独使用或与 \MyKey{rotated} 组合使用，但我无法让它们 \Doubt 工作。我也没确切发现 \MyKey{mirrored} 和 \MyKey{negative} 的用途。
+
+\stopSmallPrint
+
+\tex{setuppapersize} 的第二个参数（我已经说过，当打印尺寸与排版尺寸相同时可以省略）可以采用与第一个参数相同的值，指示纸张尺寸和方向。它也可以取 \MyKey{oversized} 作为值——根据 \ConTeXt\ wiki——这会在纸张的每个角上增加一厘米半。
+
+\startSmallPrint
+
+  根据 wiki，第二个参数还有其他可能的值：\MyKey{undersized}、\MyKey{doublesized} 和 \MyKey{doubleoversized}。但在我的测试中，使用这些值后我没有看到任何变化；命令的官方定义（参见 \in{节}[sec:qrc-setup-en]）也没有提到这些选项。
+
+\stopSmallPrint
+
+\stopsubsection
+
+
+\startsubsection
+  [title=使用非标准页面尺寸]
+
+如果我们想使用非标准的页面尺寸，可以做两件事：
+
+\startitemize[n]
+
+  \item 使用 \tex{setuppapersize} 的另一种语法，允许我们以尺寸值的形式引入纸张的高度和宽度。
+
+  \item 定义我们自己的页面尺寸，为其分配一个名称，并像使用标准纸张尺寸一样使用它。
+
+\stopitemize
+
+\subsubsubject{\tex{setuppapersize} 的替代语法}
+
+除了我们已经看到的语法，\tex{setuppapersize} 还允许我们使用另一种语法：
+
+\type{\setuppapersize[名称][选项]}
+
+其中 {\em 名称} 是一个可选参数，表示使用 \tex{definepapersize}（我们将在下一节中介绍）分配给纸张尺寸的名称，而 {\em 选项} 是那种我们赋予显式值的选项。在允许的选项中，我们可以强调以下几点：
+
+\startitemize
+
+  \item {\tt\bf width} 和 {\tt\bf height}，分别表示页面的宽度和高度。
+
+  \item {\tt\bf page} 和 {\tt\bf paper}，其中第一个指的是要排版的页面尺寸，第二个指的是实际打印的纸张尺寸。这意味着 \MyKey{page} 相当于 \tex{setuppapersize} 正常语法（上面解释过）的第一个参数，而 \MyKey{paper} 相当于第二个参数。这些选项可以采用前面提到的相同值（A4、S3 等）。
+
+  \item {\tt\bf scale}，表示页面的缩放因子。
+
+  \item {\tt\bf topspace}、{\tt\bf backspace} 和 {\tt\bf offset}：附加距离。
+
+\stopitemize
+
+
+\subsubsubject{定义自定义页面尺寸}
+
+要定义自定义页面尺寸，我们使用 \tex{definepapersize} 命令，其语法为：
+
+\PlaceMacro{definepapersize}\type{\definepapersize[名称][选项]}
+
+其中 {\em 名称} 指赋予新尺寸的名称，而 {\em 选项} 可以是：
+
+\startitemize
+
+  \item \tex{setuppapersize} 正常语法中允许的任何值（A4、A3、B5、CD 等）。
+
+  \item 宽度（纸张宽度）、高度（纸张高度）和偏移（位移）的尺寸值，或缩放值（\MyKey{scale}）。
+
+\stopitemize
+
+不能混合使用 \tex{setuppapersize} 允许的值与尺寸值或缩放因子。这是因为在第一种情况下，选项是符号词，而在第二种情况下，是赋予显式值的变量；在 \ConTeXt\ 中，正如我已经说过的，不能在同一个方括号对中混合两种类型的选项。
+
+当我们使用 \tex{definepapersize} 指示与某些标准测量值一致的纸张尺寸时，实际上我们并不是在定义一个新的纸张尺寸，而是在为已经存在的纸张尺寸定义一个新名称。如果我们想将纸张尺寸与方向结合起来，这可能会很有用。因此，例如，我们可以写
+
+\starttyping
+\definepapersize[vertical][A4, portrait]
+\definepapersize[horizontal][A4, landscape]
+\stoptyping
+
+\stopsubsection
+
+
+\startsubsection
+  [title=在文档中的任意点更改页面尺寸]
+
+在大多数情况下，文档只有一种页面尺寸，这就是为什么 \tex{setuppapersize} 是我们包含在导言区中且在每个文档中只使用一次的典型命令。然而，有时可能需要在文档中的某个点更改尺寸；例如，如果从某个点开始包含一个附录，其中纸张是横向的。
+
+在这种情况下，我们可以在希望更改发生的确切位置使用 \tex{setuppapersize}。但由于尺寸会立即更改，为避免意外结果，我们通常会在 \tex{setuppapersize} 之前插入一个强制分页（使用 \tex{page}）。
+
+如果我们只需要为单个页面更改页面尺寸，而不是使用两次 \tex{setuppapersize}（一次更改为新尺寸，第二次恢复到原始尺寸），我们可以使用 \PlaceMacro{adaptpapersize}\tex{adaptpapersize}，它会更改页面尺寸，并在下一页之后自动重置为调用 \tex{adaptpapersize} 之前的值。与 \tex{setuppapersize} 一样，在使用 \tex{adaptpapersize} 之前，我们应该插入一个强制分页。
+
+\stopsubsection
+
+\startsubsection
+  [title=调整页面尺寸以适应其内容]
+
+\ConTeXt\ 中有三个环境可以生成精确尺寸的页面来容纳其内容。它们是 \PlaceMacro{startMPpage}\tex{startMPpage}、\PlaceMacro{startpagefigure}\tex{startpagefigure} 和 \PlaceMacro{startTEXpage}\tex{startTEXpage}。第一个生成一个页面，其中包含用 MetaPost 生成的图形，MetaPost 是一种与 \ConTeXt\ 集成的图形设计语言，但本入门不会涉及。第二个对图像执行相同的操作，并可选择在图像下方添加一些文本。它有两个参数：第一个标识包含图像的文件。我将在专门讨论外部图像的章节（\in{节}[sec:externalgraphics]）中讨论这一点。第三个（\tex{startTEXpage}）创建一个完全适合其内容的页面。其语法为：
+
+\type{\startTEXpage[选项] ... \stopTEXpage}
+
+其中选项可以是以下任何一项：
+
+\startitemize
+
+\item {\tt\bf strut}：我不确定此选项的用途。在 \ConTeXt\ 术语中，{\em strut} 是一个没有宽度但具有最大高度和 \Doubt 深度的字符，但我不太明白这与该命令的整体用途有什么关系。根据 wiki，此选项允许的值有 \MyKey{yes}、\MyKey{no}、\MyKey{global} 和 \MyKey{local}，默认值为 \MyKey{no}。
+
+\item {\tt\bf align}：指示文本对齐方式。可以是 \MyKey{normal}、\MyKey{flushleft}、\MyKey{flushright}、\MyKey{middle}、\MyKey{high}、\MyKey{low} 或 \MyKey{lohi}。
+
+\item {\tt\bf offset}：指示文本周围的空白量。可以是 \MyKey{none}、\MyKey{overlay}（如果需要叠加效果）或实际尺寸。
+
+\item {\tt\bf width}、{\tt\bf height}：我们可以为页面指定宽度和高度，或者指定值 \MyKey{fit}，使得宽度和高度由环境中包含的文本所需的大小决定。（\MyKey{fit} 是每个参数的默认值。）
+
+\item {\tt\bf frame}：默认是 \MyKey{off}，但如果我们希望页面上的文本周围有边框，可以取 \MyKey{on} 值。
+
+\stopitemize
+
+\stopsubsection
+
+\stopsection
+
+
+\startsection
+  [
+    reference=sec:page-elements,
+    title=页面上的元素,
+  ]
+
+\ConTeXt\ 将页面划分为许多不同的区域（\quotation{元素}），这为文档设计者在决定页面布局方式时提供了相当大的灵活性；许多用户，尤其是 \ConTeXt\ 新手，不会使用所有这些页面元素。但对于那些需要复杂布局的用户，现在将描述许多页面布局参数。（如果你提前查看 \in{图}[img:page layout]，你会看到许多页面元素和相应距离的图示；但不要让那个图的复杂性吓到你！）
+
+这些元素的大小可以使用 \tex{setuplayout} 进行配置。我们很快就会看到这个命令，但在此之前，最好先描述每个页面元素，并指出 \tex{setuplayout} 识别它们各自的名称：
+
+% TODO：文字处理器是否将边缘称为边距，还是他们根本没有这个概念？我猜测文字处理器中的边距相当于 ConTeXt 世界中的边缘+边距。
+
+\startitemize
+
+  \item {\bf 边缘：} 文本区域周围的空白区域。尽管大多数文字处理器称之为 \quotation{边距}，但使用 \ConTeXt\ 的术语更可取，因为它使我们能够区分没有文本的边缘（尽管在电子文档中可能有导航按钮等）和有时可以放置某些文本元素（例如边注）的边距。
+
+    \startitemize
+
+      \item 上边缘的高度由两个测量值控制：上边缘本身（\MyKey{top}）以及上边缘与页眉之间的距离（\MyKey{topdistance}）。这两个测量值的总和称为 \MyKey{topspace}。
+
+      \item 左右边缘的大小分别取决于 \MyKey{leftedge} 和 \MyKey{rightedge} 测量值。如果我们希望两者长度相同，可以使用 \MyKey{edge} 选项同时配置它们。
+
+        在用于双面打印的文档中，我们不谈论左边缘和右边缘，而是谈论内边缘和外边缘；前者是离纸张装订或缝线最近的一边，即奇数页上的左边缘和偶数页上的右边缘。外边缘位于页面与内边缘相反的一侧。
+
+      \item 下边缘的高度称为 \MyKey{bottom}。
+
+    \stopitemize
+
+    % 在用于纸上打印的文档中，边缘永远不能包含文本。但在用于屏幕显示的文档中，边缘可以承载一些元素，如导航按钮等。
+
+  \item {\bf 边距}（严格意义上的）。\ConTeXt\ 仅将 \quotation{边距} 一词用于左右边距。边距位于边缘和主文本区域之间，旨在承载某些文本元素，如边注，并且在某些文档设计中，节标题或其编号位于边距中。
+
+    控制边距大小的尺寸有：
+
+    \startitemize
+
+      \item {\tt\bf margin}：用于将左右边距同时设置为相同大小。
+
+      \item {\tt\bf leftmargin}、{\tt\bf rightmargin}：分别用于设置左边距和右边距的大小。
+
+      \item {\tt\bf edgedistance}：用于设置边缘与边距之间的距离。（如果需要左右不同的距离，可以使用选项 {\tt\bf leftedgedistance} 和 {\tt\bf rightedgedistance}。）
+
+      \item {\tt\bf leftedgedistance}、{\tt\bf rightedgedistance}：分别用于设置边缘与左右边距之间的距离。
+
+      \item {\tt\bf margindistance}：用于设置边距与主文本区域之间的距离。
+
+      \item {\tt\bf leftmargindistance}、{\tt\bf rightmargindistance}：如果需要不同的距离，分别用于设置主文本区域与左右边距之间的距离。
+
+      \item {\tt\bf backspace}：此测量值表示纸张左边缘与主文本区域左边缘之间的空间。因此，它由 \MyKey{leftedge} + \MyKey{leftedgedistance} + \MyKey{leftmargin} + \MyKey{leftmargindistance} 之和组成。在不使用边距的文档中，通常直接设置 \MyKey{backspace}。
+
+    \stopitemize
+
+  \item {\bf 页眉和页脚：} 页面的页眉和页脚是两个区域，分别位于页面书写区域的顶部或底部。它们通常包含有助于提供文本上下文的信息，例如页码、作者姓名、作品标题、章节标题等。在 \ConTeXt\ 中，页面上的这些区域受以下尺寸的影响：
+
+    \startitemize
+
+      \item {\tt\bf header}：页眉的高度。
+
+      \item {\tt\bf footer}：页脚的高度。
+
+      \item {\tt\bf headerdistance}：页眉与页面主文本区域顶部之间的距离。
+
+      \item {\tt\bf footerdistance}：页脚与页面主文本区域底部之间的距离。
+
+      \item {\tt\bf topdistance}、{\tt\bf bottomdistance}：前面都提到过。它们分别是上边缘与页眉顶部之间，以及下边缘与页脚底部之间的距离。
+
+    \stopitemize
+
+  \item {\bf 主文本区域：} 这是页面上最宽的区域，容纳文档的文本。其大小取决于 \MyKey{width} 和 \MyKey{textheight} 变量。而 \MyKey{height} 变量测量的是 \MyKey{header}、\MyKey{headerdistance}、\MyKey{textheight}、\MyKey{footerdistance} 和 \MyKey{footer} 的总和。
+
+\stopitemize
+
+\placefigure
+  [here]
+  [img:page layout]
+  {页面上的区域和测量值}
+  {\externalfigure[PageLayout.png][width=.8\textwidth]}
+
+我们可以在 \in{图}[img:page layout] 中看到所有这些区域，以及相应测量值的名称和指示其范围的箭头。箭头的粗细以及箭头名称的大小旨在反映这些距离对页面布局的重要性。如果仔细观察，我们会看到此图显示一个页面可以表示为一个九行九列的表格，或者，如果不考虑不同区域之间的间距值，那么将有五行五列，其中只有三行三列可以有文本。中间行与中间列的交点构成主文本区域，通常占据页面的大部分。
+
+在文档的布局阶段，我们可以使用 \PlaceMacro{showsetups}\tex{showsetups} 查看所有页面测量值。要查看页面上视觉指示的文本分布主要轮廓，可以使用 \PlaceMacro{showframe}\tex{showframe}；而使用 \PlaceMacro{showlayout}\tex{showlayout} 可以结合前两个命令的效果。
+
+\stopsection
+
+
+
+\startsection
+  [
+    reference=sec:pagelayout,
+    title=页面布局（\tex{setuplayout}）,
+  ]
+\PlaceMacro{setuplayout}
+
+\startsubsection
+  [
+    reference=sec:setuplayout,
+    title=为不同的页面组件分配大小,
+  ]
+
+页面设计涉及为页面的各个区域分配特定的大小。这通过 \tex{setuplayout} 完成。此命令允许我们更改上一节中提到的任何尺寸。其语法如下：
+
+\type{\setuplayout [名称] [选项]}
+
+其中 {\em 名称} 是一个可选参数，仅在我们设计了多个布局时使用（参见 \in{节}[sec:definelayout]），而选项，除了我们稍后将看到的其他选项外，可以是前面提到的任何测量值。但请记住，这些测量值是相互关联的，因为影响宽度的组件总和以及影响高度的组件总和必须分别与页面的宽度和高度一致。原则上，这意味着当更改水平长度时，我们必须调整其余的水平长度；调整垂直长度时也是如此。
+
+默认情况下，\ConTeXt\ 仅在某些情况下自动调整尺寸，但另一方面，其文档中并未以任何完整或系统的方式指明这些情况。通过进行多次测试，我能够验证，例如，手动增加或减少页眉或页脚的高度会导致 \MyKey{textheight} 的调整；然而，根据我的测试，手动更改某些边距并不会自动调整文本宽度（\MyKey{width}）。这就是为什么在页面大小（用 \tex{setuppapersize} 设置）与其各个组件的大小之间不产生任何不一致的最有效方法是：
+
+\startitemize
+
+  \item 关于水平测量值：
+
+    \startitemize
+
+      \item 通过调整 \MyKey{backspace}（包括 \MyKey{leftedge} 和 \MyKey{leftmargin}）。
+
+      \item 通过调整 \MyKey{width}（文本宽度），不使用尺寸值，而使用 \MyKey{fit} 或 \MyKey{middle} 值：
+
+        \startitemize
+
+          \item {\tt fit} 根据页面其余水平组件的宽度计算文本宽度。
+
+          \item {\tt middle} 执行相同的操作，但首先使左右边距相等。
+
+        \stopitemize
+
+    \stopitemize
+
+  \item 关于垂直测量值：
+
+    \startitemize
+
+      \item 通过调整 \MyKey{topspace}。
+
+      \item 通过将 \MyKey{fit} 或 \MyKey{middle} 值应用于 \MyKey{height}。它们的工作方式与宽度情况相同。第一个根据其余组件计算高度，第二个使上下边距相等，然后计算文本高度。
+
+      \item 一旦 \MyKey{height} 被调整，如果需要，再调整页眉或页脚的高度，因为知道在这种情况下 \MyKey{textheight} 将被自动重新调整。
+
+    \stopitemize
+
+  \item 间接确定主文本区域高度的另一种可能性是指示要容纳在其中的行数（考虑到当前的 interline 间距和字体大小）。这就是为什么 \tex{setuplayout} 包含 \MyKey{lines} 选项的原因。
+
+\stopitemize
+
+\subsubsubject{将逻辑页面放置在物理页面上}
+
+在逻辑页面大小与物理页面大小不同的情况下（参见 \in{节}[sec:pagesize]），\tex{setuplayout} 允许我们配置一些影响逻辑页面在物理页面上放置的附加选项：
+
+\startitemize
+
+  \item {\tt\bf location}：此选项确定页面将放置在物理页面上的位置。其可能值为 left、middle、right、top、bottom、singlesided、doublesided 或 duplex。
+
+  \item {\tt\bf scale}：指示在将页面放置到物理页面上之前应用于页面的缩放因子。
+
+  \item {\tt\bf marking}：将在页面上打印视觉标记，以指示纸张的裁剪位置。
+
+  \item {\tt\bf horoffset}、{\tt\bf veroffset}、{\tt\bf clipoffset}、{\tt\bf cropoffset}、{\tt\bf trimoffset}、{\tt\bf bleedoffset}、{\tt\bf artoffset}：一系列指示物理页面上不同位移的测量值。其中大部分在 2013 年的参考手册中有所解释。
+
+\stopitemize
+
+这些 \tex{setuplayout} 选项必须与 \PlaceMacro{setuparranging}\tex{setuparranging} 的指示结合使用，后者指示逻辑页面在物理纸张上的排列顺序。我不会在本入门中解释这些命令，因为我还没有对它们进行任何测试。
+
+\subsubsubject{获取文本区域的宽度和高度}
+
+% TODO：“这些命令提供的值不能直接显示在最终文档中”是什么意思？
+
+命令 \PlaceMacro{textwidth}\tex{textwidth} 和 \PlaceMacro{textheight}\tex{textheight} 分别返回文本区域的宽度和高度。这些命令提供的值不能直接显示在最终文档中，但它们可以用于其他命令来设置其宽度或高度测量值。因此，例如，要指示我们希望图像的宽度为行宽的 60%，我们需要将图像 \MyKey{width} 选项的值指定为：\MyKey{width=0.6\backslash textwidth}（关于将图像放入文档，请参见 \in{节}[sec:externalgraphics]）。
+
+\stopsubsection
+
+\startsubsection
+    [title=调整页面布局]
+\PlaceMacro{adaptlayout}
+
+可能我们某个特定页面上的页面布局会产生不理想的结果；例如，章节的最后一页只有一两行，这在排版或美学上都是不可取的。为了解决这些情况，\ConTeXt\ 提供了 \tex{adaptlayout} 命令，允许我们更改一个或多个页面上文本区域的大小。此命令旨在仅在我们已经完成文档编写并进行一些小的最终调整时使用。因此，它的自然位置是在文档的导言区。该命令的语法为：
+
+\type{\adaptlayout [页面] [选项]}
+
+其中 {\em 页面} 指的是我们想要更改其布局的页码。这是一个可选参数，仅当 \tex{adaptlayout} 放在导言区中时才使用。我们可以指定一个页面，也可以指定多个页面，用逗号分隔数字。如果省略这第一个参数，\tex{adaptlayout} 将只影响它找到该命令的页面。
+
+至于选项，它们可以是：
+
+\startitemize
+
+  \item {\tt\bf height}：允许我们以尺寸值的形式指示相关页面应具有的高度。我们可以指示绝对高度（例如 \quotation{19cm}）或相对高度（例如 \quotation{+1cm}、\quotation{-0.7cm}）。例如，\MyKey{height=+5mm}。
+
+  \item {\tt\bf lines}：我们可以包含要增加或减少的行数。要增加行数，值前面加 \quote{+}，要减少行数，前面加 \quote{-}。例如，\MyKey{lines=-3}。
+
+\stopitemize
+
+考虑到当我们更改页面上的行数时，这可能会影响文档其余部分的分页。这就是为什么建议仅在文档最终确定不再更改时，在最后使用 \tex{adaptlayout}，并在导言区中进行。然后我们转到我们希望调整的第一个页面，进行调整并检查它如何影响后续页面；如果它以需要调整另一页的方式影响它，我们添加其编号并再次编译，依此类推。这可能是一个有点漫长、乏味的过程，这就是为什么建议仅在文档其他部分最终确定后才执行此操作。
+
+\stopsubsection
+
+\startsubsection
+  [
+    reference=sec:definelayout,
+    title=使用多个页面布局,
+  ]
+\PlaceMacro{definelayout}
+
+如果我们需要在文档的不同部分使用不同的布局，最好的方法是首先定义 {\em 通用} 布局，然后定义各种替代布局，这些替代布局只更改需要不同的尺寸。这些替代布局将继承整体布局的所有特性，这些特性在其定义中不会更改。要指定一个替代布局并为其命名以便以后调用，我们使用 \tex{definelayout} 命令，其一般语法为：
+
+\type{\definelayout [名称/编号] [配置]}
+
+其中 {\em 名称/编号} 是与新设计关联的名称，或者是新布局将自动激活的页码，而 {\em 配置} 将包含我们希望通过与整体布局比较而更改的布局方面。
+
+当新布局与名称关联时，要在文档中的特定点调用它，我们使用：
+
+\type{\setuplayout [布局名称]}
+
+并返回到通用布局：
+
+\type{\setuplayout [reset]}
+
+另一方面，如果新布局与特定的页码关联，则当到达该页时，它将自动激活。但是，一旦激活，要返回到通用设计，我们必须显式地指示这一点，尽管我们可以 {\em 半自动} 化这一点。例如，如果我们想将布局仅应用于第 1 页和第 2 页，我们可以在文档的导言区中写：
+
+\starttyping
+\definelayout[1][...]
+\definelayout[3][reset]
+\stoptyping
+
+这些命令的效果是，第一行定义的布局在第 1 页上激活，在第 3 页上激活另一个布局，其功能仅仅是返回到通用布局。
+
+使用 \tex{definelayout[even]} 我们创建一个在所有偶数页上激活的布局；使用 \tex{definelayout[odd]}，该布局将应用于所有奇数页。
+
+\stopsubsection
+
+
+\startsubsection
+  [
+    reference=sec:pages-other-matters,
+    title=与页面布局相关的其他事项,
+  ]
+
+\startsubsubsection
+  [
+    reference=sec:double-sided,
+    title=区分奇偶页,
+  ]
+
+在双面打印的文档中，奇数页和偶数页的页眉、页码和侧边距通常不同。偶数页也称为左手页（verso），奇数页称为右手页（recto）。在这些情况下，关于边距的术语也通常会改变，我们谈论内边距和外边距。前者位于离页面装订或缝合最近的位置，后者位于相反的一侧。在奇数页上，内边距对应于左边距，而在偶数页上，外边距对应于右边距。
+
+\tex{setuplayout} 没有任何选项允许我们明确告诉它我们想要区分奇偶页的布局。这是因为对于 \ConTeXt，两种页面之间的区别是通过一个不同的选项设置的，即 \tex{setuppagenumbering}，我们将在 \in{节}[sec:numpages] 中看到。一旦设置了双面，\ConTeXt\ 就会假定用 \tex{setuplayout} 描述的页面是奇数页，并通过将奇数页的值反转来构建偶数页。也就是说，适用于奇数页左侧的规范将适用于偶数页的右侧，反之亦然。
+
+\stopsubsubsection
+
+
+\startsubsubsection
+  [
+    reference=sec:pages-columns,
+    title=具有多栏的页面,
+  ]
+
+使用 \tex{setuplayout}，我们还可以使文档的文本分布在两栏或多栏中，例如报纸和一些杂志那样。这由 \MyKey{columns} 选项控制，其值必须是一个整数。当有多栏时，栏之间的距离由 \MyKey{columndistance} 选项指示。
+
+此选项适用于所有文本（或大部分文本）分布在多栏中的文档。如果在一个主要是单栏的文档中，我们希望特定部分为两栏或三栏，我们不需要更改页面布局，而只需使用 \MyKey{columns} 环境（参见 \in{节}[sec:multiplecolumns]）。
+
+\stopsubsubsection
+
+\stopsubsection
+
+\stopsection
+
+
+\startsection
+  [
+    reference=sec:numpages,
+    title=页码编号,
+  ]
+
+默认情况下，\ConTeXt\ 使用阿拉伯数字进行页码编号，并且数字显示在页眉中央。要更改这些特性，\ConTeXt\ 有不同的方法，在我看来，它们在这方面引入了不必要的复杂性。
+
+首先，编号的基本特性由两个不同的命令控制：
+\PlaceMacro{setuppagenumbering}\tex{setuppagenumbering} 和
+\PlaceMacro{setupuserpagenumber}\tex{setupuserpagenumber}。
+
+\type{\setuppagenumbering} 允许以下选项：
+
+\startitemize
+
+  \item {\tt\bf alternative}：此选项控制文档的设计是使页眉和页脚在所有页面上相同（\MyKey{singlesided}），还是区分奇偶页（\MyKey{doublesided}）。当此选项取后者值时，\MyKey{setup\-layout} 引入的页面布局值会自动受到影响，因此假定 \MyKey{setup\-layout} 中指示的仅适用于奇数页，因此为左边距安排的实际上指的是内边距（在偶数页上位于右侧），而为右侧安排的实际上指的是外边距，在偶数页上位于左侧。
+
+  \item {\tt\bf state}：指示是否显示页码。它允许两个值：start（将显示页码）和 stop（将隐藏页码）。这些值的名称（start 和 stop）可能让我们认为当 \MyKey{state=stop} 时页面停止编号，而当 \MyKey{state=start} 时编号重新开始。但事实并非如此：这些值只影响页码是否显示。
+
+  \item {\tt\bf location}：指示页码将显示在何处。通常我们需要在此选项中指定两个值，用逗号分隔。首先，我们需要指定我们想要页码在页眉（\MyKey{header}）还是页脚（\MyKey{footer}）中，然后，在页眉或页脚中的位置：可以是 \MyKey{left}、\MyKey{middle}、\MyKey{right}、\MyKey{inleft}、\MyKey{inright}、\MyKey{margin}、\MyKey{inmargin}、\MyKey{atmargin} 或 \MyKey{marginedge}。例如：要在页脚中显示右对齐的编号，我们应该指示 \MyKey{location=\{footer,right\}}。注意我们如何用花括号将此选项括起来，以便 \ConTeXt\ 能够正确解释分隔逗号。
+
+  \item {\tt\bf style}：指示用于页码的字体大小和样式。
+
+  \item {\tt\bf color}：指示应用于页码的颜色。
+
+  \item {\tt\bf left}：获取要放置在页码左侧的命令或文本。
+
+  \item {\tt\bf right}：获取要放置在页码右侧的命令或文本。
+
+  \item {\tt\bf command}：获取一个命令，页码将作为参数传递给该命令。
+
+  \item {\tt\bf width}：指示页码占用的宽度。
+
+  \item {\tt\bf strut}：我不太确定这个。在我的测试中，当 \MyKey{strut=no} 时，数字正好打印在页眉的上边缘或页脚的底部，而当 \MyKey{strut=yes}（默认值）时，数字和边缘之间会有一个空间。
+
+\stopitemize
+
+\type{\setupuserpagenumber} 允许这些额外选项：
+
+\startitemize
+
+  \item {\tt\bf numberconversion}：控制编号的类型；可以是阿拉伯数字（\MyKey{n}、\MyKey{numbers}）、小写字母（\MyKey{a}、\MyKey{characters}）、大写字母（\MyKey{A}、\MyKey{Characters}）、小型大写阿拉伯数字（\MyKey{KA}）、小写罗马数字（\MyKey{i}、\MyKey{r}、\MyKey{romannumerals}）、大写罗马数字（\MyKey{I}、\MyKey{R}、\MyKey{Romannumerals}）或小型大写罗马数字（\MyKey{KR}）。
+
+  \item {\tt\bf number}：指示要分配给第一页的编号，在此基础上计算其余页面。
+
+  \item {\tt\bf numberorder}：如果我们为此分配 \MyKey{reverse} 作为值，页码将按递减顺序排列；这意味着最后一页将是 1，倒数第二页是 2，依此类推。
+
+  \item {\tt\bf way}：允许我们指示编号将如何进行。可以是：\MyKey{byblock}、 \MyKey{bychapter}、 \MyKey{bysection}、 \MyKey{bysubsection} 等。
+
+  \item {\tt\bf prefix}：允许我们指示页码的前缀。
+
+  \item {\tt\bf numberconversionset}：在下面解释。
+
+\stopitemize
+
+除了这两个命令，还需要考虑涉及文档宏观结构（参见 \in{节}[sec:macrostructure]）的数字控制。从这个角度来看，\PlaceMacro{defineconversionset}\tex{defineconversionset} 允许我们为每个宏观结构块指示不同类型的编号。例如：
+
+\vbox{\starttyping
+\defineconversionset
+  [frontpart:pagenumber][][romannumerals]
+
+\defineconversionset
+  [bodypart:pagenumber][][numbers]
+
+\defineconversionset
+  [appendixpart:pagenumber][][Characters]
+
+\stoptyping}
+
+将看到我们文档中的第一个块（frontmatter）使用小写罗马数字编号，中央块（bodymatter）使用阿拉伯数字，附录使用大写字母。
+
+我们可以使用以下命令获取页码：
+
+% TODO：\setuppagenumbering 与 \userpagenumber 返回的内容有关吗？
+% TODO：\pagenumber 和 \realpagenumber 之间的区别从这里的阐述中（对我来说）不清楚。
+
+\startitemize
+
+  \item \PlaceMacro{userpagenumber}\tex{userpagenumber}：返回页码，与使用 \tex{setuppagenumbering} 和 \tex{setupuserpagenumber} 配置的完全一样。
+
+  \item \PlaceMacro{pagenumber}\tex{pagenumber}：返回与上一个命令相同的数字，但仍为阿拉伯数字。
+
+  \item \PlaceMacro{realpagenumber}\tex{realpagenumber}：返回页面的实际阿拉伯数字编号，不考虑任何这些规范。
+
+\stopitemize
+
+要获取文档最后一页的编号，有三个与上述命令并行的命令。它们是：
+\PlaceMacro{lastuserpagenumber}\tex{lastuserpagenumber}、
+\PlaceMacro{lastpagenumber}\tex{lastpagenumber}
+和 \PlaceMacro{lastrealpagenumber}\tex{lastrealpagenumber}。
+
+\stopsection
+
+
+\startsection
+  [title=强制或建议的分页]
+
+\startsubsection
+  [title=\tex{page} 命令]
+\PlaceMacro{page}
+
+\ConTeXt\ 中文本分布的算法相当复杂，基于大量的计算和内部变量，这些变量告诉程序从排版正确性的角度来看，哪里是进行实际分页的最佳可能点。\tex{page} 命令允许我们影响这个算法：
+
+\startitemize[a]
+
+  \item 通过建议某些点作为包含分页的最佳或不适当位置：
+
+    \startitemize[packed]
+
+      \item {\tt\bf no}：指示命令所在的位置不是插入分页的好候选位置，因此，应尽可能在文档的其他点进行分页。
+
+      \item {\tt\bf preference}：告诉 \ConTeXt\ 遇到命令的点是尝试分页的 {\em 好位置}，尽管它不会在那里强制分页。
+
+      \item {\tt\bf bigpreference}：指示遇到命令的点是尝试分页的 {\em 非常好的位置}，但同样不会强制分页。
+
+    \stopitemize
+
+    请注意，这三个选项既不强制也不阻止分页，只是告诉 \ConTeXt\ 在寻找分页的最佳位置时，应该考虑此命令中指示的内容。然而，最终，分页发生的位置仍将由 \ConTeXt\ 决定。
+
+  \item 通过在某个点强制分页；在这种情况下，我们还可以指示应进行多少次分页以及要插入的页面的某些特性。
+
+    \startitemize[packed]
+
+      \item {\tt\bf yes}：在此点强制分页。
+
+      \item {\tt\bf makeup}：类似于 \MyKey{yes}，但强制分页是立即的，不会先放置任何待处理的浮动对象（参见 \in{节}[sec:floating objects]）。
+
+      \item {\tt\bf empty}：在文档中插入一个完全空白的页面（即，甚至没有任何页眉或页脚文本）。
+
+      \item {\tt\bf even}：根据需要插入尽可能多的页面，使下一页为偶数页。
+
+      \item {\tt\bf odd}：根据需要插入尽可能多的页面，使下一页为奇数页。
+
+      \item {\tt\bf left}、{\tt\bf right}：类似于前两个选项，但仅适用于双面打印的文档，根据页面是奇数还是偶数，具有不同的页眉、页脚或边距。
+
+      \item {\tt\bf quadruple}：插入所需数量的页面，使下一页的页码为 4 的倍数。
+    \stopitemize
+\stopitemize
+
+% TODO：以前这表示 disable 会取消之后的所有 \page 命令。wiki 说是下一个。但这应该被确认。
+
+除了这些专门控制分页的选项外，\tex{page} 还包括其他影响此命令工作方式的选项。特别是 \MyKey{disable} 选项，它导致 \ConTeXt\ 忽略从那时起找到的 \tex{page} 命令，而 \MyKey{reset} 选项产生相反的效果，恢复后续 \tex{page} 命令的有效性。
+
+\stopsubsection
+
+
+\startsubsection
+  [title=连接某些行或段落以防止在它们之间插入分页]
+
+有时，如果我们想防止在几个段落之间分页，使用 \tex{page} 命令可能会很繁琐，因为它必须在每个可能插入分页的位置写入。一个更简单的做法是将我们想要保持在同一页上的材料放入 \TeX\ 所称的 {\em 垂直盒子} 中。
+
+\startSmallPrint
+
+  在本文档的开头（\at{page}[ref:boxes]），我指出在内部，对 \TeX\null\ 来说一切都是 {\em 盒子}。盒子概念对于任何类型的 {\em 高级} 操作在 \TeX\ 中都是基础；但管理它过于复杂，无法包含在本入门中。这就是为什么我只偶尔提及盒子。
+
+\stopSmallPrint
+
+\TeX\ 盒子一旦创建，就是不可分割的\footnote{这不完全正确\unknown\ 它们可以被分割，但那是另一个对于本入门来说过于高级的话题。}，这意味着我们不能插入一个会将盒子一分为二的分页。这就是为什么，如果我们把想要保持在一起的材料放在一个不可见的盒子中，我们就可以避免插入会分割这些材料的分页。执行此操作的命令是 \PlaceMacro{vbox}\tex{vbox}，其语法为
+
+\type{\vbox{材料}}
+
+其中 {\em 材料} 是我们想要保持在一起的文本。
+
+\ConTeXt\ 的某些环境确实将其内容放在一个盒子中，例如 \MyKey{framedtext}。因此，如果我们把想要保持在一起的材料放在这个环境中，并设置边框不可见（通过使用 {\tt frame=off} 选项），我们就达到了保持材料在一起的目标。
+
+但是\unknown\ 请注意，我们最终可能会在页面上出现多余的空白，例如，如果带框的文本几乎适合页面，但没有完全适合。如果发生这种情况，您将不得不决定是要重写一些文本、撤销保持文本在一起的决定，还是接受一个带有大量空白的页面。
+
+\stopsubsection
+
+\stopsection
+
+
+\startsection
+  [
+    reference=sec:headerfooter,
+    title=页眉和页脚,
+  ]
+
+\startsubsection
+    [title=建立页眉和页脚内容的命令]
+\PlaceMacro{setupheadertexts}\PlaceMacro{setupfootertexts}
+
+如果我们在页面布局中为页眉和页脚分配了特定的大小，我们可以使用 \tex{setupheadertexts} 和 \tex{setupfootertexts} 命令在它们中包含文本。这两个命令相似，唯一的区别是前者激活页眉内容，后者激活页脚内容。两者都有一到五个参数。
+
+\startitemize[n]
+
+  \item 使用单个参数时，这些命令会将页眉或页脚的文本放置在页面的（水平）中央。例如：\tex{setupfootertexts[pagenumber]} 将在页脚中央写入页码。
+
+  \item 使用两个参数时，第一个参数的内容将放置在页眉或页脚的左侧，第二个参数的内容将放置在右侧。例如，\tex{setupheadertexts[Preface][pagenumber]} 将排版一个页眉，其中单词 \quotation{Preface} 写在左侧，页码打印在右侧。
+
+  \item 如果我们使用三个参数，第一个将指示 {\em 区域}，其中将打印其他两个参数。我所说的 {\em 区域} 指的是 \in{节}[sec:page-elements] 中提到的页面 {\em 区域}，即：\MyKey{edge}、\MyKey{margin}、\MyKey{header}、\unknown\ 其他两个参数分别包含要放置在左侧和右侧的文本。
+
+\stopitemize
+
+% TODO：是否需要调用 \setuppagenumbering 才能生效？
+
+使用四个或五个参数调用 \tex{setupheadertexts} 或 \tex{setupfootertexts} 类似于分别使用两个或三个参数，但适用于区分奇偶页的情况。我们知道，当使用 \tex{setuppagenumbering} 设置了 \MyKey{alternative=doublesided} 时，就会发生这种情况。在这种情况下，不是指定左侧和右侧文本，而是前两个文本参数用于右页，后两个文本参数用于左页。
+
+这两个命令的一个重要特性是，当使用两个参数时，之前的中央页眉或页脚（如果存在）不会被重写，这允许我们只要先写入中央文本（使用单个参数调用命令），然后写入两侧的文本（再次调用，现在使用两个参数），就可以在每个区域写入不同的文本。因此，例如，如果我们写入以下命令：
+
+\starttyping
+\setupheadertexts[and]
+\setupheadertexts[Tweedledum][Tweedledee]
+\stoptyping
+
+第一个命令将在页眉中央写入 \quotation{and}，第二个命令将在左侧写入 \quotation{Tweedledum}，在右侧写入 \quotation{Tweedledee}，保持中央区域不变，因为它没有被命令重写。生成的页眉现在将显示为
+
+\color[maincolor] {Tweedledum\hfill and\hfill Tweedledee}
+
+% TODO：最好删除对 2013 年文档的引用。那是 Mk II 还是 Mk IV？
+
+\startSmallPrint
+
+  我刚刚对这些命令操作的解释是经过多次测试后得出的结论。\ConTeXt\ {\em 一瞥} 中对这些命令的解释基于五个参数的版本；而 2013 年参考手册中的解释基于三个参数的版本。我认为我的 \Conjecture 更清晰。另一方面，我没有看到关于为什么第二次命令调用不会覆盖前一次调用的解释，但如果我们首先写入页眉或页脚中的中央项目，然后写入两侧的项目，情况就是如此。但是，如果我们首先指定页眉/页脚的左侧和右侧内容，随后调用命令指定中央项目将删除左侧和右侧的页眉或页脚。为什么？我不知道。我认为这些小细节引入了不必要的复杂性，应该在官方文档中明确解释。
+
+\stopSmallPrint
+
+此外，我们可以指示任何文本和命令的组合作为页眉或页脚的实际内容，但也可以使用以下值：
+
+\startitemize
+
+  \item {\tt\bf date}、{\tt\bf currentdate}：其中任何一个都会写入当前日期。
+
+  \item {\tt\bf pagenumber}：将写入页码。
+
+  \item {\tt\bf part}、{\tt\bf chapter}、{\tt\bf section}、\unknown：将写入当前部分、章节、节或任何其他结构划分的相应标题。
+
+  \item {\tt\bf partnumber}、{\tt\bf chapternumber}、{\tt\bf sectionnumber}、\unknown：将写入部分、章节、节或任何其他结构划分的编号。
+
+\stopitemize
+
+{\bf 注意：} 这些符号名称（{\tt date}、{\tt currentdate}、{\tt pagenumber}、{\tt chapter}、{\tt chapternumber} 等）只有在符号名称本身是参数的唯一内容时才会被如此解释；但如果我们添加一些其他文本或格式化命令，这些单词将被逐字解释；例如，如果我们写 \tex{setupheadertexts[chapternumber]}，我们将得到当前章节的编号；但如果我们写 \tex{setupheadertexts[{Chapter chapternumber}]}，我们最终会得到：\quotation{Chapter~chapternumber}。在这些情况下，当命令的内容不仅仅是符号词时，我们需要做更多的工作：
+
+\startitemize
+
+  \item 对于 {\tt date}、{\tt currentdate} 和 {\tt pagenumber}，不使用符号词，而使用同名的命令（\tex{date}、\tex{currentdate} 或 \PlaceMacro{pagenumber}\tex{pagenumber}）。
+
+  \item 对于 {\tt part}、{\tt partnumber}、{\tt chapter}、{\tt chapternumber} 等，使用 \PlaceMacro{getmarking}\tex{getmarking[标记]} 命令，该命令返回所请求的 {\em 标记} 的内容。因此，例如，\tex{getmarking[chapter]} 将返回当前章节的标题，而 \tex{getmarking[chapternumber]} 将返回当前章节的编号。
+
+\stopitemize
+
+要禁用特定页面上的页眉和页脚，请使用 \PlaceMacro{noheaderandfooterlines}\tex{noheaderandfooterlines} 命令，该命令仅作用于它所在的页面。如果我们只想删除特定页面上的页码，我们必须使用 \tex{page[blank]} 命令。
+
+\stopsubsection
+
+
+\startsubsection
+    [title=格式化页眉和页脚]
+\PlaceMacro{setupheader}\PlaceMacro{setupfooter}
+
+页眉或页脚文本显示的具体格式可以在 \tex{setupheadertexts} 或 \tex{setupfootertexts} 的参数中使用相应的格式命令来指示。但是，我们也可以使用 \tex{setupheader} 和 \tex{setupfooter} 全局配置，它们允许以下选项：
+
+\startitemize
+
+  \item {\tt\bf state}：允许以下值：{\tt start}、{\tt stop}、{\tt empty}、{\tt high}、{\tt none}、{\tt normal} 或 {\tt nomarking}。
+
+  \item {\tt\bf style}、{\tt\bf leftstyle}、{\tt\bf rightstyle}：页眉和页脚文本样式的配置。{\tt style} 影响所有页面，{\tt leftstyle} 影响偶数页，{\tt rightstyle} 影响奇数页。
+
+  \item {\tt\bf color}、{\tt\bf leftcolor}、{\tt\bf rightcolor}：页眉或页脚颜色。它可以影响所有页面（{\tt color} 选项）或仅影响偶数页（{\tt leftcolor}）或奇数页（{\tt rightcolor}）。
+
+  \item {\tt\bf width}、{\tt\bf leftwidth}、{\tt\bf rightwidth}：所有页眉和页脚的宽度（{\tt width}）或偶数页上的页眉/页脚（{\tt leftwidth}）或奇数页上的页眉/页脚（{\tt rightwidth}）。
+
+  \item {\tt\bf before}：在写入页眉或页脚之前要执行的命令。
+
+  \item {\tt\bf after}：在写入页眉或页脚之后要执行的命令。
+
+  \item {\tt\bf strut}：如果是 \quotation{yes}，则在页眉与边缘之间建立垂直分隔空间。当是 \quotation{no} 时，页眉或页脚紧贴上下边缘区域的边界。
+
+\stopitemize
+
+% \subsection{上下边缘中的文本}
+
+% 如果回想一下我在 \in{节}[sec:elementospag] 中关于页面元素的解释，我说过页面的上下边缘（\ConTeXt\ 术语中的 {\tt top} 和 {\tt bottom}）原则上不能有文本。然而，这不是绝对的规则，因为主要是在用于屏幕显示的电子文档中，在这些区域中包含一些文本元素可能很有用。这就是为什么 \ConTeXt\ 允许在其中包含文本内容的原因。
+
+\stopsubsection
+
+
+\startsubsection
+    [title=定义特定的页眉和页脚并将其链接到节命令]
+\PlaceMacro{definetext}
+
+\ConTeXt\ 的页眉和页脚系统允许我们在更改章节或节时自动更改页眉或页脚中的文本；或者当我们更改页面时，如果我们为奇偶页设置了不同的页眉或页脚。但它不允许区分（文档、章节或节的）第一页和其余页面。要实现后者，我们必须：
+
+\startitemize[n, packed]
+
+  \item 定义特定的页眉或页脚。
+  \item 将其链接到适用的节。
+
+\stopitemize
+
+特定页眉或页脚的定义使用 \tex{definetext} 命令完成，其语法为：
+
+\vbox{\starttyping
+\definetext
+  [名称] [类型]
+  [内容1] [内容2] [内容3]
+  [内容4] [内容5]
+\stoptyping}
+
+其中 {\em 名称} 是分配给正在处理的页眉或页脚的名称；{\em 类型} 可以是 {\tt header} 或 {\tt footer}，取决于我们定义的是哪一个，其余五个参数包含我们想要的新页眉或页脚的内容，类似于我们看到的 \PlaceMacro{setupheadertexts}\tex{setupheadertexts} 和 \PlaceMacro{setupfootertexts}\tex{setupfootertexts} 的工作方式。完成后，我们需要使用 \tex{setuphead} 的 {\tt header} 和 {\tt footer} 选项（这些在 \in{章}[cap:structure] 中没有解释）将新页眉或页脚链接到某个特定的节。
+
+% TODO：西班牙语中也说“没有解释”。这是 JAL 的意思吗？与第 7 章交叉引用。
+
+因此，以下示例将在每个章节的第一页上隐藏页眉，并显示一个居中的页码作为页脚：
+
+\starttyping
+\definetext[ChapterFirstPage] [footer] [pagenumber]
+\setuphead
+  [chapter]
+  [header=high, footer=ChapterFirstPage]
+\stoptyping
+
+\stopsubsection
+
+\stopsection
+
+
+\startsection
+  [
+     reference=sec:margintext,
+     title=在页面边缘和边距中插入文本元素,
+  ]
+
+上下边缘以及左右边距通常不包含任何文本。然而，\ConTeXt\ 允许在那里放置一些文本元素。特别地，以下命令可用于此目的：
+
+\startitemize
+
+  \item \PlaceMacro{setuptoptexts}\tex{setuptoptexts}：允许我们在页面上边缘（页眉区域上方）放置文本。
+
+  \item \PlaceMacro{setupbottomtexts}\tex{setupbottomtexts}：允许我们在页面下边缘（页脚区域下方）放置文本。
+
+  \item \PlaceMacro{margintext}\tex{margintext}、
+    \PlaceMacro{atleftmargin}\tex{atleftmargin}、
+    \PlaceMacro{atrightmargin}\tex{atrightmargin}、
+    \PlaceMacro{ininner}\tex{ininner}、
+    \PlaceMacro{ininneredge}\tex{ininneredge}、
+    \PlaceMacro{ininnermargin}\tex{ininnermargin}、
+    \PlaceMacro{inleft}\tex{inleft}、
+    \PlaceMacro{inleftedge}\tex{inleftedge}、
+    \PlaceMacro{inleftmargin}\tex{inleftmargin}、
+    \PlaceMacro{inmargin}\tex{inmargin}、\PlaceMacro{inother}\tex{inother}、
+    \PlaceMacro{inouter}\tex{inouter}、
+    \PlaceMacro{inouteredge}\tex{inouteredge}、
+    \PlaceMacro{inoutermargin}\tex{inoutermargin}、
+    \PlaceMacro{inright}\tex{inright}、
+    \PlaceMacro{inrightedge}\tex{inrightedge}、
+    \PlaceMacro{inrightmargin}\tex{inrightmargin}：允许我们在文档的侧边边缘和边距中放置文本。
+
+\stopitemize
+
+前两个命令的功能与 \tex{setupheadertexts} 和 \tex{setupfootertexts} 完全相同，甚至可以使用 \tex{setuptop} 和 \tex{setupbottom} 预先配置这些文本的格式，类似于 \tex{setupheader} 允许我们配置 \tex{setupheadertexts} 的文本。关于所有这些，我请读者参考我已经在 \in{节}[sec:headerfooter] 中说过的内容。唯一需要补充的小细节是，如果在页面布局中没有为上下边缘（{\tt top} 或 {\tt bottom}）预留空间，则为 \tex{setuptoptexts} 或 \tex{setupbottomtexts} 设置的文本将不可见。为此，请参见 \in{节}[sec:setuplayout]。
+
+至于旨在将文本放置在文档边距中的命令，它们都具有类似的语法：
+
+\type{\命令名称[引用][配置]{文本}}
+
+其中 {\em 引用} 和 {\em 配置} 是可选参数；第一个用于可能的交叉引用，第二个允许我们设置边距文本。最后一个参数，用花括号括起来，包含要放置在边距中的文本。
+
+在这些命令中，\tex{margintext} 更通用，因为它允许将文本放置在页面的任何边距或侧边边缘中。其余命令，如其名称所示，将文本放置在边距本身（右或左，内或外）或边缘（右或左，内或外）。这些命令与页面布局密切相关，因为例如，如果我们使用 \tex{inrightedge} 但未在页面布局中为右边缘预留任何空间，则什么也看不到。
+
+\tex{margintext} 的配置选项如下：
+
+\startitemize
+
+  \item {\tt\bf location}：指示文本将放置在哪个边距中。可以是 {\tt left}、{\tt right}，或者在双面文档中，可以是 {\tt outer} 或 {\tt inner}。默认情况下，在单面文档中是 {\tt left}，在双面文档中是 {\tt outer}。
+
+  \item {\tt\bf width}：用于打印文本的可用宽度。默认情况下，将使用边距的全部宽度。
+
+  \item {\tt\bf margin}：指示文本将放置在 {\tt margin} 本身还是 {\tt edge} 中。
+
+  \item {\tt\bf align}：文本对齐方式：这里使用的值与 \in{\tex{setupalign}}[sec:setupalign] 中的相同。
+
+  \item {\tt\bf line}：允许我们指示边距中文本的位移行数。因此，{\tt line=1} 将文本向下移动一行，{\tt line=-1} 将文本向上移动一行。
+
+  \item {\tt\bf style}：用于指示要放置在边距中的文本样式的命令。
+
+  \item {\tt\bf color}：边距文本的颜色。
+
+  \item {\tt\bf command}：一个命令的名称，要放置在边距中的文本将作为参数传递给该命令。此命令将在写入文本之前执行。例如，如果我们想在文本周围绘制一个框架，可以使用 \MyKey{[command=\backslash framed]\{Text\}}。
+
+\stopitemize
+
+下面是一个演示 \tex{inmargin} 的示例：在本句末尾，使用了文本 \quotation{\type{\inmargin[color=red]\{!!!\}}}。
+\inmargin[color=red]{!!!}
+
+其余的命令允许相同的选项，除了 {\tt location} 和 {\tt margin}。特别是，\tex{atrightmargin} 和 \tex{atleftmargin} 命令将文本完全紧贴页面主体放置。我们可以使用 {\tt distance} 选项设置一个分隔空间，我在谈论 \tex{margintext} 时没有提到这个选项，因为在我的测试中，我没有看到该选项对该命令有任何效果。
+
+% TODO：弄清楚并记录其中一些。
+
+\startSmallPrint
+
+  除了上述选项之外，这些命令还支持其他选项（{\tt strut}、{\tt anchor}、{\tt method}、{\tt category}、{\tt scope}、{\tt option}、{\tt hoffset}、{\tt voffset}、{\tt dy}、{\tt bottomspace}、{\tt threshold\/} 和 {\tt stack}），我没有提到它们，因为它们没有文档 \Doubt，而且坦率地说，我不太确定它们的用途。像 {\em distance} 这样的名称我们可以猜到，但其余的？wiki 只提到了 {\tt stack} 选项，说它用于模拟 \LaTeX\ 中的 \tex{marginpars} 命令，但这对我来说似乎不是很清楚。
+
+\stopSmallPrint
+
+\PlaceMacro{setupmargindata}\tex{setupmargindata} 命令允许我们全局配置每个边距中的文本。因此，例如，
+
+\type{\setupmargindata[right][style=slanted]}
+
+将确保右边距中的所有文本都以倾斜样式书写。
+
+我们还可以使用以下命令创建自己的定制命令：
+
+\PlaceMacro{definemargindata}\type{\definemargindata[名称][配置]}
+
+之后像这样使用它：
+
+\type{\名称{我边距中的定制文本}}
+
+
+\stopsection
+
+\stopchapter
+
+\stopcomponent
+
+%%% Local Variables:
+%%% mode: ConTeXt
+%%% eval: (auto-fill-mode 1)
+%%% coding: utf-8-unix
+%%% TeX-master: "../introCTX_eng.tex"
+%%% End:
+%%% vim:set filetype=context tw=72 : %%%

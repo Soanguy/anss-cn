@@ -1,0 +1,513 @@
+%%% File:     Installation.tex
+%%% Author:       Joaquín Ataz-López
+%%% Begun:      May 2020
+%%% concluded: May 2020
+%%% Contents: 我曾考虑是否要包含这个附录。从一开始我就清楚，如果要包含它，就必须作为附录，因为如果把它放在开头，一开始就很难吸引读者。我也不太热衷于此，因为我不想解释与 Windows 或 Apple 相关的方面，这些我其实不太了解，因为我已经超过15年没用过前者，后者也从未用过。我也曾想引用 Pablo Rodriguez 的文本（更为完整），但最终，由于现在“官方”版本已经变成了 LMTX，在某种程度上，Pablo 的信息已经过时，所以我决定包含这个附录，但只以非常概括的形式呈现。由于我无法用当前版本的 LMTX 编译本文档（直到八月初的一个版本它还能正常编译），而且我阅读 ConTeXt 发行邮件列表已有几个月，我看到新版本的 LMTX 包含需要修复的错误是相对常见的……我决定推荐 Standalone。
+%%%
+%%% 编辑工具：Emacs + AUCTeX - 有时也用 vim + context-plugin
+%%%
+%%% JD 注：我移除了 MkII 的内容，因为现在已经过时，不在本 LMTX 入门指南的范围内。
+%%%
+%%% TODO：本章的编辑 *非常* 仓促，LMTX 之前的说明大多被注释掉或删除了。然而，这导致它变得有些混乱，确实需要更重要的编辑和/或重组。特别是关于运行多个 ConTeXt 版本的部分。
+
+\environment introCTX_env.tex
+
+\setuphead
+  [section]
+  [sectionsegments=3:3]
+
+\setuphead
+  [subsection]
+  [sectionsegments=3:4]
+
+\startcomponent c01_Installation.tex
+
+\startchapter
+  [
+    reference=installation_suite,
+    title={安装、配置和更新 \ConTeXt},
+  ]
+
+\TeX\ 的主要发行版（\TeX~Live、MikTeX、MacTeX 等）都包含一个 \ConTeXt\ 版本。然而，这并不总是最新的版本。在本附录中，我将解释安装 \ConTeXt\ LMTX 的过程。此安装也包含 \ConTeXt\ MkIV，但不包含现已过时的 MkII。
+
+安装过程在任何操作系统上都遵循相同的步骤；但细节因系统而异。不过，我们可以简化事情，在下面的内容中，我将区分两大系统类别：
+
+\startitemize
+
+  \item {\bf Unix 类型系统：} 这包括 Unix 本身，以及 GNU Linux、Mac OS、FreeBSD、OpenBSD 或 Solaris。所有这些系统的过程基本相同；有一些非常小的差异，我会在适当的地方指出。
+
+  \item {\bf Windows 系统：} 包括该操作系统的不同版本：Windows 11（撰写本文时的最新版本）、Windows 10、Windows 8、Windows 7、Windows Vista、Windows XP、Windows NT 等。
+
+\stopitemize
+
+\startSmallPrint
+
+  {\bf 关于 Microsoft Windows 系统安装过程的重要说明：}
+
+  \dontleavehmode\ConTeXt 与所有 \TeX\ 系统一样，被设计为在终端中工作；安装程序和过程也同样被设计。在 Windows 中，这也完全可能，并且不会造成任何重大困难。问题在于，一方面 Windows 用户并不总是习惯这样做，另一方面，由于 Windows 诞生时就带有（错误的）幻觉，认为计算机系统中的一切都可以通过图形界面完成，通常该操作系统的版本不会过多地“宣传”如何使用终端。此外，该系统的每个版本都常常更改运行终端的程序名称以及打开方式。据我所知，Windows 终端仿真程序有过许多名称：\quotation{DOS 窗口}、\quotation{命令提示符}、\quotation{cmd} 等。该程序在 Windows 应用程序菜单中的位置也因 Windows 版本而异。
+
+  我在 2004 年就不再使用基于 Windows 的系统了，所以在这里我几乎无法帮助读者。读者必须自己弄清楚如何在其特定版本的操作系统中打开终端；这应该不会太难。
+
+\stopSmallPrint
+
+
+\startsection[title=安装和配置 \suite-]
+
+被称为 \quotation{Standalone} 的 \ConTeXt\ 发行版，也称为 \quotation{\ConTeXt\ Suite}，是一个完整且更新的 \ConTeXt\ 发行版，它从互联网下载必要的文件，占用磁盘空间不大，易于更新，最重要的是——因此得名 {\em Standalone}——它包含在一个单独的目录中，该目录可以放在我们硬盘上的任何位置。甚至一台计算机可以有多个版本的 \ConTeXt，每个版本都在自己的目录中。该发行版包含运行 \ConTeXt\ LMTX（这意味着 LuaMetaTeX 引擎）以及 \ConTeXt\ Mark~IV（这意味着 LuaTeX 引擎）所需的字体、二进制文件和文档。
+
+\startSmallPrint
+
+有关 \TeX\ {\em 引擎} 的信息，请参见 \in{Section}[sec:engines]；关于与 \ConTeXt 相关的 \TeX\ 引擎，以及称为 Mark~II 和 Mark~IV 的版本，请参见 \in{Section}[sec:historyctx]。
+
+\stopSmallPrint
+
+以下各节说明如何在我们的系统上安装、运行、更新和恢复 \suite-。这里提供的数据和过程是对 \goto{\ConTeXt\ wiki}[url(https://wiki.contextgarden.net/Introduction/Installation)] 中更广泛信息的总结，并添加了一些来自托管在 \goto{wikibooks}[url(https://fr.wikibooks.org/wiki/ConTeXt/Installation)] 上的 \ConTeXt\ 维基教科书的额外细节。如果安装有任何问题，或者你想扩展任何细节，你应该直接查阅这些资源（尽管后者是法语的）。
+
+%% \startsubsection[title=Installation]
+%%
+%% 这是非 LMTX 的说明。暂时保留，以防万一。
+%%安装 \suite- 意味着需要有互联网连接，并包括以下步骤：
+%%
+%%\startitemize[n, packed]
+%%
+%%\item 创建用于安装 \ConTeXt 的目录。
+%%
+%%\item 将安装 {\em 脚本} 下载到此目录。
+%%
+%%\item 使用所需的选项运行此 {\em 脚本}。
+%%
+%%\item 进行一些最终调整。
+%%
+%%\stopitemize
+%%
+%%\subsubsubject{第 1 步：创建安装目录}
+%%
+%%实际上，这与 \ConTeXt 无关，我们必须假设每个用户都知道如何做。在 Windows 系统中，通常的方法是通过文件管理器。在 Unix 类型系统上，可以通过文件管理器或终端完成。然而，重要的是要记住，不建议安装目录的路径中包含任何空格。我个人也倾向于避免使用包含带重音元音等非英文目录名称。
+%%
+%%从现在开始，我将假设在 Unix 类系统中安装目录为 \MyKey{\lettertilde/context/}，在 Windows 中为 \MyKey{C:\backslash Programs\backslash context}。
+%%
+%%\subsubsubject{第 2 步：将安装 {\em 脚本} 下载到安装目录}
+%%
+%%安装 {\em 脚本} 将根据您安装的操作系统而有所不同：
+%%
+%%\startitemize
+%%
+%%  \item 在 Unix 类系统上，可以使用网页浏览器下载，或者从终端使用 \MyKey{wget} 或 \MyKey{rsync} 下载：
+%%
+%%  \starttyping
+%%
+%%    wget http://minimals.contextgarden.net/setup/first-setup.sh
+%%    rsync rsync://minimals.contextgarden.net/setup/first-setup.sh
+%%
+%%  \stoptyping
+%%
+%%\item 在 Windows 类型系统上，据我所知，没有用于从控制台下载的标准工具。必须使用网页浏览器。下载地址可以是以下任意一个：
+%%
+%%  \color [blue] {\goto {\ttx http://minimals.contextgarden.net/setup/context-setup-mswin.zip}[url(http://minimals.contextgarden.net/setup/context-setup-mswin.zip)]\\    \goto{\ttx http://minimals.contextgarden.net/setup/context-setup-win64.zip}[url(http://minimals.contextgarden.net/setup/context-setup-win64.zip)]}
+%%
+%%  下载后，在 Windows 中你必须解压缩该文件。
+%%
+%%\stopitemize
+%%
+%%\subsubsubject{第 3 步：运行安装 {\em 脚本}}
+%%
+%%安装 {\em 脚本} 必须从终端运行。在 Unix 类型系统中，{\em 脚本} 的名称是 \MyKey{first-setup.sh}，可以使用 {\tt bash} 或 {\tt sh} 运行。在 Windows 类型系统中，{\em 脚本} 称为 \MyKey{first-setup.bat}，只需在系统控制台或 MS-DOS 窗口中从安装目录键入其名称即可运行。
+%%
+%%安装 {\em 脚本} 允许以下选项：
+%%
+%%%默认情况下，安装 {\em 脚本} 会安装最新的测试版，不包括扩展模块。但这取决于我们在运行 {\em 脚本} 时指示的安装选项。这些选项如下：\footnote{在本附录开头提到的法文维基教科书中，还讨论了 \MyKey{--fonts=all} 和 \MyKey{--goodies=all}。Contextgarden 没有提到它们，但将它们也包含在命令中也没有坏处。}
+%%
+%%\startitemize
+%%
+%%  \item {\tt\bf --context}：此选项决定将安装哪个版本的 ConTeXt，是最新的开发版本（\quotation{--context=latest}）还是最新的稳定版本（\quotation{--context=beta}）。默认值为 \quotation{beta}。
+%%
+%%  \item {\tt\bf --engine}：允许我们指示是要安装 Mark IV（\quotation{--engine=luatex}，默认值）还是 Mark II。
+%%
+%%  \item {\tt\bf --modules}：同时也安装不属于发行版本身但提供有趣附加实用程序的 ConTeXt 扩展模块。为此，我们需要指示 \quotation{--modules=all}。
+%%
+%%\stopitemize
+%%
+%%\startSmallPrint
+%%    关于安装选项，我认为 wiki 中的信息现在已经过时。那里说要仅安装 Mark IV，需要明确指示 "--engine=luatex" 选项，并且 "--context=latest" 选项安装最新的稳定版本，而不是开发版本。然而，从 2020 年年中开始，first-setup.sh 的内容发生了变化，查看其内部我发现要安装最新版本，你需要明确指示 "--context=latest"，并且 "--engine=luatex" 是默认启用的。
+%%\stopSmallPrint
+%%
+%%我在开头提到的法文维基教科书在我刚才提到的选项之外还添加了两个其他可能的选项（在 ConTEXt wiki 中有记录）：\quotation{--fonts=all} 和 \quotation{goodies=all}。ConTeXtgarden 没有提到它们，但将它们也包含在安装命令中也没有坏处。因此，我建议你使用以下选项运行安装脚本（取决于我们使用的是 Unix 类型系统还是 Windows 类型系统）：
+%%
+%%\startitemize[packed]\tfx
+%%
+%%  \item Unix：
+%%    \type{bash first-setup.sh --context=latest --modules=all --fonts=all --goodies=all}
+%%
+%%  \item Windows：
+%%    \type{first-setup.bat --context=latest --modules=all --fonts=all --goodies=all}
+%%
+%%\stopitemize
+%%这可能需要一些时间，具体取决于我们互联网连接的速度，但不会太多。
+%%
+%%\startSmallPrint
+%%
+%%\subsubsubject{配置代理}
+%%
+%%安装脚本使用 rsync 获取必要的文件。因此，如果您位于代理服务器后面，您需要向 rsync 指定其详细信息。设置此信息的最简单方法是在终端或您的启动 {\em 脚本}（.bashrc 或每个 shell 的相应文件）中设置 RSYNC_PROXY 变量。将用户名、密码、代理主机和代理端口替换为正确的信息。在 Unix 类型系统上，使用 \MyKey{export} 命令完成，在 Windows 类型系统上使用 \MyKey{set} 命令完成。例如：
+%%
+%%\type{export RSYNC_PROXY=username:password@proxyhost:proxyport}
+%%
+%%有时，当我们在防火墙后面时，端口 873 可能对传出的 TCP 连接关闭。如果端口 22 对 ssh 连接开放，可以使用的一个技巧是连接到防火墙外部的某台计算机，并通过隧道连接到端口 873（使用 nc 程序）。
+%%
+%%\type{export RSYNC_CONNECT_PROG='ssh tunelhost nc %H 873'}
+%%
+%%其中 \quote{tunnelhost} 是我们有权访问的防火墙外部的机器。当然，该机器必须具有 nc 并且端口 873 对传出的 TCP 连接开放。
+%%
+%%\stopSmallPrint
+%%
+%%在安装目录中运行 \MyKey{first-setup} 后，将出现两个名为 \MyKey{bin} 和 \MyKey{tex} 的新目录。
+%%
+%%\subsubsubject{第 4 步：最终调整（仅限 GNU Linux）}
+%%
+%%在 GNU Linux 系统中，有许多可以安装字体的目录。如果我们希望 \ConTeXt 使用这些字体，我们必须告诉它在哪里找到它们。为此，我们必须将以下行添加到安装后创建的 \MyKey{tex/setuptex} 文件中：
+%%
+%%{\tfx\type{export OSFONTDIR="~/.fonts:/usr/share/fonts:/usr/share/texmf/fonts/opentype/”}}
+%%
+%%这样，环境变量 OSFONTDIR 就加载了通常存放系统安装字体的三个目录。
+%%
+%%\startSmallPrint
+%%
+%%    /usr/share/texmf/fonts/ 只有在我们的操作系统中安装了其他 \TEX\ 或基于它的系统时才会存在；在这种情况下，它应该包含在 OSFONTDIR 路径中，以便我们可以使用此类安装可能包含的 opentype 字体。如果您有任何希望 \ConTeXt 使用的商业字体，您必须确保这些字体的路径是 OSFONTDIR 中包含的路径之一，或者将路径添加到此变量。例如，我看到有些字体安装在 /usr/local/fonts 而不是 /usr/share/fonts。
+%%
+%%\stopSmallPrint
+%%
+%%最后，让 \ConTeXt 生成一个包含执行所需文件的数据库可能是个好主意。这可以通过从终端运行以下三个命令来完成：
+%%
+%%
+%%\starttyping
+%%  . ~/context/tex/setuptex
+%%  context --generate
+%%  context --make
+%%\stoptyping
+%%
+%%第一条指令是一个点（dot）。这是 bash 内部 {\tt source} 命令的缩写。当然，如果更方便，我们也可以运行 {\em source}。
+%%
+%%\stopsubsection
+
+
+% 在 ANSS 中，“installing LMTX” 部分位于“运行”和“更新”小节之后。但由于此处不再有非 LMTX 安装说明，LMTX 部分被移到了这里。
+
+
+\startsection[title=安装 LMTX]
+
+%%如果我们只打算使用 \ConTeXt\ Mark~IV，并且希望我们的项目编译时不直接使用 LuaTeX 而是使用 LuaMetaTex（一个使用更少系统资源并且可以在“功能较弱”的系统上工作的简化版 LuaTeX），那么我们需要安装的不是 \suite-，而是
+
+LMTX 是最新版本的 \ConTeXt。这个名字是所使用的 \TeX\ 引擎名称的首字母缩写：LuaMetaTeX。该版本于 2019 年发布，大约从 2020 年 5 月起，它已成为推荐的默认 \ConTeXt\ 发行版，正如 \goto{\ConTeXt\ wiki}[url(wiki)] 所建议的那样。
+
+\startSmallPrint
+
+2019 年 LMTX 的开发相当密集，版本可能每周变化数次。然而，到 2026 年，LMTX 早已成为一个稳定且相当成熟的产品。尽管 LMTX 仍在积极开发，但开发主要涉及添加新功能或改进现有能力，更新极不可能“破坏”现有的 LMTX 文档。
+
+\stopSmallPrint
+
+\startsubsection[title=安装过程本身]
+
+安装非常简单：
+
+\startitemize
+
+  \item {\bf 第 1 步：} 决定要安装 LMTX 的位置，如果需要，在该位置创建一个目录。对于这些说明，我将假设安装是在我们主目录下某个名为 \quotation{\tt context} 的目录中完成的。
+
+  \item {\bf 第 2 步：}（在安装目录中）从 \goto{\ConTeXt\ wiki}[url(https://wiki.contextgarden.net/Introduction/Installation)] 下载与您的操作系统和处理器相对应的 zip 文件。截至 2026 年 4 月，可以是以下任意一种：
+
+
+\page[preference]
+
+  \startitemize[packed]
+
+  \item GNU/Linux
+    \startitemize
+    \item X86/AMD64 处理器
+      \startitemize
+      \item \goto{32 位版本}[url(http://lmtx.pragma-ade.nl/install-lmtx/context-linux.zip)]。
+      \item \goto{64 位版本}[url(http://lmtx.pragma-ade.nl/install-lmtx/context-linux-64.zip)]。
+      \stopitemize
+    \item ARM 处理器
+      \startitemize
+      \item \goto{32 位版本}[url(http://lmtx.pragma-ade.nl/install-lmtx/context-linux-armhf.zip)]。
+      \item \goto{64 位版本}[url(http://lmtx.pragma-ade.nl/install-lmtx/context-linux-aarch64.zip)]。
+      \stopitemize
+    \stopitemize
+  \item Mac OS，
+    \startitemize
+    \item \goto{AMD64 位版本}[url(http://lmtx.pragma-ade.nl/install-lmtx/context-osx-64.zip)]
+  \item \goto{ARM 64 位版本}[url(http://lmtx.pragma-ade.nl/install-lmtx/context-osx-arm64.zip)]
+\stopitemize
+  \item FreeBSD~14.0
+    \startitemize
+    \item \goto{AMD64 版本}[url(http://lmtx.pragma-ade.nl/install-lmtx/context-freebsd-amd64.zip)]。
+    \stopitemize
+  \item OpenBSD~7.4
+    \startitemize
+    \item \goto{AMD64 版本}[url(http://lmtx.pragma-ade.nl/install-lmtx/context-openbsd-amd64.zip)]。
+    \stopitemize
+  \item Microsoft Windows
+    \startitemize
+    \item \goto{X86（32 位）版本}[url(http://lmtx.pragma-ade.nl/install-lmtx/context-mswin.zip)]
+    \item \goto{AMD64 版本}[url(http://lmtx.pragma-ade.nl/install-lmtx/context-win64.zip)]
+    \item \goto{ARM 64 位版本}[url(http://lmtx.pragma-ade.nl/install-lmtx/context-windows-arm64.zip)]
+    \stopitemize
+
+  \stopitemize
+
+  如果您不知道您的系统是 32 位还是 64 位，除非您的计算机 {\em 非常} 老旧，否则很可能是 64 位。如果您不知道您的处理器是 X86/AMD64 还是 ARM，对于 Linux 和 Windows 用户来说，很可能是 X86/AMD64，而对于 2020 年后制造的 Apple 计算机用户来说，很可能是 ARM~64。
+
+  \item {\bf 第 3 步：} 将上一步下载的文件解压到安装目录中。这将创建一个名为 \MyKey{bin} 的目录，其中包含安装所需的三个文件。它还将创建两个（Unix 类系统）或三个（Windows 系统）文件，一个名为 \MyKey{installation.pdf}，另一个是实际的安装程序，称为 \MyKey{install.sh}（Unix 类型系统）或 \MyKey{install.bat}（Windows 系统），并且在 Windows 系统上还有另一个名为 \MyKey{setpath.bat} 的文件。{\tt installation.pdf} 文件包含有关 \ConTeXt\ 文件组织方式、如何更新安装以及一些获取帮助的地方的有用信息。
+ 
+
+  \item {\bf 第 4 步：} 运行安装程序（\MyKey{install.sh} 或 \MyKey{install.bat}）。该程序需要互联网连接，因为它会通过互联网下载 \ConTeXt\ 发行版文件。
+
+  \startitemize
+
+    \item 在 Unix 类型系统上，位于安装目录中的安装程序从终端运行，可以使用 {\tt bash} 或 {\tt sh}：
+      \\\type{sh install.sh}\\
+      不需要管理员权限，除非安装目录位于用户主目录之外。
+
+      在大多数情况下，最好 {\em 不要} 使用管理员权限安装 \ConTeXt；如果您想将其安装到主目录之外的某个位置（例如 \type{/usr/local/context}），最好先使用管理员权限创建目录，然后使用管理员权限将所选目录的所有权更改为您的用户 ID。例如，以下两个命令
+      \starttyping
+sudo mkdir /usr/local/context
+sudo chown $USER /usr/local/context
+    \stoptyping %$
+      将创建目录 {\tt /usr/local/context} 并将其所有权更改为您的用户 ID，这样从那时起您就可以在该目录中创建和删除文件，而无需调用管理员权限。
+
+% TODO：在 Windows 上创建符号链接是否需要管理员权限（现在仍然）是这样吗？
+
+    \item 在 Windows 类型系统上，您必须打开一个终端，移动到安装目录，然后从终端运行 {\tt install.bat}。这里也不要求以系统管理员身份运行安装程序，但建议这样做，以便可以使用文件的符号链接，从而节省磁盘空间。
+
+  \stopitemize
+
+  \item {\bf 第 5 步}：让 LMTX 的位置可知：
+
+    在 Windows 系统中，安装 \ConTeXt\ 会创建一个名为 \MyKey{setpath.bat} 的文件，该文件会更新所有必要的配置文件，让 Windows 知道您已在系统中安装了 LMTX 以及安装位置。
+
+    在 GNU Linux 系统、FreeBSD、OpenBSD 或 Mac OS 中，不会生成自动化此任务的 {\em 脚本}，因此我们必须将 \ConTeXt\ 二进制文件的地址加入到我们的 PATH 变量中，我们可以通过在终端中运行以下命令（修改后包含正确的信息！\null）来实现：
+
+    {\tt export PATH="{\em InstallationDir}/tex/texmf-{\em Platform}/bin:\$PATH”}
+
+    其中 {\tt {\em InstallationDir}} 是选择的安装目录，{\tt texmf-{\em Platform}} 将根据我们安装的 LMTX 版本而变化。例如，如果我们在 AMD64 Linux 系统上安装了 \ConTeXt\ 在 {\tt /home/user/context} 中，那么 {\tt texmf-{\em Platform}} 将是 {\tt texmf-linux-64}，因此我们应该从终端运行以下命令：
+
+    {\tt export PATH="/home/user/context/texmf-linux-64/bin:\$PATH”}
+
+    运行此命令会将 LMTX 包含在命令解释器的路径中，但仅限于运行它的终端保持打开状态。如果我们希望每次打开终端时都自动设置 {\tt context} 程序的位置（在 99.9\% 的情况下，我们都希望如此），我们必须将此命令包含在我们用户使用的 {\em shell\,}\footnote{在 Unix 类型系统中，命令解释器通常被称为 \quotation{shell}。} 程序的配置文件中。此文件的名称根据我们使用的特定 shell（{\tt bash,} {\tt sh}, {\tt zsh}, {\tt ksh}, {\tt tcsh}, {\tt csh}, \unknown）而变化。在大多数 Linux 系统上，默认 shell 是 {\tt bash}；对于 {\tt bash} 用户，要更新的文件称为 \MyKey{.bashrc}，因此我们应该运行以下命令：
+
+    \starttyping
+echo export PATH="/home/user/context/texmf-linux-64/bin:$PATH" >> ~/.bashrc
+   \stoptyping
+
+    对于使用 {\tt zsh} 的用户，类似的命令是
+
+    \starttyping
+echo export PATH="/home/user/context/texmf-linux-64/bin:$PATH" >> ~/.zshenv
+    \stoptyping
+
+%% 我认为这夸大了情况：
+%%    {\bf 重要提示：} 执行此步骤后，我们将无法使用系统上的其他版本的 \ConTeXt，例如 \TeX~Live 或 \quotation{\ConTeXt\ Standalone} 中包含的版本。如果我们希望使两个版本兼容，最好使用 \in{Section}[sec:run-several-versions] 中描述的过程。
+
+
+\item {\bf 第 6 步：最终调整（主要针对 GNU Linux）}
+
+\ConTeXt\ 附带大量字体选择，但您可能希望能够使用 \quotation{系统} 字体和/或您已获得并存储在主目录下某个位置的字体。（如果您没有这种需求，可以完全跳过此步骤。）
+
+在撰写本文时，在 Windows 系统上，\ConTeXt\ standalone 发行版在以下位置查找字体：
+\starttyping
+C:/windows/fonts//
+\stoptyping
+在 Apple 系统上，它在以下位置查找：
+\starttyping
+$HOME/Library/Fonts//;/Library/Fonts//;/System/Library/Fonts//
+\stoptyping %$
+
+在 GNU Linux 系统中，有许多可以安装字体的目录，并且（在撰写本文时）\ConTeXt\ 没有设置默认位置来查找系统或用户字体。因此，如果我们希望 \ConTeXt\ 能够使用这些字体，我们必须告诉它在哪里找到它们。为此，我们 {\em 可以} 修改 \ConTeXt\ 安装中的文件 \type{.../tex/texmf-linux-64/bin/mtxrun.lua}，但我们的更改可能会在下次 \ConTeXt\ 更新时被覆盖。除了这个问题之外，对于大多数非专家用户来说，修改这个关键的 \ConTeXt\ 文件也不是一个好主意。
+
+% TODO：在 Linux 中，每个目录末尾的 // 是必需和/或期望的吗？
+
+相反，非 Windows、非 Apple 系统的用户可以设置一个环境变量 {\tt OSFONTDIR}，列出 \ConTeXt\ 应搜索字体的目录。例如，
+\starttyping
+export OSFONTDIR=~/.fonts//:/usr/share/fonts//:/usr/share/texmf/fonts//
+\stoptyping 告诉 \ConTeXt\ 在三个额外的目录（以及它们下面的子目录！\null）中查找字体：我们主目录下的 {\tt .fonts} 目录、系统目录 {\tt /usr/share/fonts} 和系统目录 {\tt /usr/share/texmf/fonts/opentype}。每个用户必须决定希望 \ConTeXt\ 搜索的特定目录列表。
+
+\startSmallPrint
+
+    {\tt /usr/share/texmf/fonts} 目录只有在我们的操作系统中安装了其他 \TeX\ （或基于 \TeX\ 的其他系统）时才会存在；在这种情况下，此目录应包含在 OSFONTDIR 路径中，以便我们可以使用此类安装可能包含的 opentype 字体。如果您有任何希望 \ConTeXt\ 使用的商业字体，您必须确保包含这些字体的目录（或多个目录）的路径是 OSFONTDIR 中包含的路径之一。例如，我看到有时字体安装在 {\tt /usr/local/fonts} 而不是（或除了）{\tt /usr/share/fonts}。
+
+\stopSmallPrint
+虽然您可以每次打开终端仿真器窗口运行 \ConTeXt 时都键入 \type{export OSFONTDIR=...} 命令，但一旦您决定了所需的目录列表，将该命令放在您的命令解释器（\quotation{shell}）启动时读取的初始化文件之一（例如，\type{~/.zshenv}、\type{~/.bashrc}、\type{~/.cshrc}、\type{~/.profile}，\unknown）中是有意义的。
+
+如果您从桌面环境或窗口管理器启动编辑器，并从编辑器内部运行 \ConTeXt，您还必须确保 {\tt OSFONTDIR} 环境变量对您的编辑器是已知的。如何做到这一点取决于您的特定桌面环境或窗口管理器，如果您不知道如何在编辑器的环境中获得 {\tt OSFONTDIR}，最好的办法可能是在处理您特定类型系统的网络论坛或邮件列表上提问。
+
+最后，让 \ConTeXt\ 使用通过 {\tt OSFONTDIR} 添加的字体文件更新其字体数据库可能是个好主意。这可以通过在已知并导出了 {\tt OSFONTDIR} 的终端中运行以下命令来完成：
+
+\starttyping
+  context --generate
+  context --make
+\stoptyping
+
+\stopitemize
+
+\stopsubsection
+
+
+% TODO：这个小节和 run-several-versions 部分确实需要合理化。
+
+
+\startsubsection[title=运行 \suite-]
+
+\suite- 被设计为能够与其他 \TeX\ 系统的安装共存，这是一个优点，因为它允许我们在同一操作系统上安装多个不同版本。（这个概念在本章 \in{Section}[sec:run-several-versions] 中有更全面的描述。）
+
+为了利用这个优点，我们有两种选择来指定要运行的特定 {\tt context}：
+\startitemize
+  \item 在 Unix 类型系统上，我们可以简单地给出要运行的特定 {\tt context} 的 \quotation{完整路径名}。例如，我们可能已经将 {\tt PATH} 变量设置为指向（例如）{\tt /usr/local/context/tex/texmf-linux-64/bin:\$PATH}（如上面的 {\bf 第~5 步} 所述）。如果我们想使用另一个 {\tt context} 程序，也许是在目录 {\tt /usr/local/texlive/current/bin/x86_64-linux} 中找到的，我们可以执行（有点长的）命令
+    \starttyping
+/usr/local/texlive/current/bin/x86_64-linux/context mydoc.tex
+    \stoptyping
+    来使用 \TeX{}live 的 {\tt context} 可执行文件编译 {\tt mydoc.tex}。
+  \item 在 Unix 类型系统上，我们可以选择在每次想要尝试不同的 {\tt context} 程序时更改 {\tt PATH} 环境变量。但是，创建 shell {\em 别名} 或 shell {\em 函数} 来调用替代的 {\tt context} 程序可能更容易。（创建 shell 别名的说明见下面的 \in{Section}[sec:run-several-versions]；创建 shell 函数的说明超出了本 \ConTeXt\ LMTX 入门指南的范围，但通过简单的互联网搜索很容易找到说明。）
+  \item 在 Windows 系统上，我们可以（在终端中）从我们想要使用的 {\tt context} 版本的特定安装目录运行 \type{tex\setuptex.bat} 命令。运行此命令后，运行 {\tt context} 命令将引用此特定安装目录中的 context。
+\stopitemize
+
+如果我们的系统中没有其他 \TeX\ 或其任何衍生品的安装，我们可以通过每次打开终端时自动化指定 {\tt context} 和 {\bf mtxrun} 的位置来避免上述工作：
+
+\startitemize
+
+  \item 在 Unix 类系统上，通过将其包含在包含通用终端启动 {\em 脚本} 的文件中来完成（例如，\MyKey{.bashrc}、\MyKey{.zshenv}，\unknown）。
+
+  \startSmallPrint
+
+      终端的配置文件取决于终端默认使用的 {\em shell} 程序。如果是 {\tt bash}（GNU Linux 系统中最常用的），则在开头读取的文件是 {\tt .bashrc}。{\tt sh} 和 {\tt ksh} {\em shells} 使用名为 {\tt .profile} 的文件，{\tt zsh} 使用 {\tt .zshenv}，而 {\tt tcsh} 或 {\tt csh} 读取 {\tt .cshrc} 文件。某些具体实现可能会更改这些文件的名称，因此，例如，{\tt .bashrc} 有时被称为 {\tt .bash_profile}。
+
+  \stopSmallPrint
+
+  \item 在 Windows 类型系统上，我们可以在桌面上创建一个运行 cmd.exe 的快捷方式，然后编辑它，将双击时运行的命令设置为：
+
+  \starttyping
+    C:\WINDOWS\System32\cmd.exe /k C:\Programs\context\tex\setuptex.bat
+  \stoptyping
+
+\stopitemize
+
+% TODO：这个编辑器列表正确吗？
+
+另一种可能性是，如果我们不希望每次想使用 ConTeXt 时都运行此脚本，也不希望永久设置运行它所需的环境变量，那么可以从文本编辑器本身执行此操作，而不是从终端运行 ConTeXt。如何做到这一点取决于您使用的特定文本编辑器。ConTeXt wiki 提供了有关如何设置各种常见编辑器的信息：emacs、LEd、Notepad++、Scite、TeXnicCenter、TeXworks、vim 以及其他一些。
+
+\stopsubsection
+
+% 这现在似乎是多余的
+%%\startsubsection
+%%  [title=更新 \suite- 的版本或恢复到更早的版本]
+%%
+%%\ConTeXt\ LMTX 正在持续开发中，因此 \suite- 经常更新。要更新安装，只需重复该过程：下载新版本的 \MyKey{install.sh}（如果已被删除）并运行它。更简单的方法是直接将 {\tt install.sh}（或 {\tt install.bat}）留在解压 zip 文件的目录中。
+
+% TODO：在 LMTX 中可以这样做吗？
+%%如果出于任何原因，我们想恢复到 \suite- 的先前版本，只需使用 \MyKey{--context=date} 选项运行 \MyKey{first-setup}，其中 {\em date} 是我们要恢复的版本对应的日期。请注意，日期必须采用美式月-日-年格式输入。
+%%
+%%完整的 \ConTeXt\ 版本列表及相关日期可以在 \goto{此链接}[url(https://minimals.contextgarden.net/current/context/)] 找到。
+%%
+%%最后，请记住，在重新安装系统后，无论是升级还是恢复到先前版本，在 GNU Linux 系统上，您都必须再次运行安装的第 4 步，我称之为 \quotation{最终调整}。
+
+\stopsubsection
+
+\stopsection
+
+
+\startsubsection[title=在 LMTX 中安装扩展模块]
+
+\ConTeXt\ LMTX 包含一个用于安装或升级 \ConTeXt\ 扩展模块的过程。在 \ConTeXt\ wiki 中有安装和更新模块的说明；请参阅 \goto{此页面}[url(https://wiki.contextgarden.net/Input_and_compilation/Modules)]，以了解从终端运行的命令。我亲自验证过这在 GNU Linux 系统上有效。我不确定它是否能在 Windows 系统上工作，因为我没有任何版本的该操作系统可以用来测试。
+
+以下命令（至少在 \ConTeXt\ 版本 2026.03.25 中）列出所有已知模块：
+\starttyping
+mtxrun --script install-modules --list
+\stoptyping
+
+
+\stopsubsection
+
+\startsubsection[title=更新 LMTX]
+
+\ConTeXt\ LMTX 正在持续开发中，因此 \suite- 经常更新。更新 LMTX 就像再次运行安装程序（\MyKey{install.sh} 或 \MyKey{install.bat}）一样简单：它会将已安装的文件与 Web 服务器上的文件进行比较，并根据需要更新。
+
+在极不可能的情况下，如果获取文件的网站发生变化，我们可能需要从头重新安装 \ConTeXt。或者，我们可以下载新的 zip 文件，将其解压到现有的 \ConTeXt\ 安装目录中，然后执行 \MyKey{install.sh} 脚本（对于 Windows 用户，则是 \MyKey{install.bat} 脚本）。
+
+\stopsubsection
+
+% 我不确定这对新手来说是否比必要的更令人困惑。
+% TODO：也许说一些关于 TEXROOT 或 TEXMFHOME 或 TEXMFPROJECT 或
+% TEXMFFONTS 或 TEXMFLOCAL 或 TEXMFMODULES 或 TEXMFCONTEXT 或 TEXMFOS 或 TEXMFMAIN 的内容？
+%%\startsubsection
+%%  [title={创建一个将运行 LMTX 所需的变量加载到内存中的文件（仅限 GNU/Linux 系统）}]
+%%
+%%\suite- 包含，正如我们已经知道的，一个（\MyKey{tex/setuptex}）文件，该文件将运行它所需的所有变量加载到内存中，但 LMTX 不包含类似的文件。然而，我们可以轻松地自己创建它，并将其存储在例如 \MyKey{tex} 目录中，作为 \MyKey{setuplmtx}。该文件可能包含的命令是：
+%%
+%%\starttyping
+%%export PATH="~/context/LMTX/tex/texmf-linux-64/bin:"\$PATH
+%%echo "Adding ~/context/LMTX/tex/texmf-linux-64/bin to PATH"
+%%export TEXROOT="~/context/LMTX/tex"
+%%echo "Setting ~/context/LMTX/tex as TEXROOT"
+%%export OSFONTDIR="~/.fonts:/usr/share/fonts:/usr/share/texmf/fonts/opentype/"
+%%echo "Loading font directories into memory"
+%%alias lmtx="~/context/LMTX/tex/texmf-linux-64/bin/context"
+%%echo "Creating an alias to run lmtx"
+%%\stoptyping%$
+%%
+%%这样，除了将运行 LMTX 所需的路径和变量加载到内存中，我们还将启用 \MyKey{lmtx} 命令作为 \MyKey{context} 的同义词。
+%%
+%%创建此文件后，在使用 LMTX 之前，在我们打算使用它的地方，我们应该在终端中运行以下命令：
+%%
+%%\type{source ~/context/LMTX/tex/setuplmtx}
+%%
+%%所有这些都假设 LMTX 安装在 \MyKey{~/context/LMTX} 中，并且我们已将此文件命名为 \MyKey{setuplmtx} 并存储在 \MyKey{~/context/LMTX/tex} 中。
+%%
+%%\startSmallPrint
+%%
+%%  以上是我所做的，以便以与过去使用 \suite- 相同的方式使用 LMTX。然而，我不排除在 LMTX 中，例如，可能不需要将 OSFONTDIR 变量加载到内存中，因为令我惊讶的是 \ConTeXt\ wiki 对此只字未提。
+%%
+%%\stopSmallPrint
+%%
+%%\stopsubsection
+%%
+%%\stopsection
+
+\startsection
+  [
+    reference=sec:run-several-versions,
+    title={在同一系统上使用多个版本的 \ConTeXt（仅限 Unix 类型系统）}
+  ]
+
+Unix 类系统的大多数或所有命令解释器中，称为 {\tt alias} 的 shell 功能允许我们将不同的名称与不同版本的 \ConTeXt\ 关联起来。因此，我们可以使用例如 \TeX~Live 中包含的 \ConTeXt\ 版本；或者 LMTX 的 {\em Standalone} 版本。
+
+例如，如果我们将 2020 年 1 月和 8 月下载的 LMTX 版本存储在不同的目录中，我们可以在 \type{~/.bashrc}（或您选择的 shell 在打开终端时读取的等效文件，如 \type{~/.zshenv} 或 \type{~/.profile}）中写入以下两条指令：
+
+\starttyping
+alias context-01=”/home/user/context/202001/tex/texmf-linux-64/bin/context”
+alias context-08=”/home/user/context/202008/tex/texmf-linux-64/bin/context”
+\stoptyping
+
+请注意，{\tt csh} 和 {\tt tcsh} 用户必须使用以下语法，并且可能希望将这些命令输入到他们的 \type{~/.cshrc} 或 \type{~/.tcshrc} 文件中：
+
+\starttyping
+alias context-01 ”/home/user/context/202001/tex/texmf-linux-64/bin/context”
+alias context-08 ”/home/user/context/202008/tex/texmf-linux-64/bin/context”
+\stoptyping
+
+这些指令将名称 {\tt context-01} 与安装在 \MyKey{context/202001} 目录中的 LMTX 版本关联，将 {\tt context-08} 与安装在 \MyKey{context/202008} 目录中的版本关联。在将这些别名输入到适当的文件（并打开一个新的终端模拟器使其生效）之后，可以通过键入以下命令使用 2020 年 1 月的 \ConTeXt\ 版本处理 {\tt mydoc.tex}：
+
+\starttyping
+context-01 mydoc.tex
+\stoptyping
+
+\stopsection
+
+\stopchapter
+
+\stopcomponent
+
+%%% Local Variables:
+%%% mode: ConTeXt
+%%% eval: (auto-fill-mode 1)
+%%% coding: utf-8-unix
+%%% TeX-master: "../introCTX_eng.tex"
+%%% End:

@@ -1,0 +1,883 @@
+%%% File:     b06_Fonts.tex
+%%% Author:   Joaquín Ataz-López et al
+%%% Begun:    March 2020
+%%% Concluded: June 2020
+%%% Title:  本章是我开始写的第一章。我经常回到这一章，因为我希望它包含使用系统上安装的字体。但我未能让 wiki 中的指令正常工作。最近（八月）我发现了 fonttest，可以在运行 mtxrun --script server --auto 后访问。我需要进一步研究。它能“看到”我系统上安装的字体，并告诉我使用它们需要什么代码。但我仍然不明白它是如何工作的。关键可能在于“Fonts out of ConTeXt”手册，但我很难理解它。
+%%%
+%%% Edited with: Emacs + AUCTeX - And at times vim + context-plugin
+%%%
+
+\environment introCTX_env.tex
+
+\startcomponent b06_Fonts.tex
+
+\startchapter
+  [
+    reference=sec:fontscol,
+    title=\ConTeXt\ 中的字体与颜色,
+    bookmark=ConTeXt 中的字体与颜色,
+  ]
+
+\TocChap
+
+\startsection
+  [title=\suite- 中包含的排版字体]
+
+\ConTeXt\ 的字体系统提供了许多可能性，但也相当复杂。我不会在本手册中分析所有高级字体可能性，而是仅限于假设我们使用的是随 \ConTeXt\ Standalone 安装提供的 21 种字体中的一些，即 \in{表}[tbl:ctx-fonts] 中显示的字体。
+
+{\switchtobodyfont[small]
+  \placetable
+    [here]
+    [tbl:ctx-fonts]
+    {\ConTeXt\ 发行版中包含的字体}
+    \starttabulate[|l|l|w{2cm}|]
+      \HL
+      \NC{\bf 官方名称}\NC{\bf \ConTeXt\ 中的名称}\NC{\bf 示例}\NR
+      \HL
+      \NC Latin Modern \NC modern, modern-base\NC{\switchtobodyfont[modern] Emily Brontë's book}\NR
+      \NC Antykwa Poltawskiego\NC antykwapoltawskiego\NC{\switchtobodyfont[antykwapoltawskiego] Emily Brontë's book}\NR
+      \NC Antykwa Toruńska\NC antykwa\NC{\switchtobodyfont[antykwa] Emily Brontë's book}\NR
+      \NC Cambria \NC cambria\NC{\switchtobodyfont[cambria] Emily Brontë's book}\NR
+      \NC DejaVu\NC dejavu\NC{\switchtobodyfont[dejavu] Emily Brontë's book}\NR
+      \NC DejaVu Condensed\NC dejavu-condensed\NC{\switchtobodyfont[dejavu-condensed] Emily Brontë's book}\NR
+      \NC Gentium \NC gentium\NC{\switchtobodyfont[gentium] Emily Brontë's book}\NR
+      \NC Iwona\NC iwona\NC{\switchtobodyfont[iwona] Emily Brontë's book}\NR
+      \NC Latin Modern Variable\NC modernvariable, modern-variable\NC{\switchtobodyfont[modernvariable] Emily Brontë's book}\NR
+      \NC PostScript\NC postscript\NC  {\switchtobodyfont[postscript] Emily Brontë's book}\NR
+      \NC TeX Gyre Adventor\NC adventor, avantgarde\NC{\switchtobodyfont[adventor] Emily Brontë's book}\NR
+      \NC TeX Gyre Bonum\NC bonum, bookman\NC{\switchtobodyfont[bonum] Emily Brontë's book}\NR
+      \NC TeX Gyre Cursor\NC cursor, courier\NC{\switchtobodyfont[cursor] Emily Brontë's book}\NR
+      \NC TeX Gyre Heros\NC heros, helvetica\NC{\switchtobodyfont[heros] Emily Brontë's book}\NR
+      \NC TeX Gyre Schola\NC schola, schoolbook\NC{\switchtobodyfont[schola] Emily Brontë's book}\NR
+      \NC Tex Gyre Chorus\NC chorus, chancery\NC{\switchtobodyfont[chorus] Emily Brontë's book}\NR
+      \NC Tex Gyre Pagella\NC pagella, palatino\NC{\switchtobodyfont[pagella] Emily Brontë's book}\NR
+      \NC Tex Gyre Termes\NC termes, times\NC{\switchtobodyfont[termes] Emily Brontë's book}\NR
+      \NC Euler\NC eulernova\NC{\switchtobodyfont[eulernova] Emily Brontë's book}\NR
+      \NC Stix2\NC stix\NC{\switchtobodyfont[stix] Emily Brontë's book}\NR
+      \NC Xits\NC xits\NC{\switchtobodyfont[xits,8pt] Emily Brontë's book}\NR
+      \HL
+    \stoptabulate
+}
+
+\in{表}[tbl:ctx-fonts] 的中间列指示了 \ConTeXt\ 识别相关字体的一个或多个名称。当有两个名称时，它们是同义的。最后一列是使用该字体的示例。至于字体的显示顺序，第一个是 \ConTeXt\ 默认使用的字体，最后三个是专门为数学设计的字体，其余字体按字母顺序排列。请注意，Euler 字体不能直接表示带重音的字母，所以我们得到的是 Bront's，而不是 Brontë's。
+
+对于来自 Windows 世界及其默认字体的读者，我将指出 {\em heros} 类似于 Windows 中的 Arial，而 {\em termes} 类似于 Times New Roman。它们不完全相同，但足够相似，以至于需要非常细心才能看出区别。
+
+  \startSmallPrint
+
+    Windows 使用的字体不是 {\em 自由软件}（事实上 Windows 中几乎没有什么是 {\em 自由软件}），因此它们不能包含在 \ConTeXt\ 发行版中。然而，如果 \ConTeXt\ 安装在 Windows 中，那么这些字体已经安装好了，并且可以像运行 \ConTeXt\ 的系统上安装的任何其他字体一样使用。不过，在本入门中，我不会讨论如何使用系统上已安装的字体。这方面的帮助可以在 \goto{\ConTeXt\ wiki}[url(wiki)] 上找到。
+
+  \stopSmallPrint
+
+\stopsection
+
+\startsection
+    [title=字体特性]
+
+\startsubsection
+    [title={字体、{\em 样式} 和样式变体}]
+
+关于字体的术语有些混乱，因为有时所谓的字体实际上是一个 {\em 字体系列}，包括共享基本设计的不同样式和变体。我不会讨论哪种术语更正确；我只想澄清 \ConTeXt\ 中使用的术语。在那里，它区分了字体、样式和每种样式的变体（或替代形式）。\ConTeXt\ 发行版中包含的 {\em 字体}（实际上它们是 {\em 字体系列}）就是我们上一节中看到的。我们现在来看一下 {\em 样式} 和 {\em 替代形式}。
+
+\subsubsubject{字体样式}
+
+\dontleavehmode{\sc Donald E.~Knuth} 为 \TeX\ 设计了 {\em Computer Modern} 字体，赋予它三种不同的 {\em 样式}，称为 {\em Roman}、{\em sans serif} 和 {\em teletype}。{\em Roman} 样式是一种字符带有装饰性衬线的设计，在排版术语中称为 {\em serif}，这也是为什么这种字体样式也被称为 {\em serif}。这种样式被认为是 {\em 正常} 或默认样式。{\em sans serif} 样式，顾名思义，没有这些衬线，因此是一种更简单、更风格化的字体，有时也以其他名称出现；例如，在西班牙语中称为 {\em paloseco}。这种字体可以作为文档的主要字体，但也适合在以 {\em roman} 样式为主要字体的文本的某些片段中使用，例如标题或页眉。最后，{\em teletype} 样式被包含在 {\em Computer Roman} 中，因为它被设计用于编写与计算机编程相关的书籍，其中涉及大量计算机 {\em 代码}，在印刷材料中，这些代码通常以模仿计算机终端和旧式打字机的等宽样式呈现。
+
+\startSmallPrint
+
+    除了这三种字体{\em 样式}之外，还可以添加第四种用于数学片段的样式。但由于 \TeX\ 在进入数学模式时会自动使用这种样式，并且不包含明确启用或禁用它命令，也没有其他样式的 {\em 变体} 或替代形式，因此通常不将其视为真正意义上的 {\em 样式}。
+
+    \ConTeXt\ 包含两种可能的附加样式的命令：手写体和书法体。我不太确定它们之间的区别，因为一方面，\ConTeXt\ 发行版中包含的字体都没有在其设计中包含这些样式，另一方面，在我看来，书法体也是手写的。\ConTeXt\ 包含的这些用于启用此类样式的命令，如果用于未实现它们的字体，编译时不会产生任何错误：只是什么都不会发生。
+
+\stopSmallPrint
+
+\subsubsubject{字体替代形式}
+
+每种 {\em 样式} 都允许许多替代形式，这就是 \ConTeXt\ 对它们的称呼（{\em alternative}）：
+
+\startitemize[2,packed]
+
+  \item 常规或正常（\MyKey{tf}，来自 {\em typeface}）。
+  \item 粗体（\MyKey{bf}，来自 {\em boldface}）。
+  \item 斜体（\MyKey{it}，来自 {\em italic}）
+  \item 粗斜体（\MyKey{bi}，来自 {\em bold italic}）
+  \item 倾斜体（\MyKey{sl}，来自 {\em slanted}）
+  \item 粗倾斜体（\MyKey{bs}，来自 {\em bold slanted}）
+  \item 小型大写字母（\MyKey{sc}，来自 {\em small caps}）
+  \item 旧式数字（\MyKey{os}，来自 {\em old style}）
+
+\stopitemize
+
+这些 {\em 替代形式}，顾名思义，是互斥的：当一个被启用时，其他的被禁用。这就是为什么 \ConTeXt\ 提供了启用它们的命令，而没有提供禁用的命令；因为当我们启用一个替代形式时，我们就禁用了之前使用的那个；因此，例如，如果我们正在用斜体书写并启用了粗体，那么斜体将被禁用。如果我们想同时使用粗体和斜体，我们不必先启用一个再启用另一个，而是启用同时包含两者的替代形式（\MyKey{bi}）。
+
+另一方面，必须记住，尽管 \ConTeXt\ 假定每种字体都有这些替代形式，并因此提供了启用它们的命令，但为了在最终文档中起作用并产生一些可察觉的效果，这些命令需要字体在其设计中为每种样式和替代形式提供特定的形式。
+
+\startSmallPrint
+
+  特别是，许多字体在其设计中不区分倾斜体和斜体字母，或者不包含小型大写字母的特殊形式。
+
+\stopSmallPrint
+
+\subsubsubject{斜体与倾斜体的区别}
+
+斜体和倾斜体在排版功能上的相似性导致许多人混淆这两种替代形式。倾斜体是通过稍微倾斜常规字形得到的。但斜体意味着——至少在某些字体中——一种不同的设计，其中字母{\em 看起来}是倾斜的，因为它们是按照那种样子绘制的；但实际上并没有真正的倾斜。这可以在下面的示例中看到，其中我们以相同的大小将同一个词写了三次，大小足够大，以便容易看出差异。第一个版本使用常规形式，第二个使用倾斜体，第三个使用斜体：
+
+\midaligned{\switchtobodyfont[20pt,rm] %
+  \framed{{\rm italics} -- {\sl italics} -- {\it italics}}}
+
+注意前两个示例中字符的设计是相同的，但在第三个示例中，某些字母的笔画存在微妙（或者可能并不微妙！\null）的差异，这非常明显，尤其是在 \quote{a} 的绘制方式上，尽管差异实际上几乎发生在所有字符上。
+
+斜体和倾斜体的通常用法是相似的，每个人决定使用哪一种。这里有自由，但我们应该指出，如果斜体和倾斜体的使用是 {\em 一致} 的，文档的排版会更好，看起来也会更好。此外，在许多字体中，斜体和倾斜体之间的设计差异可以忽略不计，因此使用哪一种都没有区别。
+
+另一方面，斜体和倾斜体都是字体的替代形式，这主要意味着两件事：
+
+\startitemize[n]
+
+  \item 我们只能在字体中定义了它们时才能使用它们。
+
+  \item 当启用其中一个时，我们正在禁用之前一直使用的替代形式。
+
+\stopitemize
+
+除了斜体和倾斜体的命令之外，\ConTeXt\ 还提供了一个用于 {\em 强调} 文本特定部分的额外命令。与斜体或倾斜体相比，它的使用意味着微妙的差异。参见 \in{节}[sec:emphasis]。
+
+\stopsubsection
+
+
+\startsubsection
+    [title=字体大小]
+
+\ConTeXt{} 处理的所有字体都基于矢量图形，因此理论上它们可以以任何字体大小显示，尽管正如我们将看到的，这取决于我们用来确定字体大小的实际指令。除非另有说明，否则假定字体大小为 12 点。
+
+% TODO：大概 ConTeXt 也可以使用 TT 字体。下面的段落应该编辑吗？
+
+% TODO：我重写了下面的历史。我认为是正确的，但是...
+
+\startSmallPrint
+
+    \ConTeXt{} 使用的所有字体都基于矢量图形，因此是 Opentype 或 Type 1 字体，这意味着起源早于这项技术的字体已经被重新实现。特别是，由 {\sc Knuth} 设计的 \TeX\ 默认字体 {\em Computer Modern} 最初仅以某些离散大小存在，每个字符由 \quotation{位图} 表示，而不是矢量图形。后来 {\em Computer Modern} 被重新实现为 Type 1 字体。再后来，{\em Computer Modern} 被用作开发 \emph{Latin Modern} 的基础，其中添加了许多字形，改进了各种字体度量以提供更好的字母间距，并整合了各种其他改进。{\em Latin Modern} 是 \ConTeXt{} 使用的默认字体，尽管在许多文档中它仍被称为 {\em Computer Modern}。这可能是因为该字体对于 \TeX{} 系统仍然具有强烈的象征意义，因为这些系统最初是由 {\sc Knuth} 与另一个名为 \MetaFont{} 的程序一起开发和发展的，该程序旨在设计可与 \TeX{} 一起使用的字体。
+
+\stopSmallPrint
+
+\stopsubsection
+
+\stopsection
+
+
+% TODO：本章后面没有 \setupbodyfont 的使用示例。在适当的地方添加一个。
+
+\startsection
+  [
+    reference=sec:mainfont,
+    title=设置文档的主字体,
+  ]
+\PlaceMacro{setupbodyfont}
+
+默认情况下，除非指定了其他字体，否则 \ConTeXt{} 将使用 12 点的 {\em Latin Modern Roman} 作为主字体。如前所述，这种字体是从 {\em Computer Modern} 发展而来的，后者最初由 {\sc Knuth} 设计用于 \TeX\null。它是一种优雅的罗马风格字体，在某些笔画中具有丰富的比例和装饰性 \quotation{花饰}——称为 {\em 衬线}——非常适合打印文本和屏幕显示，尽管——这是个人观点——它不太适合像 {\em 智能手机} 这样的小屏幕，因为 {\em 衬线} 或花饰往往会 \quotation{堆积}，使阅读变得困难。
+
+要设置不同的字体，我们使用 \tex{setupbodyfont}，它不仅允许我们更改实际字体，还允许更改其大小和样式。当我们希望这适用于整个文档时，需要将其包含在源文件的导言区中。但如果我们只是想在某些点更改字体，这就是我们需要包含后续内容的地方。
+
+\tex{setupbodyfont} 的格式为：
+
+\type{\setupbodyfont[选项]}
+
+其中命令的各种选项允许我们指示：
+
+\startitemize
+
+  \item {\bf 字体名称}，可以是 \in{表}[tbl:ctx-fonts] 中的任何符号字体名称。
+
+  \item {\bf 大小}，可以通过其尺寸（使用点作为测量单位）或某些符号名称来指示。但请注意，尽管我之前说过 \ConTeXt{} 使用的字体几乎可以缩放到任何大小，但在 \tex{setupbodyfont} 中，\ConTeXt\ 仅支持 4 到 12 之间的整数大小，以及 14.4 和 17.3 这些值。默认情况下，它假定大小为 12 点。
+
+    \tex{setupbodyfont} 建立了我们可以称之为文档 {\em 基本大小} 的东西；换句话说，就是 {\em 正常} 字符大小，基于此计算其他大小，例如标题和脚注。当我们使用 \tex{setupbodyfont} 更改主大小时，所有基于主字体计算的其他大小也会更改。
+
+    除了直接指示字符大小（10pt、11pt、12pt 等\null）之外，我们还可以使用一些基于当前大小计算要应用的字符大小的符号名称。相关的符号名称，从大到小依次为：\quotation{big}、\quotation{small}、\quotation{script}、\quotation{x}、\quotation{scriptscript} 和 \quotation{xx}。因此，例如，如果我们想使用 \tex{setupbodyfont} 设置大于 12 点的正文文本，我们可以使用 \MyKey{big} 来实现。
+
+  \item {\bf 字体样式}，正如我们已经指出的，可以是 roman（带衬线）、无衬线（sans serif）、打字机体，以及对于某些字体，手写体和书法体样式。\tex{setupbodyfont} 允许不同的符号名称来指示不同的样式。这些可以在表 \in[tab:ctx-stylesstbdf] 中找到：
+
+% TODO："modo" 作为等宽字体的名称正确吗？
+
+{\switchtobodyfont[script] %
+    \placetable %
+      [here, force] %
+      [tab:ctx-stylesstbdf] %
+      {setupbodyfont 中的样式} %
+      {\startxtable %
+        \startxrow [topframe=on, bottomframe=on]%
+          \startxcell \bf 样式 \stopxcell %
+          \startxcell \bf 允许的符号名称\stopxcell %
+        \stopxrow %
+        \startxrow %
+          \startxcell Roman \stopxcell %
+          \startxcell \tt rm, roman, serif, regular \stopxcell %
+        \stopxrow %
+        \startxrow %
+          \startxcell Sans Serif \stopxcell %
+          \startxcell \tt ss, sans, support, sansserif\stopxcell %
+        \stopxrow %
+        \startxrow %
+          \startxcell 等宽 \stopxcell %
+          \startxcell \tt tt, modo, type, teletype \stopxcell %
+        \stopxrow %
+        \startxrow %
+          \startxcell 手写体 \stopxcell %
+          \startxcell \tt hw, handwritten \stopxcell %
+        \stopxrow %
+        \startxrow [bottomframe=on]%
+          \startxcell 书法体 \stopxcell %
+          \startxcell \tt cg, calligraphic\stopxcell %
+        \stopxrow %
+      \stopxtable} %
+ }
+
+% TODO：以下内容正确吗？例如，肯定存在看起来不像“teletype”的等宽字体。
+
+据我所知，每种样式支持的不同名称是完全同义的。
+ 
+\stopitemize
+
+
+\startsubsubject
+  [
+    reference=sec:see-font,
+    title=查看字体的外观,
+  ]
+
+在决定在文档中使用特定字体之前，我们通常想看看它是什么样子。这几乎总是可以从操作系统完成，因为通常有一些实用程序可以检查系统上安装字体的外观；但为了方便起见，\ConTeXt{} 本身提供了一个实用程序，允许我们查看 \ConTeXt{} 中启用的任何字体的外观。这就是 \tex{showbodyfont}，它会生成一个包含我们所指示字体示例的表格。
+
+\tex{showbodyfont} 的格式如下：
+
+\type{\showbodyfont [选项]}
+
+其中我们可以像在 \tex{setupbodyfont} 中一样精确地指示相同的符号名称作为选项。因此，例如，\tex{showbodyfont[schola, 8pt]} 将向我们展示下面的表格，其中包含 schola 字体在基本大小为 8 点时的不同示例：
+
+\showbodyfont[schola,8pt]\bigskip
+
+请注意表格的第一行和第一列中有某些命令。稍后，当这些命令的含义被解释后，我们将再次查看 \tex{showbodyfont} 生成的表格。
+
+% TODO：我们解释表格中的 \mr 是什么吗？
+
+如果我们想查看特定字体的完整字符范围，可以使用 \PlaceMacro{showfont}\tex{showfont[字体名称]} 命令。此命令将显示每个字符的主要设计，而不应用样式和替代形式的命令。
+
+\stopsubsubject
+
+\stopsection
+
+
+\startsection
+    [title=更改字体或某些字体特性]
+
+\startsubsection
+    [title=\tex{setupbodyfont} 和 \tex{switchtobodyfont} 命令]
+\PlaceMacro{switchtobodyfont}\PlaceMacro{setupbodyfont}
+
+要更改字体、样式或大小，我们可以使用与在文档开头不想使用 \ConTeXt\ 默认字体时设置字体的相同命令：\tex{setupbodyfont}。我们只需要将此命令放在我们希望更改字体的文档位置。它将产生一个 {\em 永久性} 的字体更改，这意味着它将直接影响主字体，并间接影响所有与之相关的字体。
+
+与 \tex{setupbodyfont} 非常相似的是 \tex{switchtobodyfont}。这两个命令都允许我们更改字体的相同方面（字体本身、样式和大小），但它们在内部的工作方式不同，并且用于不同的用途。第一个命令（\tex{setupbodyfont}）旨在 {\em 建立} 文档的主字体（通常也是唯一一个）；一个文档拥有多个主字体既不常见，也不符合排版规范（这就是为什么它被称为 {\em 主} 字体）。相比之下，\tex{switchtobodyfont} 旨在以不同的字体书写文本的某些部分，或者为我们在文档中定义的特定类型的段落分配特定的字体。
+
+% TODO：第一句话清楚吗？
+除了上述内容——实际上影响了这两个命令各自的内部运作——从用户的角度来看，使用一个命令或另一个命令之间存在一些差异。特别是：
+
+\startitemize[n]
+
+  \item 正如我们已经知道的，\tex{setupbodyfont} 仅限于特定的大小范围，而 \tex{switchtobodyfont} 允许我们指示几乎任何大小，因此如果字体没有该大小，字体将缩放到该大小。
+
+  \item \tex{switchtobodyfont} 除了在其使用的位置之外，不会以任何方式影响文本元素。这与 \tex{setupbodyfont} 形成对比，如上所述，后者会建立主字体，并通过更改主字体，也会更改所有其字体是基于主字体计算的文本元素的字体。
+
+\stopitemize
+
+另一方面，这两个命令不仅更改字体、样式和大小，还更改与字体相关的其他方面，例如，行间距。
+
+\startSmallPrint
+
+    有趣的是，\tex{setupbodyfont} 如果请求不允许的字体大小会产生编译错误，但如果请求不存在的字体则不会产生错误，在这种情况下，将启用默认字体（{\em Latin Modern Roman}）。\tex{switchtobodyfont} 在字体方面的行为相同，在大小方面，正如我已经说过的，它试图通过缩放字体来实现。然而，有些字体无法缩放到某些大小，在这种情况下，默认字体将再次被启用。
+
+\stopSmallPrint
+
+\stopsubsection
+
+
+\startsubsection
+  [
+    reference=sec:quick-change,
+    title={快速更改样式、替代形式和大小的后缀},
+  ]
+
+\subsubsubject{更改样式和替代形式}
+
+除了 \tex{switchtobodyfont}，\ConTeXt\ 还提供了一组命令，允许我们快速更改样式、替代形式或大小。关于这些命令，\ConTeXt\ wiki 警告说，有时当它们出现在段落的开头时，可能会产生一些不希望的副作用，因此它建议在这种情况下，在相关命令之前加上 \PlaceMacro{dontleavehmode}\tex{dontleavehmode} 命令。
+
+% TODO：这里的表格标题（以及上面）真的非常小。我认为 \switchtobodyfont[small] 一般来说太小了，但在这里尤其令人痛苦。
+
+{\switchtobodyfont[small] %
+\placetable[here][tab:ctx-styles]
+  {在不同样式之间切换的命令}
+  {
+    \starttabulate[|l|l|]
+      \HL
+      \NC {\bf 样式} \NC {\bf 启用它的命令}\NR
+      \HL
+      \NC Roman\NC\type{\rm}, \type{\roman}, \type{\serif}, \type{\regular}\NR\PlaceMacro{rm}\PlaceMacro{roman}\PlaceMacro{serif}\PlaceMacro{regular}
+      \NC Sans Serif\NC\type{\ss}, \type{\sans}, \type{\support}, \type{\sansserif}\NR\PlaceMacro{ss}\PlaceMacro{sans}\PlaceMacro{support}\PlaceMacro{sansserif}
+      \NC 等宽\NC\type{\tt}, \type{\mono}, \type{\teletype},\NR\PlaceMacro{tt}\PlaceMacro{mono}\PlaceMacro{teletype}
+      \NC 手写体\NC\type{\hw}, \type{\handwritten},\NR\PlaceMacro{hw}\PlaceMacro{handwritten}
+      \NC 书法体\NC\type{\cf}, \type{\calligraphic}\PlaceMacro{cf}\PlaceMacro{calligraphic}\NR
+      \HL
+    \stoptabulate
+  }}
+
+
+\in{表}[tab:ctx-styles] 包含了允许我们更改样式的命令，而不改变任何其他方面；而 \in{表}[tab:ctx-alternatives] 包含了允许我们专门更改替代形式的命令。
+
+
+{\switchtobodyfont[small] %
+  \placetable[here][tab:ctx-alternatives]
+  {启用特定替代形式的命令}
+  {
+    \starttabulate[|l|l|]
+      \HL
+      \NC {\bf 替代形式} \NC {\bf 启用它的命令}\NR
+      \HL
+      \NC 正常           \NC\type{\tf}, \type{\normal}\NR\PlaceMacro{tf}\PlaceMacro{normal}
+      \NC 斜体          \NC\type{\it}, \type{\italic}\NR\PlaceMacro{it}\PlaceMacro{italic}
+      \NC 粗体          \NC\type{\bf}, \type{\bold}\NR\PlaceMacro{bf}\PlaceMacro{bold}
+      \NC 粗斜体  \NC\type{\bi}, \type{\bolditalic}, \type{\italicbold}\NR\PlaceMacro{bi}\PlaceMacro{bolditalic}\PlaceMacro{italicbold}
+      \NC 倾斜体        \NC\type{\sl}, \type{\slanted}\NR\PlaceMacro{sl}\PlaceMacro{slanted}
+      \NC 粗倾斜体\NC\type{\bs}, \type{\boldslanted}, \type{\slantedbold}\NR\PlaceMacro{bs}\PlaceMacro{boldslanted}\PlaceMacro{slantedbold}
+      \NC 小型大写字母       \NC\type{\sc}, \type{\smallcaps}\NR\PlaceMacro{sc}\PlaceMacro{smalcaps}
+      \NC 旧式数字         \NC\type{\os}, \type{\mediaeval}\PlaceMacro{os}\PlaceMacro{mediaeval}\NR
+    \stoptabulate
+  }
+}
+
+所有这些命令都会保持其有效性，直到显式启用另一种样式或替代形式，或者声明该命令的 {\em 组} 结束。因此，当我们希望命令只影响文本的一部分时，我们所必须做的是将该部分括在一个组内，如下例所示，其中每当单词 {\em thought} 作为名词而不是动词出现时，它就以斜体出现，为其创建一个组。
+
+\startDoubleExample
+
+\starttyping
+I thought a {\it thought} but
+the {\it thought} I thought wasn't
+the {\it thought} I thought I thought.
+If the {\it thought} I thought I thought
+had been the {\it thought} I thought
+I wouldn't have thought so much!
+\stoptyping
+
+\column
+
+I thought a {\it thought}, but
+the {\it thought} I thought, wasn't
+the {\it thought} I thought I thought.
+If the {\it thought} I thought I thought
+had been the {\it thought} I thought
+I wouldn't have thought so much!
+
+\stopDoubleExample
+
+\subsubsubject[sec:sufijos de tamaño]{用于同时更改替代形式和大小的后缀}
+\PlaceMacro{rmx}\PlaceMacro{rmxx}\PlaceMacro{rma}\PlaceMacro{rmb}\PlaceMacro{rmc}\PlaceMacro{rmd}
+\PlaceMacro{ssx}\PlaceMacro{ssxx}\PlaceMacro{ssa}\PlaceMacro{ssb}\PlaceMacro{ssc}\PlaceMacro{ssd}
+\PlaceMacro{ttx}\PlaceMacro{ttxx}\PlaceMacro{tta}\PlaceMacro{ttb}\PlaceMacro{ttc}\PlaceMacro{ttd}
+\PlaceMacro{tfx}\PlaceMacro{tfxx}\PlaceMacro{tfa}\PlaceMacro{tfb}\PlaceMacro{tfc}\PlaceMacro{tfd}
+\PlaceMacro{itx}\PlaceMacro{itxx}\PlaceMacro{ita}\PlaceMacro{itb}\PlaceMacro{itc}\PlaceMacro{itd}
+\PlaceMacro{bfx}\PlaceMacro{bfxx}\PlaceMacro{bfa}\PlaceMacro{bfb}\PlaceMacro{bfc}\PlaceMacro{bfd}
+\PlaceMacro{bix}\PlaceMacro{bixx}\PlaceMacro{bia}\PlaceMacro{bib}\PlaceMacro{bic}\PlaceMacro{bid}
+\PlaceMacro{slx}\PlaceMacro{slxx}\PlaceMacro{sla}\PlaceMacro{slb}\PlaceMacro{slc}\PlaceMacro{sld}
+\PlaceMacro{bsx}\PlaceMacro{bsxx}\PlaceMacro{bsa}\PlaceMacro{bsb}\PlaceMacro{bsc}\PlaceMacro{bsd}
+
+更改样式或替代形式的命令在其双字母版本（\tex{tf}、\tex{it}、\tex{bf} 等\null）中允许使用一系列影响字体大小的 {\em 后缀}。后缀 \quote{a}、\quote{b}、\quote{c} 和 \quote{d} 分别将字体大小乘以 $1.2$、$1.2^2$（$=1.44$）、$1.2^3$（$=1.728$）或 $1.2^4$（$=2.42$）。例如：
+
+\type{\tf test, \tfa test, \tfb test, \tfc test, \tfd test}
+
+{\color[red]{\tf test, \tfa test, \tfb test, \tfc test, \tfd test}}
+
+而后缀 x 和 xx 会减小字体大小，分别乘以 0.8 和 0.6：
+
+% TODO：真的是 0.8 和 0.6 吗？两页前的表格表明并非如此。
+
+\type{\tf test, \tfx test, \tfxx test}
+
+{\color[red]{\tf test, \tfx test, \tfxx test}}
+
+应用于 \tex{tf} 的后缀 \quote{x} 和 \quote{xx} 允许我们缩短命令，因此 \tex{tfx} 可以写成 \PlaceMacro{tx}\tex{tx}，\tex{tfxx} 可以写成 \PlaceMacro{txx}\tex{txx}。
+
+% TODO：LMTX 的情况如何？
+
+这些不同后缀的可用性取决于字体的实际实现。根据 \ConTeXt{} 2013 年参考手册（主要针对 Mark~II），唯一保证始终有效的后缀是 \quote{x}，其他的可能实现也可能不实现；或者它们可能仅适用于某些替代形式。
+
+% TODO：在下一段中，JAL 引用了 sec:see-font，但这里 \in{}[] 命令没有数字引用。为了（比没有好）JD 将其改为了包含的节。无论好坏。
+% 但这里正确的做法是什么？
+
+无论如何，为了消除疑问，我们可以使用我之前提到过的 \tex{showbodyfont}（在 \in{节}[sec:mainfont] 中）。此命令显示一个图表，不仅让我们能够欣赏字体的外观，还能看到字体在其每种样式和替代形式中的样子，以及哪些调整大小的后缀可用。
+
+% 不要让那一行单独留在页面底部！
+%（真的应该使用更像 ConTeXt 的方式！\testpage 在这里崩溃。）
+% 再次提到 \mr... google 说“Mathematical Roman or Medium Roman”...
+\need 5cm
+
+让我们再次查看 \tex{showbodyfont} 显示的表格：
+
+\showbodyfont[modern]
+
+如果我们仔细观察表格，可以看到第一列包含字体样式（\tex{rm}、\tex{ss} 和 \tex{tt}）。第一行左侧包含替代形式（\tex{tf}、\tex{sc}、\tex{sl}、\tex{it}、\tex{bf}、\tex{bs} 和 \tex{bi}），而第一行的右侧包含其他可用的后缀，尽管仅适用于常规替代形式。
+
+需要注意的是，通过这些后缀中的任何一个更改字体大小都只会严格地更改字体大小，而保持通常与字体大小相关的其他值不变，例如行距。
+
+\subsubsubject{自定义后缀的缩放因子}
+
+要自定义缩放因子，我们可以使用 \PlaceMacro{definebodyfontenvironment}\tex{definebodyfontenvironment}，其格式可以是：
+
+\starttyping
+\definebodyfontenvironment[特定大小][缩放]
+\definebodyfontenvironment[default][缩放]
+\stoptyping
+
+在第一个版本中，我们将为 \tex{setupbodyfont} 或 \tex{switchtobodyfont} 设置的主字体的特定大小重新定义缩放。例如：
+
+\type{\definebodyfontenvironment[10pt][a=12pt, b=14pt, c=2, d=3]}
+
+将确保当主字体为 10 点时，后缀 \quote{a} 将其更改为 12 点，后缀 \quote{b} 更改为 14 点，后缀 \quote{c} 将原始字体乘以 2，后缀 \quote{d} 乘以 3。请注意，对于 \quote{a} 和 \quote{b} 指示了固定尺寸，但对于 \quote{c} 和 \quote{d} 指示了原始大小的乘数因子。
+
+然而，当 \tex{definebodyfontenvironment} 的第一个参数等于 \MyKey{default} 时，我们将为所有可能的字体大小重新定义缩放值，并且作为缩放值，我们只能输入一个乘数数字。因此，例如，如果我们写：
+
+\type{\definebodyfontenvironment[default][a=1.3, b=1.6, c=2.5, d=4]}
+
+我们将指示，无论主字体大小如何，\quote{a} 后缀指示的字体大小是默认大小的 1.3 倍，\quote{b} 是 1.6 倍，\quote{c} 是 2 倍，\quote{d} 是 4 倍。
+
+除了后缀 \quote{xx}、\quote{x}、\quote{a}、\quote{b}、\quote{c} 和 \quote{d} 之外，使用 \tex{definebodyfontenvironment} 我们还可以为 \MyKey{big}、\MyKey{small}、\MyKey{script} 和 \MyKey{scriptscript} 关键字分配缩放值。这些值分配给 \tex{setupbodyfont} 和 \tex{switchtobodyfont} 中与这些关键字关联的所有大小。它们也应用于以下命令中，我认为从它们的名称可以推断出它们的用途：
+
+\startitemize[1,packed]
+
+  \item \PlaceMacro{smallbold}\tex{smallbold}
+  \item \PlaceMacro{smallslanted}\tex{smallslanted}
+  \item \PlaceMacro{smallboldslanted}\tex{smallboldslanted}
+  \item \PlaceMacro{smallslantedbold}\tex{smallslantedbold}
+  \item \PlaceMacro{smallbolditalic}\tex{smallbolditalic}
+  \item \PlaceMacro{smallitalicbold}\tex{smallitalicbold}
+  \item \PlaceMacro{smallbodyfont}\tex{smallbodyfont}
+  \item \PlaceMacro{bigbodyfont}\tex{bigbodyfont}
+
+\stopitemize
+
+如果我们想查看特定字体的默认大小，可以使用 \PlaceMacro{showbodyfontenvironment}\tex{showbodyfontenvironment[字体]}。例如，将此命令应用于 {\tt modern} 字体，会得到以下结果：
+
+\showbodyfontenvironment[modern]
+
+\stopsubsection
+
+
+\startsubsection
+  [title={为字体大小、样式和替代形式定义命令和关键字}]
+
+用于更改字体大小、样式和变体的预定义命令非常丰富。此外，\ConTeXt\ 允许我们：
+
+\startitemize[n]
+
+  \item 添加我们自己的命令来更改字体样式、大小或变体。
+
+  \item 为 \tex{switchtobodyfont} 识别的样式或变体名称添加同义词。
+
+\stopitemize
+
+它提供以下命令来实现这一点：
+
+\startitemize
+
+  \item \PlaceMacro{definebodyfontswitch}\tex{definebodyfontswitch}：允许我们定义一个更改字体大小的命令。例如，如果我们想定义 \tex{eight} 命令（或 \tex{viii} 命令\footnote{请记住，除了控制符号的情况外，\ConTeXt\ 命令名称只能由字母组成。}）来设置 8 pt 字体，我们需要写：
+
+    {\tfx\type{\definebodyfontswitch[eight][8pt]}} 或
+    {\tfx\type{\definebodyfontswitch[viii][8pt]}}
+
+  \item \PlaceMacro{definefontstyle}\tex{definefontstyle}：允许我们定义一个或多个可以在 \tex{setupbodyfont} 或 \tex{switchtobodyfont} 中使用的词来设置特定的字体样式；因此，例如，如果我们想用其他名称来称呼 {\em sans serif}（例如，在西班牙语中称为 \quotation{paloseco}），我们可以写
+
+    \type{\definefontstyle[paloseco][ss]}
+
+    \tex{definefontstyle} 的一个特点是它允许将多个词同时关联到同一样式，因此，继续西班牙语的例子：
+
+    \type{\definefontstyle[paloseco, sosa, sinrebordes][ss]}
+
+% TODO：如何使用它的示例？
+
+  \item \PlaceMacro{definealternativestyle}\tex{definealternativestyle}：允许我们将一个名称与字体变体关联起来。这个名称可以作为命令使用，或者被允许配置要应用样式的命令的 {\tt style} 选项识别。因此，例如，以下片段
+
+    \type{\definealternativestyle[strong][\bf][]}
+
+    将启用 \tex{strong} 命令和关键字 \MyKey{strong}，该关键字将被允许此选项的命令的 {\tt style} 选项识别。我们本可以说 \quotation{bold}，但这个词已经在 ConTeXt 中使用，所以我选择了一个 HTML 中使用的术语，即 \quotation{strong} 作为替代。
+
+% TODO：有关于 LMTX 的信息吗？
+
+    \startSmallPrint
+
+        我不知道 \tex{definealternativestyle} 的第三个参数是做什么的。它不是可选的，因此不能 \Doubt 省略；但我找到的关于它的唯一信息是在 \ConTeXt\ 参考手册中，其中说第三个参数仅与章节标题相关：\quotation{{\em 除了 \tex{cap} 之外，我们必须遵守此处使用的字体}}（？？）
+
+    \stopSmallPrint
+
+\stopitemize
+
+\stopsubsection
+
+\stopsection
+
+
+\startsection
+    [title=与使用某些替代形式相关的其他事项]
+
+在字体的不同替代形式中，有两种的使用需要一定的澄清：
+
+\startsubsection
+  [
+    reference=sec:emphasis,
+    title={斜体、倾斜体和强调},
+  ]
+
+斜体和倾斜体都主要用于在排版上突出文本片段以吸引注意力。换句话说，就是 {\em 强调它}。
+
+当然，我们可以通过显式启用斜体或倾斜体来强调文本。但 \ConTeXt\ 提供了一个更有用和有趣的替代命令，专门用于强调文本片段。这就是源自单词 {\em emphasis} 的 \PlaceMacro{em}\tex{em} 命令。与纯粹排版命令的 \tex{it} 和 \tex{sl} 相比，\tex{em} 是一个 {\em 概念性} 命令；它的工作方式不同，因此更通用，以至于 \ConTeXt{} 文档建议优先使用 \tex{em} 而不是 \tex{it} 或 \tex{sl}。当我们使用后两个命令时，我们是在告诉 \ConTeXt{} 我们想要使用哪种字体替代形式；但当我们使用 \tex{em} 时，我们是在告诉它我们想要产生什么效果，让 \ConTeXt{} 决定如何做到这一点。通常，为了达到强调或突出某物的效果，我们会启用斜体或倾斜体，但这取决于上下文。因此，如果我们在一个已经是斜体——或倾斜体——的文本中使用 \tex{em}，该命令将以相反的方式突出显示：在这种情况下是直立文本。
+
+因此，下面的示例：
+
+\startDoubleExample
+
+\startlines
+\starttyping
+
+{\em One of the most beautiful
+orchids in the world is the
+{\em Thelymitra variegata}
+or Southern Queen of Sheba.}
+\stoptyping
+\stoplines
+
+\column
+
+
+{\em One of the most beautiful orchids in the world is the {\em
+ Thelymitra variegata} or Southern Queen of Sheba}.
+
+\stopDoubleExample
+
+注意，第一个 \tex{em} 启用了斜体（实际上是倾斜体，见下文），而第二个 \tex{em} 禁用了斜体，而是将单词 \quotation{Thelymitra variegata} 设置为正常的直立样式。
+
+\tex{em} 的另一个优点是它不是一种替代形式，因此不会禁用我们之前拥有的替代形式，因此，例如，在粗体文本中，使用 \tex{em} 我们将得到粗倾斜体，而无需显式调用 \tex{bs}。类似地，如果 \tex{bf} 命令出现在已经强调的文本中，这种强调不会停止。
+
+默认情况下，\tex{em} 启用的是倾斜体而不是斜体，但我们可以使用 \tex{setupbodyfontenvironment[default][em=italic]} 来更改这一点。
+
+\stopsubsection
+
+
+\startsubsection
+  [
+    reference=sec:smallcaps,
+    title=小型大写字母和伪小型大写字母,
+  ]
+
+{\sc 小型大写字母} 是一种排版资源，通常比使用大写字母好得多。小型大写字母给我们大写字母的形状，但保持与行中小写字母相同的高度。这就是为什么小型大写字母是小写字母的样式变体。小型大写字母在某些上下文中替换大写字母，对于书写罗马数字或章节标题特别有用。在学术文本中，通常也使用小型大写字母来书写被引用作者的姓名。
+
+问题在于并非所有字体都实现了小型大写字母，而那些实现了的字体，也并非总是为其某些 {\em 字体样式} 实现了小型大写字母。此外，由于小型大写字母是斜体、粗体或倾斜体的替代形式，根据我们在本章中阐述的一般规则，所有这些排版特性不能同时使用。
+
+这些问题可以通过使用 {\em 伪小型大写字母} 来解决，\ConTeXt\ 允许我们使用 \tex{cap} 和 \tex{Cap} 命令来创建伪小型大写字母；有关此主题的更多信息，请参见 \in{节}[sec:Upper-Lower-Fake]。
+
+\stopsubsection
+
+\stopsection
+
+
+\startsection
+  [title=颜色的使用与配置]
+
+\ConTeXt\ 提供了更改整个文档、其某些元素或文本某些部分的颜色的命令。它还提供了将数百种预定义颜色加载到内存中以及查看其成分的命令。
+
+\startsubsection
+    [title=排版彩色文本片段的方法]
+
+大多数 \ConTeXt\ 的可配置命令都允许一个名为 \MyKey{color} 的选项，该选项允许我们指示受该命令影响的文本应以何种颜色书写。因此，例如，要指示章节标题用蓝色书写，我们只需要写：
+
+\vbox{\starttyping
+  \setuphead
+    [chapter]
+    [color=blue]
+\stoptyping}
+
+使用此方法，我们可以为标题、题头、脚注、边注、条和线、表格、表格或图像标题等着色。使用此方法的优点是最终结果将保持一致（所有履行相同功能的文本将使用相同的颜色书写），并且更容易全局更改。
+
+我们也可以直接为文本的一部分或片段着色，但是，为了避免颜色过于斑驳（从排版角度来看不愉快）或不一致的使用，通常建议避免直接着色，而使用我们可以称之为 {\em 语义着色} 的方法。也就是说，例如，我们不写
+
+\type{\color[red]{Very important text}}
+
+而是为非常重要的文本定义一个命令，并赋予其颜色。例如
+
+\starttyping
+\definehighlight[important][color=red]
+\important{Very important text}
+\stoptyping
+
+\stopsubsection
+
+
+\startsubsection
+  [title=更改文档的背景和前景颜色]
+\PlaceMacro{setupbackgrounds}\PlaceMacro{setupcolors}
+
+如果我们想更改整个文档的颜色，无论是想更改背景颜色还是前景（文本）颜色，我们将使用 \tex{setupbackgrounds} 或 \tex{setupcolors}。因此，例如：
+
+\starttyping
+\setupbackgrounds
+  [page]
+  [background=color, backgroundcolor=blue]
+\stoptyping
+
+将设置页面的背景颜色为蓝色。作为 \MyKey{backgroundcolor} 的值，我们可以使用任何预定义颜色的名称。
+
+要全局更改整个文档的前景颜色（从插入命令的位置开始），请使用 \tex{setupcolors}，其中 \MyKey{textcolor} 选项控制文本颜色。例如：
+
+\type{\setupcolors[textcolor=red]}
+
+将确保文本颜色为红色。
+
+\stopsubsection
+
+
+\startsubsection
+  [title=为特定文本片段着色的命令]
+\PlaceMacro{color}\PlaceMacro{colored}
+
+为小段文本着色的通用命令是
+
+\type{\color[颜色名称]{要着色的文本}}
+
+对于较大的文本片段，最好使用
+
+\type{\startcolor[颜色名称] ... \stopcolor}
+
+这两个命令都使用某种预定义颜色。如果我们想即时定义颜色，可以使用 \tex{colored} 命令。例如：
+
+\startDoubleExample
+
+\starttyping
+Three \colored[r=0.1, g=0.8, b=0.8]
+{coloured} cats
+\stoptyping
+
+\column
+
+Three \colored[r=0.1, g=0.8, b=0.8]{coloured} cats.
+
+\stopDoubleExample
+
+生成一种颜色，由红色（最大可能量的 10\%）、绿色（80\%）和蓝色（80\%）组成。（在这种方案中，白色将是 \type{r=1, g=1, b=1}，这在白色页面背景上是看不见的。
+\inmargin{\colored[r=1, g=1, b=1]{你找到藏在这里的文本了吗？}}
+
+\stopsubsection
+
+
+\startsubsection
+  [
+    reference=sec:predefined-colours,
+    title=预定义颜色,
+  ]
+  % ANSS-CE 更新：我在 Standalone 发行版的任何“当前”文档文件中找不到关于定义了哪些颜色的声明。然而，
+  %   grep '^\\definecolor ' /local/context/tex/texmf-context/tex/context/base/mkiv/colo-imp-rgb.mkiv | sed -e 's/^.definecolor .//' -e 's/].*//'
+  % 给出了表中列出的颜色。
+  % 注意（2026 年 3 月）没有 .mkxl 文件，只有 .mkiv 版本。
+
+  % ANSS 评论：
+  % 此信息来自参考手册。但我怀疑有相当多的预定义颜色。例如，本文档中使用的“maincolor”是基于未在预定义颜色列表中定义的橙色。
+
+% 这是 JAL 在这里的原始文本
+%  \ConTeXt\ 加载了 \in{表}[tbl:predefined colours] 中列出的最常见的预定义颜色。\footnote{此列表可以在参考手册和 \ConTeXt\ wiki 中找到，但我相当确定它是一个不完整的列表，因为在本文档中，例如，在没有加载任何额外颜色定义的情况下，我们使用了 \quotation{orange}——它不在 \in{表}[tbl:predefined colours] 中——用于节标题。}
+
+  \ConTeXt\ LMTX 自动加载 \in{表}[tbl:predefined colours] 中列出的颜色定义。
+
+{\switchtobodyfont[small]
+\placetable
+  [here]
+  [tbl:predefined colours]
+  {\ConTeXt\ 的预定义颜色}
+{\starttabulate[|l|l|l|l|]
+\HL
+\NC{\bf 名称}
+\NC{\bf 浅色调}
+\NC{\bf 中色调}
+\NC{\bf 深色调}
+\NR
+\HL
+\NC black
+\NR
+\NC white
+\NR
+\NC gray	\NC lightgray	\NC middlegray		\NC darkgray
+\NR
+\NC red		\NC lightred	\NC middlered		\NC darkred
+\NR
+\NC green	\NC lightgreen	\NC middlegreen		\NC darkgreen
+\NR
+\NC blue	\NC lightblue	\NC middleblue		\NC darkblue
+\NR
+\NC cyan	\NC lightcyan	\NC middlecyan		\NC darkcyan
+\NR
+\NC magenta	\NC lightmagenta \NC middlemagenta	\NC darkmagenta
+\NR
+\NC yellow	\NC lightyellow	\NC middleyellow	\NC darkyellow
+\NR
+\NC orange	\NC lightorange	\NC middleorange	\NC darkorange
+\NR
+\HL
+\NS[3][c] 更多灰色调
+\NR
+\HL
+\NC palegray	\NC gray-1	\NC gray-2		\NC gray-3
+\NR
+\NC gray-4	\NC gray-5	\NC gray-6		\NC gray-7
+\NR
+\NC gray-8	\NC gray-9
+\NR
+\stoptabulate
+}}
+
+还有其他颜色集默认未加载，但可以使用以下命令加载：
+
+\PlaceMacro{usecolors}\type{\usecolors[集合名称]}
+
+其中集合名称可以是：
+
+% 注意：颜色数量于 2026 年 3 月 17 日验证/修正。
+
+\startitemize[packed]
+  \item \MyKey{crayola}，235 种模仿马克笔色调的颜色。
+  \item \MyKey{dem}，91 种颜色。
+  \item \MyKey{ema}，540 种基于 Emacs 使用的颜色的颜色定义。
+  \item \MyKey{rainbow}，91 种用于数学公式的颜色。
+  \item \MyKey{ral}，213 种来自 {\em Deutsches Institut für Gütesicherung und Kennzeichnung}（德国质量保证与认证协会）的颜色定义。
+  \item \MyKey{ryb}，36 种颜色。
+  \item \MyKey{solarized}，16 种基于 \quotation{solarized} 方案的颜色。
+  \item \MyKey{svg}，147 种颜色。
+  \item \MyKey{x11}，550 种 X11 标准颜色。
+  \item \MyKey{xwi}，125 种颜色。
+\stopitemize
+
+% TODO：LMTX 中与以下段落对应的是什么？
+
+\startSmallPrint
+
+    颜色定义文件包含在发行版的 \MyKey{context/base/mkiv} 目录中，其名称遵循 \MyKey{colo-imp-NAME.mkiv} 模式。（默认颜色位于 \type{.../colo-imp-rgb.mkiv} 文件中，即使对于 \ConTeXt\ LMTX\null 也是如此。）我刚刚提供的关于不同预定义颜色集的信息是基于我的特定发行版。具体的集合或其中定义的颜色数量在将来的版本中可能会改变。还要注意，这些集合之间的颜色名称有很多重叠，并且与特定名称关联的实际颜色在不同的集合中并不总是完全相同。
+
+\stopSmallPrint
+
+要查看这些集合中的每一个包含哪些颜色，我们可以使用下面描述的 \PlaceMacro{showcolor}\tex{showcolor[集合名称]} 命令。要使用这些颜色中的一些，我们首先需要使用（\tex{usecolors[集合名称]}）命令将它们加载到内存中，然后我们必须告诉 \tex{color} 或 \PlaceMacro{startcolor}\tex{startcolor} 命令颜色的名称。例如，以下序列：\page[preference]
+
+\starttyping
+\usecolors[xwi]
+\color[darkgoldenrod]{Tweedledum and Tweedledee}
+\stoptyping
+\page[no]
+
+将写出 \usecolors[xwi]\color[darkgoldenrod]{Tweedledum and Tweedledee}
+\page[preference]
+
+\stopsubsection
+
+\startsubsection
+    [title=查看可用颜色]
+\PlaceMacro{showcolor}
+
+\tex{showcolor} 命令显示一个颜色列表，您可以在其中看到颜色的外观、颜色在灰度中使用时的外观、颜色的红、绿、蓝分量，以及 \ConTeXt\ 识别它的名称。不带任何参数使用时，\tex{showcolor} 将显示当前文档中使用的颜色。但作为参数，我们可以指示 \in{节}[sec:predefined-colours] 中讨论的任何预定义颜色集，因此，例如，\tex{showcolor[solarized]} 将向我们显示该集合中的 16 种 solarized 颜色：
+
+\showcolor[solarized]
+
+如果我们想查看特定颜色的 rgb 分量，可以使用 \PlaceMacro{showcolorcomponents}\tex{showcolorcomponents[颜色名称]}。如果我们试图定义一种特定的颜色，查看与其接近的某种颜色的组成，这会很有用。例如，\tex{showcolorcomponents[darkgoldenrod]}（使用 \MyKey{xwi} 颜色）将向我们显示：
+
+\startframedtext[width=\textwidth]\switchtobodyfont[small]
+\showcolorcomponents[darkgoldenrod]
+\stopframedtext
+
+\stopsubsection
+
+\startsubsection
+    [title=定义我们自己的颜色]
+\PlaceMacro{definecolor}
+
+\tex{definecolor} 允许我们克隆现有颜色或定义新颜色。克隆现有颜色就像为其创建一个替代名称一样简单。为此，您需要写：
+
+\type{\definecolor[新颜色][旧颜色]}
+
+这将确保 \MyKey{新颜色} 与 \MyKey{旧颜色} 的颜色完全相同。
+
+但 \tex{definecolor} 的主要用途是创建新颜色。为此，必须按以下方式使用该命令：
+
+\type{\definecolor[颜色名称][定义]}
+
+其中 {\em 定义} 可以通过应用最多六种不同的颜色生成方案来完成：
+
+\startitemize
+
+% TODO：这些石灰颜色很难看到。应该将它们改为更容易看到的颜色吗？
+
+% 英文文本中有多处类似 ('h', from {\em hue}) 的内容。过了一会儿我意识到有些西班牙语单词有相同的首字母，但不是全部。我删除了这些解释，但任何将此翻译成其他语言的人可能希望根据语言需要将它们放回去。
+
+  \item {\bf RGB 颜色}：RGB 颜色的定义是最广泛使用的方法之一；它基于通过加法混合三种原色来表示颜色的想法：红色（\quote{r} 代表 {\em red}）、绿色（\quote{g} 代表 {\em green}）和蓝色（\quote{b} 代表 {\em blue}）。这些分量中的每一个都表示为一个介于 0 和 1 之间（含）的十进制数。
+
+    \type{\definecolor[lime 1][r=0.75, g=1, b=0]}：\definecolor[lime 1]
+         [r=0.75, g=1, b=0] \color[lime 1]{“lime 1”颜色的文本。}
+
+  \item {\bf Hex 颜色}：这种表示颜色的方式也基于 RGB 方案，但红、绿、蓝分量表示为一个三字节的十六进制数，其中第一个字节（两个字符）代表红色的值，第二个字节代表绿色的值，第三个字节代表蓝色的值。例如：
+
+    \type{\definecolor[lime 2][x=BFFF00]}：\definecolor[lime 2][x=BFFF00]
+    \color[lime 2]{“lime 2”颜色的文本。}
+
+  \item {\bf CMYK 颜色}：这种颜色生成模型称为 \quotation{减色模型}，基于以下颜色颜料的混合：青色（\quote{c}）、品红色（\quote{m}）、黄色（\quote{y}）和黑色（\quote{k}，来自 {\em key}）。这些分量中的每一个都表示为一个介于 0 和 1 之间的十进制数：
+
+    \type{\definecolor[lime 3][c=0.25, m=0, y=1, k=0]}：
+    \definecolor[lime 3][c=0.25, m=0, y=1, k=0] \color[lime 3]{“lime 3”颜色的文本。}
+
+  \item {\bf HSL/HSV}：这种颜色模型基于测量色相（\quote{h}）、饱和度（\quote{s}）和亮度（\quote{l}）（或有时是明度（\quote{v}））。色相对应于 0 到 360 之间的数字；饱和度和亮度/明度必须是 0 到 1 之间的十进制数。例如
+
+    \type{\definecolor[lime 4][h=75, s=1, v=1]}：\definecolor[lime
+        4][h=75, s=1, v=1] \color[lime 4]{“lime 4”颜色的文本。}
+
+  \item {\bf HWB 颜色}：HWB 模型是 CSS4 的一个建议标准，它测量色相（\quote{h}）、白度（\quote{w}）和黑度（\quote{b}）。色相对应于 0 到 360 之间的数字，而白度和黑度由 0 到 1 之间的十进制数表示。（{\em 注意}：2026 年 3 月的实验显示，使用 HWB 产生的颜色与假定的 RGB 等效色之间的一致性不是很好。不清楚是转换错误还是 \ConTeXt\ 的 HWB 处理有问题。）
+
+    % TODO（至少要考虑）：
+    % Google 说 Azure 的 HSV 是 210/1/1，维基百科说是 210/0/0 HWB
+    % 这给出了一种颜色，不像 75/0.2/0.7 看起来是黑色，但颜色是 FF BF 80，看起来偏橙。
+    % x11 和 svg 使用 F0FFFF，Google 转换为 180/0.94/0。
+    % F0FFFF 似乎是错误的，几乎是白色。维基百科说是 0080FF，
+    % Google 说是 210/0/0，ConTeXt 输出为 004080，至少看起来有点像蓝色。
+    % ConTeXt 的 X11 颜色文件与我电脑上各种 rgb.txt 文件一致。我猜测 Azure 不是一个公认的名称。
+    % 所以为了避免混淆，我选择了一种争议较小且在白色背景上易于看到的新颜色。我尝试了 Maroon B03060（Google 说是 338/0.19/0.31），但结果是黑色。
+    % 我猜这里使用 Azure 是因为下面注释掉的 'lima 5' 也不起作用。
+
+    % \type{\definecolor[Azure][h=75, w=0.2, b=0.7]}  % JAL 的原文
+    \type{\definecolor[Tomato 1][h=9, w=0.28, b=0.]}
+    \definecolor[Tomato 1][h=9, w=0.28, b=0.]\color[Tomato 1]{“Tomato 1”颜色的文本。}
+    
+    % \type{\definecolor[lima 5][h=75, w=0, b=0]}
+    % \definecolor[lima 5][h=75, w=0.2, b=0.7]\color[lima 5]{Texto en
+        %   color “lima 5”}.
+
+  \item {\bf 灰度}：基于一个称为（\quote{s}，来自 {\em scale}）的分量，测量灰色的程度。它需要是一个介于 0 和 1 之间的数字。例如：
+
+    \type{\definecolor[my dark grey][s=0.35]}： 
+    \definecolor[my dark grey][s=0.35] \color[my dark grey]{“my dark grey”颜色的文本。}
+
+\stopitemize
+
+也可以从另一种颜色定义新颜色。例如，本入门中标题所用的颜色定义为：
+
+\type{\definecolor[maincolour][0.6(orange)]}
+
+\stopsubsection
+
+\stopsection
+
+\stopchapter
+
+\stopcomponent
+
+
+%%% Local Variables:
+%%% mode: ConTeXt
+%%% eval: (auto-fill-mode 1)
+%%% coding: utf-8-unix
+%%% TeX-master: "../introCTX_eng.tex"
+%%% End:
+%%% vim:set filetype=context tw=72 : %%%

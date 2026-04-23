@@ -1,0 +1,681 @@
+%%% File:        b04_SourceFile.tex
+%%% Author:      Joaquín Ataz-López et al
+%%% Begun:       April 2020
+%%% Concluded:   June 2020
+%%% Contents:    本章第一部分的构思取自《The TeX Book》第2章：“书籍印刷与普通打字”。主要是解释如何编写源文件。最初，本章包含了最终成为第10章和附录B的部分内容。但在最后一刻，我决定重新配置它，并将其与处理项目联系起来，我原本计划在结尾处理项目。我认为最终的这个顺序更可取。
+%%%
+%%% Edited with: Emacs + AUCTeX - And at times with vim + context-plugin
+%%%
+
+% TODO：这里有很多内容对于初学者来说并非必需（依我拙见）。具体来说，了解项目、产品和组件对于只想写5页或10页文档的人来说信息量太大了。我认为，如果有人想设置使得他们所有的5页或10页文档看起来都一样，了解“环境”和 /input 是好的，但除此之外的细节可能太多了。
+
+\environment ../introCTX_env.tex
+
+\startcomponent b04_SourceFile.tex
+
+\startchapter
+  [reference=cap:sourcefile, title=源文件与项目]
+
+\TocChap
+
+正如我们已经知道的，在使用 \ConTeXt\ 时，我们总是从一个文本文件开始，其中除了最终文档的内容外，还包括许多指令，告诉 \ConTeXt\ 它必须应用哪些转换，以便从源文件生成我们最终正确格式化的 PDF 文档。
+
+考虑到那些迄今为止只知道如何使用文字处理器的读者，我认为花一些时间研究源文件本身是值得的。或者更确切地说，是源文件们，因为有时只有一个源文件，而其他时候我们会使用多个源文件来生成最终文档。在后一种情况下，我们可以谈论 \quotation{多文件项目}。（本书本身就是一个多文件项目，并且（在你学习 \ConTeXt\ 的某个阶段）检查其源文件的结构可能会有所启发。）
+
+\startsection
+  [title=源文件的编码, reference=sec:encoding]
+
+源文件必须是文本文件。在计算机术语中，这是指仅包含人类可读文本且不包含二进制代码的文件。这些文件也称为{\em 简单文本}或{\em 纯文本}文件。
+
+由于计算机系统内部只处理二进制数，文本文件实际上由表示{\em 字符}的{\em 数字}组成。使用一个{\em 表}将数字与字符联系起来。对于文本文件，有几种可能的表。术语{\em 文本文件编码}指的是特定文本文件所使用的特定字符匹配表。
+
+\startSmallPrint
+
+  文本文件存在不同编码表是计算机科学自身历史的结果。在早期发展阶段，当计算机设备的内存和存储容量稀缺时，人们决定使用一个名为 ASCII（代表 \quotation{{\em 美国信息交换标准代码}}）的表，该表仅允许 128 个字符，并于 1963 年由美国标准委员会制定。显然，128 个字符不足以表示世界上所有语言中使用的所有字符和符号；但对于英语来说绰绰有余，在所有西方语言中，英语是字符最少的语言，因为它不使用任何变音符号（重音和其他在字母上方、下方或穿过字母的标记）。使用 ASCII 的优点是文本文件占用的空间非常小，因为 127（表中的最大数字）可以用 7 位二进制数表示，并且许多早期计算机使用 8 位字节作为内存测量单位。表中的任何字符都适合放入单个字节。由于字节有 8 个二进制位（bits），而 ASCII 只使用 7 位，甚至还有空间可以添加 128 个其他字符，以表示（一些）其他语言的字符。
+
+  但是当计算机的使用扩大时，ASCII 的不足变得明显，有必要开发{\em 替代}表，以包含英语字母表中不熟悉的字符，如西班牙语的 \quote{ñ}、带重音的元音、加泰罗尼亚语或法语的 \quote{ç} 等。另一方面，对于这些 ASCII 的{\em 替代表}应该是什么，最初没有达成一致，因此不同的专业计算机公司逐渐自行解决这个问题。因此，不仅为不同的语言或语言组创建了特定的表，而且根据创建它们的公司（微软、苹果、IBM 等）的不同，也有不同的表。
+
+  随着计算机内存的增加和存储设备成本的降低，以及相应容量的增加，创建一种可用于所有语言的单一表的想法才得以出现。但是，再次强调，实际创建的不是一个包含所有字符的单一表，而是一个标准编码（称为 {\sc Unicode}）以及不同的表示方式（UTF-8、UTF-16、UTF-32 等）。在所有这些系统中，最终成为事实标准的是 UTF-8，它能够表示几乎任何现存语言，以及许多已经消亡的语言，还有众多附加符号，全部使用可变长度（1 到 4 字节）的数字，这反过来又有助于优化文本文件的大小。与使用纯 ASCII 的文件相比，这个大小并没有{\em 太大}的增加。
+
+  在 \XeTeX\ 出现之前，基于 \TeX\ 的系统——它也是在美国诞生，因此以英语为母语——假定编码是纯 ASCII；因此，要使用不同的编码，您必须以某种方式在源文件中指明这一点。
+
+\stopSmallPrint
+
+\dontleavehmode\ConTeXt\ LMTX 假定编码为 UTF-8。然而，在较旧的计算机系统中，默认可能仍使用不同的编码。我不太确定 Windows 使用的默认编码，因为微软面向大众的策略在于隐藏复杂性（但即使隐藏，并不意味着它消失了！）。关于其默认使用的编码系统，没有太多可用信息（或者我没能找到）。
+
+在任何情况下，无论默认编码是什么，任何文本编辑器都允许您以所需的编码保存文件。打算由 \ConTeXt\ LMTX 处理的源文件必须以 UTF-8 保存\footnote{注意 ASCII 是 UTF-8 的子集，因此如果您不需要 ASCII 中可用的字符以外的字符，您的编辑器可能指示您的文件是 ASCII 而不是 UTF-8；这完全没问题}，除非有非常好的理由使用不同的编码（尽管我想不出这个理由可能是什么）。
+
+如果我们想编写一个以其他编码编写的文件（也许是一个旧文件），我们可以：
+
+\startitemize[a]
+
+\item 将文件转换为 UTF-8，这是推荐的选项；有多种工具可以做到这一点；例如，在 Linux 中，命令 {\tt iconv} 或 {\tt recode}。
+
+\item 在源文件中告诉 \ConTeXt\ 编码不是 UTF-8。为此，我们需要使用命令 \tex{enableregime}，其语法为：
+
+\PlaceMacro{enableregime}{\tt \color[maincolor]{\backslash
+        enableregime[{\em 编码}]}}
+
+其中 {\em 编码} 指的是 \ConTeXt\ 知道的相关文件实际编码的名称。在 \in{表}[encodings] 中，您将找到各种编码以及 \ConTeXt\ 认识它们的名称。
+
+\stopitemize
+
+{\switchtobodyfont[small]
+  \placetable
+    [here]
+    [encodings]
+    {\ConTeXt\ 中的主要编码}
+    {
+      \starttabulate[|l|l|l|]
+        \HL
+        \NC {\bf 编码} \NC {\bf \ConTeXt\ 中的名称} \NC{\bf 注释}\NR
+        \HL
+        \NC Windows CP 1250\NC cp1250, windows-1250\NC 西欧\NR
+        \NC Windows CP 1251\NC cp1251, windows-1251\NC 西里尔字母\NR
+        \NC Windows CP 1252\NC cp1252, win, windows-1252\NC 西欧\NR
+        \NC Windows CP 1253\NC cp1253, windows-1253\NC 希腊语\NR
+        \NC Windows CP 1254\NC cp1254, windows-1254\NC 土耳其语\NR
+        \NC Windows CP 1257\NC cp1257, windows-1257\NC 波罗的海语\NR
+        \NC ISO-8859-1, ISO Latin 1\NC iso-8859-1, latin1, il1\NC 西欧\NR
+        \NC ISO-8859-2, ISO Latin 2\NC iso-8859-2, latin2, il2\NC 西欧\NR
+        \NC ISO-8859-15, ISO Latin 9\NC iso-8859-15,  latin9,  il9\NC 西欧\NR
+        \NC ISO-8859-7\NC iso-8859-7,  grk\NC 希腊语\NR
+        \NC Mac Roman\NC mac\NC 西欧\NR
+        \NC IBM PC DOS\NC ibm\NC 西欧\NR
+        \NC UTF-8\NC utf\NC Unicode\NR
+        \NC VISCII\NC vis,  viscii\NC 越南语\NR
+        \NC DOS CP 866\NC cp866, cp866nav\NC 西里尔字母\NR
+        \NC KOI8\NC koi8-r, koi8-u, koi8-ru\NC 西里尔字母\NR
+        \NC Mac Cyrillic\NC maccyr, macukr\NC 西里尔字母\NR
+        \NC 其他\NC cp855, cp866av, cp866mav, cp866tat, \NC 各种\NR
+        \NC \NC ctt, dbk, iso88595, isoir111, mik, mls, \NC\NR
+        \NC \NC mnk, mos, ncc\NC\NR
+        \HL
+      \stoptabulate
+    }
+}
+
+\ConTeXt\ LMTX 强烈推荐使用 UTF-8；我同意这个建议。从现在开始，在本入门书中，我们假定编码始终为 UTF-8。
+
+\startSmallPrint
+
+  除了 \tex{enableregime}，\ConTeXt\ 还包含命令 \PlaceMacro{useregime}\tex{useregime}，它允许我们使用一种或另一种编码的代码作为参数。我没有找到关于此命令的信息，也没有找到它与 \tex{enableregime} 的区别，只有一些关于其 \Conjecture 使用的示例。我怀疑 \tex{useregime} 是为使用许多源文件的复杂项目设计的，期望并非所有源文件都具有相同的编码。但这只是一个猜测。
+
+\stopSmallPrint
+
+\stopsection
+
+\startsection
+  [title=源文件中 \ConTeXt\ 以特殊方式处理的字符]
+
+{\em 特殊字符}是我给一组不同于{\em 保留字符}的字符起的名字。如 \in{节}[sec:reserved characters] 所示，它们对 \ConTeXt\ 具有特殊含义，因此不能直接用作源文件中的字符。除此之外，还有另一组字符，尽管 \ConTeXt\ 在源文件中遇到它们时会按原样处理，但确实以特殊规则处理它们。这组字符包括空格、制表符、换行符和连字符。
+
+\startsubsection
+  [title=空格和制表符, reference=sec:spaces]
+
+在源文件中，制表符和空格在所有意图和目的上都被同等对待。制表符（取决于您的编辑器和其设置，您可能通过按键盘上的 Tab 键将其输入文件）将被 \ConTeXt\ 转换为空格。空格会被其后紧随的任何其他空格（或制表符）吸收。因此，在源文件中写
+
+\type{Tweedledum and Tweedledee.}
+
+或
+
+\type{Tweedledum   and   Tweedledee.}
+
+绝对没有区别。\ConTeXt{} 认为这两个句子完全相同。因此，如果我们想在单词之间引入一个额外的空格，我们需要使用一些 \ConTeXt{} 命令来做到这一点。通常，使用 \quotation{\cmd{\textvisiblespace}} 会起作用，意思是 {\tt\backslash} 字符后跟一个空格。但是还有其他方法，将在关于水平空格的 \in{章}[sec:horizontal space1] 中讨论。
+
+连续空格的吸收使我们能够通过简单地增加或减少所使用的缩进来视觉上突出我们想要突出的部分来编写源文件，并且放心地知道这不会以任何方式影响最终文档。因此，在以下示例中
+
+\starttyping
+
+马德里七年代末的音乐团体 {\em La Romántica Banda Local} 创作了风格 eclectic 且难以归类的歌曲。例如，在他们的歌曲“El Egipcio”中，他们说：
+\quotation{{\em Esto es una farsa más que una comedia, página muy seria
+  de la histeria musical; sueños de princesa, vicios de gitano pueden en
+  su mano acariciar la verdad}}，仅仅因为词语具有内在韵律（comedia-histeria-seria, gitano-mano）而混合词语和短语。
+
+\stoptyping
+
+您可以看到有些行稍微向右缩进。这些行是属于将以斜体显示的部分。缩进这些行有助于（作者）看到斜体结束的位置。
+
+\startSmallPrint
+
+  有些人可能会想，真是一团糟！我必须费心缩进行吗？事实上，这种特殊的缩进是由我的文本编辑器（GNU Emacs）在编辑 \ConTeXt\ 源文件时自动完成的。正是这种小小的帮助让您选择使用某个文本编辑器而不是另一个。
+
+\stopSmallPrint
+
+空格被吸收的规则仅适用于源文件中连续的空格。因此，如果在源文件中的两个空格之间放置一个空组（\MyKey{\{\}}），尽管空组不会在最终文件中产生任何东西，但它的存在将确保这两个空格不是连续的。例如，如果我们写 \MyKey{Tweedledum \{\} and Tweedledee}，我们将得到 \quotation{\color[red]{Tweedledum {} and Tweedledee}}，如果您仔细观察，会看到前两个单词之间的空格更大。
+
+同样的情况也发生在保留字符 \MyKey{\lettertilde} 上，尽管它的效果是生成一个空格，即使它实际上不是一个空格：一个空格后跟一个 \lettertilde\ 不会吸收后者，而 \lettertilde\ 后的空格也不会被吸收。（回想一下，\lettertilde\ 产生一个 \quotation{不间断空格}，用于那些我们希望确保两个单词在输出的 PDF 文件中保持在同一行的情况。）
+
+\stopsubsection
+
+
+\startsubsection
+  [reference=sec:linebreaks, title=换行]
+
+在大多数文本编辑器中，当一行超过最大宽度时，会自动插入换行。我们也可以通过按 \quotation{Enter} 或 \quotation{Return} 键明确地插入换行。
+
+\ConTeXt{} 对换行应用以下规则：
+
+\startitemize[a, broad]
+
+\item 单个换行在所有意图和目的上等同于一个空格。因此，如果在换行之前或之后有任何空格或制表符，它们将被换行或第一个空格吸收，并且在最终文档中将插入一个简单的空格。
+
+\item 两个或更多连续的换行创建一个段落分隔符。为此，如果第一个和第二个换行之间只有空格或制表符（因为这些被第一个换行吸收），则认为两个换行是连续的；这简而言之意味着源文件中一个或多个完全空白的连续行（其中没有任何字符，或者只有空格或制表符）成为一个段落分隔符。
+
+\stopitemize
+
+注意我说的是 \quotation{两个或更多连续的换行}，然后是 \quotation{一个或多个连续的空白行}，这意味着如果我们想增加段落之间的间距，不能仅仅通过插入另一个换行来实现。为此，我们需要使用增加垂直空间的命令。如果我们只想要一个额外的行距，可以使用 \PlaceMacro{blank}\tex{blank} 命令。但是还有其他增加垂直空间的方法。我建议您参考 \in{节}[sec:verticalspace]。
+
+\startSmallPrint
+
+  在某些情况下，当一个换行变成空格时，我们最终可能会得到一些不期望和意想不到的空格。尤其是在编写宏时，很容易在我们没有意识到的情况下“溜进”一个空格。为了避免这种情况，我们可以使用保留字符 \MyKey{\%}，正如我们所知，它会导致其所在行的处理终止，这意味着行尾的换行也不会被处理。因此，例如，命令
+
+\vbox{
+\starttyping
+\define[3]\Test{
+  {\em #1}
+  {\bf #2}
+  {\sc #3}
+}
+\stoptyping
+}
+
+将其第一个参数写成斜体，第二个写成粗体，第三个写成小型大写字母，会在这些参数中的每一个之间插入一个空格，而
+
+\starttyping
+\define[3]\Test{%
+  {\em #1}%
+  {\bf #2}%
+  {\sc #3}%
+}
+\stoptyping
+
+不会在它们之间插入任何空格，因为保留字符 \% 阻止了换行被处理并变成空格。
+
+您可能在想 \quotation{但是行首的空格呢？为什么它们不会在输出中产生空格？}。原因是 \ConTeXt\ 遵循与 \TeX\ 相同的规则：行首的空格和制表符被忽略。这使得您可以方便地缩进行，当这样做允许您以一种增强查看 \ConTeXt\ 源文件结构的能力的方式编写文本（或您的宏！\null）时。
+
+现在您可能在想 \quotation{但是本入门书中怎么有以空格开头的行？}。好问题！答案是您可以告诉 \ConTeXt\ 输出 {\em 逐字} 文本；也就是说，输出与 \ConTeXt\ 源文件中的输入完全一致。这将在 \in{节}[sec:verbatim] 中更详细地讨论。但通常情况下，空格、制表符和换行的规则如上所述。
+
+\stopSmallPrint
+
+\stopsubsection
+
+
+\startsubsection
+  [reference=sec:dashes, title=连字符/短划线]
+
+连字符是计算机键盘与印刷文本之间差异的一个很好的例子。在普通键盘上，通常只有一个字符用于短划线（或用排版术语来说，称为“规则”），我们称之为连字符（\MyKey{-}）；但印刷文本使用多达四种不同长度的规则：
+
+\startitemize[1,broad]
+
+\item 短规则（连字符）（-），例如用于行尾断字时分隔音节，或用于复合词（至少在英语中），如 \quotation{thought-provoking}。
+
+\item 中等长度的规则（\quotation{en 短划线} 或 \quotation{en 规则}）（--），比连字符稍长。它们有多种用途，包括：对于某些欧洲语言（英语较少），用于对话行的开头，或用于分隔日期或页码范围中大小数字的范围，例如 \quotation{pp. 12--33}。
+
+\item 长规则（\quotation{em 短划线} 或 \quotation{em 规则}）（---），用作括号的替代，将一个句子包含在另一个句子中，包围句子中间的列表，以及用于许多其他情况。
+
+\item 减号（$-$），表示减法或负数。在 \ConTeXt\ 中（排版上）正确的负数排版方式是，例如，输入 \quotation{\type{$-40$}}、\quotation{\type{\im{-40}}} 或 \quotation{\tex{minus40}}，而不是 \quotation{\type{-40}}；比较 $-40$（前三种方式中的任何一种）与 -40 的外观。
+
+\stopitemize
+
+如今，上述所有规则以及其他规则都可以作为 UTF-8 编码中的单个字符使用。但由于只有连字符可以通过键盘上的单个键生成，其他的在源文件中就不那么容易产生了。幸运的是，\TeX\ 看到了在我们的最终文档中包含比键盘所能产生的更多规则/短划线的必要性，并设计了一个简单的程序来实现这一点。\ConTeXt{} 通过添加生成这些不同种类规则的命令来补充这一程序。我们可以使用两种方法来生成四种规则：要么使用命令的普通 \ConTeXt{} 方式，要么直接从键盘输入。这些程序显示在 \in{表}[tbl:rules] 中：
+
+{\switchtobodyfont[small]
+\placetable
+  [here]
+  [tbl:rules]
+  {\ConTeXt\ 中的规则/短划线}
+  {\starttabulate[|l|c|c|l|]
+    \HL
+    \NC {\bf 规则类型}
+    \NC {\bf 外观}
+    \NC {\bf 直接输入}
+    \NC {\bf 命令}
+    \NR
+    \HL
+    \NC 连字符
+    \NC -
+    \NC {\tt -}
+    \NC \PlaceMacro{hyphen}\tex{hyphen}
+    \NR
+    \NC En 短划线
+    \NC --
+    \NC {\tt --}
+    \NC \PlaceMacro{endash}\tex{endash}
+    \NR
+    \NC Em 短划线
+    \NC ---
+    \NC {\tt ---}
+    \NC \PlaceMacro{emdash}\tex{emdash}
+    \NR
+    \NC 减号
+    \NC $-$
+    \NC {\tt \$-\$}
+    \NC \PlaceMacro{minus}\tex{minus}
+    \NR
+    \HL
+  \stoptabulate}
+}
+
+命令名称 \tex{hyphen} 和 \tex{minus} 是英语中通常使用的名称。尽管印刷业的许多人称它们为 \quote{规则}，但 \TeX\ 的术语，即 \tex{endash} 和 \tex{emdash}，在排版术语中也很常见。\quotation{{\em en}} 和 \quotation{{\em em}} 是排版中使用的测量单位名称\footnote{我们在 \in{表}[tbl:measurements] 中看到 \ConTeXt\ 使用 \MyKey{em} 作为测量单位，但 LMTX 不支持 \MyKey{en} 作为单位。}。\quotation{en} 大致（但不一定精确！\null）等于所用字体中 \quote{n} 的宽度，而 \quotation{em} 大致（但不一定精确）等于所用字体中 \quote{m} 的宽度。
+
+% 关于 em 和 em-dash 以及 en-dash 的评论见 b03。
+
+\stopsection
+
+
+\startsection
+  [title=简单项目与多文件项目]
+
+在 \ConTeXt\ 中，我们可以只使用一个源文件，其中包含我们最终文档的所有内容以及与它相关的所有细节，在这种情况下，我们谈论的是 \quotation{简单项目}，或者相反，我们可以使用多个共享我们最终文档内容的源文件，在这种情况下，我们谈论的是 \quotation{多文件项目}。
+
+通常使用多个源文件进行工作的场景如下：
+
+% TODO：英文翻译使用了 "festschrift"，我现在用了“纪念性出版物”。我在想是否有更好的翻译，或者一个更好的协作文档的例子。有人有聪明的建议吗？
+
+\startitemize
+
+  \item 如果我们正在编写一个由多位作者合作的文档，每位作者负责自己与其他部分不同的部分；例如，如果我们正在编写一本包含不同作者贡献的纪念性出版物，或者一本期刊的某一期等。
+
+  \item 如果我们正在编写一个长篇文档，其中每个部分（章节）具有相对自主性，因此这些部分的最终安排允许有多种可能性，并将在最后决定。这对于许多学术文本（手册、入门书等）来说相对频繁地发生，其中章节的顺序可能会变化。
+
+  \item 如果我们正在编写多个共享某些样式特征的相关文档。
+
+  \item 简单来说，如果我们正在处理的文档很大，以至于计算机在编辑或编译它时变慢；在这种情况下，将材料拆分到多个源文件中将大大加快编译速度（如果我们能单独编译每个文件的话）。
+
+  \item 此外，如果我们编写了许多宏，想要应用于某些（或所有）文档，或者如果我们生成了一个控制或样式化我们文档的模板，并希望将它们应用于这些文档，等等。
+
+\stopitemize
+
+\stopsection
+
+
+\startsection
+    [title=简单项目中源文件的结构,
+        reference=sec:structure]
+
+在单个源文件中开发的简单项目中，结构非常简单，并围绕着必须出现在同一文件中的 \MyKey{text} 环境。我们区分该文件的以下部分：
+
+\startitemize
+
+\item {\bf 文档导言区}：从文件的第一行到 \MyKey{text} 环境（\PlaceMacro{starttext}\PlaceMacro{stoptext}\tex{starttext}）开始之前的所有内容。
+
+\item {\bf 文档主体}：这是 \MyKey{text} 环境的内容；或者换句话说，\tex{starttext} 和 \tex{stoptext} 之间的所有内容。
+
+\stopitemize
+
+在 \in{图}[img:ProyectoSimple] 中，我们看到了一个非常简单的源文件。在命令 \tex{starttext}（在图中，仅计算有文本的行，它在第 5 行）之前的所有内容构成导言区；\tex{starttext} 和 \tex{stoptext} 之间的所有内容构成文档主体。\tex{stoptext} 之后的任何内容都将被忽略。
+
+\startbuffer
+  \starttyping
+  % 文档的第一行
+  
+  % 导言区：
+  % 包含文档的全局配置命令
+  
+  \starttext % 文档主体从这里开始
+  
+  ...
+  ... % 文档内容
+  ...
+  
+  \stoptext % 文档结束
+  
+  \stoptyping
+\stopbuffer
+
+\placefigure
+  [here]
+  [img:ProyectoSimple]
+  {\tfx 包含简单项目的文件}
+ {\startframedtext
+    \getbuffer
+  \stopframedtext}
+
+{\bf 导言区}用于包含要影响整个文档的命令，即决定其整体配置的命令。在导言区中编写任何命令都不是必需的。如果没有，\ConTeXt\ 将采用一个默认配置，这个配置不是很完善，但可能适用于许多文档。在一个规划良好的文档中，导言区将包含所有影响整个文档的命令，比如要在源文件中使用的宏和定制命令。在一个典型的导言区中，这可能包括以下内容：
+
+\startitemize[packed]
+
+  \item 文档主语言的指示（参见 \in{节}[sec:langdoc]）。
+
+  \item 纸张大小（\in{节}[sec:papersize]）和页面布局（\in{节}[sec:pagelayout]）的指示。
+
+  \item 文档主字体的特性（\in{节}[sec:mainfont]）。
+
+  \item 要使用的章节命令的自定义（\in{节}[sec:setuphead]），以及如果需要，定义新的章节命令（\in{节}[sec:definehead]）。
+
+  \item 页眉和页脚的布局（\in{节}[sec:headerfooter]）。
+
+  \item 我们自己的宏的设置（\in{节}[sec:definingcommands]）。
+
+  \item 等等。
+
+\stopitemize
+
+导言区用于文档的整体配置；因此，任何与文档{\em 内容}或可处理文本有关的东西都不应该在那里。理论上，包含在导言区中的任何可处理文本都将被忽略，尽管有时，如果它在那里，会导致编译错误。
+
+{\bf 文档主体}，位于 \tex{starttext} 和 \tex{stoptext} 命令之间，包括实际内容，即可处理文本，以及不应影响整个文档的 \ConTeXt\ 命令。
+
+\stopsection
+
+
+\startsection
+    [title=\TeX\ 风格的多文件管理]
+
+为了能够处理多个源文件，\TeX\ 包含了一个称为 \tex{input} 的原语，它在 \ConTeXt 中也可以工作，尽管后者包含两个特定命令，在某种程度上完善了 \tex{input} 的功能。
+
+\stopsection
+
+
+\startsubsection
+    [reference=input, title=\tex{input} 命令]
+\PlaceMacro{input}
+
+\tex{input} 命令插入它指示的文件的内容。其格式为：
+
+\type{\input 文件名}
+
+其中 {\em 文件名} 是要插入的文件的名称。注意，文件名不必放在花括号之间，即使这样做也不会抛出错误。但是，它绝不应该放在方括号之间。如果文件扩展名是 \quotation{\type{.tex}}，则可以省略。
+
+% 注意：在 2026 年 3 月 15 日，我问 Hans 关于找不到 \input 文件时没有错误消息的问题。但到目前为止，他没有对此发表评论。
+
+% TODO：如果某人将 TEXMFHOME 设置为其他值，它将替换 ~/texmf 作为个人文件的默认位置。这表明这一段（以及下面提到 TEXINPUTS 的一段）可能需要更多的工作。
+
+当 \ConTeXt\ 编译文档并找到 \tex{input} 命令时，它会查找指示的文件，并继续编译，就好像该文件的内容是属于调用它的文件的一部分，位于找到 \tex{input} 的位置。当 \ConTeXt\ 处理完 \tex{input} 文件后，它返回到原始文件，并从它停止的地方继续。因此，实际结果是，通过 \tex{input} 调用的文件的内容被插入到调用该文件的位置。使用 \tex{input} 调用的文件必须在我们的操作系统中有一个有效的名称，并且名称中没有空格。\ConTeXt\ 将在工作目录中查找它，如果在那里找不到，它将在 {\tt TEXINPUTS} 环境变量（如果您已设置）中指定的目录中查找。最后，如果您的主目录中有一个名为 {\tt texmf} 的目录，\ConTeXt\ 也会在那里查找 \tex{input} 文件。如果最终找不到该文件，则应该会导致编译错误\footnote{截至 2026 年 3 月，并不总是出现明确的错误消息；{\tt context} 运行可能会因没有明显原因而突然结束。如果您检查 {\tt .log} 文件或终端输出，在非常接近末尾的地方，您可能会看到一行如 \type{open source     > level 1, order 2, name './FileName.tex'}，而没有相应的 \type{close source ...} 行。有 \type{open} 而没有 \type{close} 告诉您 \ConTeXt\ 无法找到文件 \type{FileName.tex} 并停止了执行。}。
+
+\tex{input} 命令最常见的用法如下：编写一个文件，我们称之为 \MyKey{principal.tex}，它将用作一个容器，通过 \tex{input} 命令调用构成我们项目的各个文件。这显示在以下示例中：
+
+\startframedtext\switchtobodyfont[small]
+\starttyping
+% 全局配置命令：
+
+  \input MyConfiguration
+
+\starttext
+
+  \input TitlePage
+  \input Preface
+  \input Chap1
+  \input Chap2
+  \input Chap3
+
+  ...
+
+\stoptext
+\stoptyping
+\stopframedtext
+
+注意，对于文档的全局配置，我们调用了文件 \quotation{MyConfiguration.tex}，我们假设它包含我们想要应用的全局命令。然后，在命令 \tex{starttext} 和 \tex{stoptext} 之间，我们调用包含我们文档各个部分内容的几个文件。如果在某个时刻，为了加快编译过程，我们想跳过编译一些文件，我们只需在调用该文件或那些文件的行的开头放置一个注释标记。例如，如果我们正在编写第三章，并且我们想编译它只是为了检查其中是否有错误，我们不需要编译其余部分，因此可以写：
+
+% TODO：除非上面的更改改变了分页，否则这里会有一大块丑陋的空白。这应该被修复，也许通过将这两个示例都变成图形并让它们浮动。删除它们之间的 5 或 6 行也可以。
+
+\startframedtext\switchtobodyfont[small]
+\starttyping
+% 全局配置命令：
+
+  \input MyConfiguration
+
+\starttext
+
+  % \input TitlePage
+  % \input Preface
+  % \input Chap1
+  % \input Chap2
+
+  \input Chap3
+
+  ...
+
+\stoptext
+\stoptyping
+\stopframedtext
+
+并且只有第 3 章将被编译。注意，另一方面，更改章节的顺序就像更改调用它们的行的顺序一样简单。
+
+\startSmallPrint
+
+    当我们在一个多文件项目中排除某个文件不被编译时，我们获得了处理速度的提升，但结果是，正在编译的部分对尚未编译的其他部分的所有引用将不再起作用。参见 \in{节}[sec:references]。这些缺失的引用不会导致编译错误，但是您会在您编译的部分中看到诸如 \quotation{section ??} 之类的内容，对于每个对您未编译部分的引用。不要太担心这些，当您最终编译整个文档时，它们会出现。
+
+\stopSmallPrint
+
+重要的是要清楚，当我们使用 \tex{input} 工作时，只有主文件（调用所有其他文件的文件）必须包含 \tex{starttext} 和 \tex{stoptext} 命令，因为如果其他文件包含它们，将会出现错误。另一方面，这意味着我们不能直接编译构成项目的不同文件，而必须从主文件编译它们，主文件是存放文档基本结构的文件。
+
+% 毫无疑问，我们可以使用一些 \if<something> 技巧来解决这个问题，但这对于像本书这样的“简短”入门来说可能太复杂了。
+
+\stopsubsection
+
+
+\startsubsection
+    [title=\tex{ReadFile} 和 \tex{readfile}]
+\PlaceMacro{ReadFile}\PlaceMacro{readfile}
+
+正如我们刚刚看到的，如果 \ConTeXt\ 找不到用 \tex{input} 调用的文件，它将产生一个错误。对于我们希望仅当文件存在时才插入文件，但允许其可能不存在的情况，\ConTeXt\ 提供了 \tex{input} 命令的一个变体。即
+
+\type{\ReadFile{文件名}}
+
+此命令在所有方面都与 \tex{input} 相似，唯一的例外是，如果要插入的文件未找到，它将继续编译而不产生任何类型的错误。它在语法上也与 \tex{input} 不同，因为我们知道使用 \tex{input} 时，不必将要插入的文件名放在花括号之间。但是对于 \tex{ReadFile}，这是必需的。如果我们不使用花括号，\ConTeXt\ 会认为要查找的文件名与 \tex{ReadFile} 命令之后的第一个字符相同，后跟扩展名 \type{.tex}。因此，例如，如果我们写
+
+\type{\ReadFile MyFile}
+
+\ConTeXt\ 将理解为要读取的文件名为 \quotation{\type{M.tex}}，因为紧接在命令 \tex{ReadFile} 之后的字符（不包括我们知道在命令名称末尾被忽略的空格）是一个 \quote{M}。由于 \ConTeXt\ 通常不会找到名为 \quotation{\type{M.tex}} 的文件，并且 \tex{ReadFile} 在找不到文件时不会产生错误，因此 \ConTeXt\ 将在 \quotation{\type{MyFile}} 中的 \quote{M} 之后继续编译，并将插入文本 \quotation{\type{yFile}}。
+
+\tex{ReadFile} 的一个更精细的版本是 \tex{readfile}，其格式为
+
+\type{\readfile{文件名}{存在时文本}{不存在时文本}}
+
+第一个参数类似于 \tex{ReadFile} 的参数：它是一个用花括号括起来的文件名。第二个参数包含如果文件存在，在插入文件内容之前要写入的文本。第三个参数包含如果找不到相关文件时要写入的文本。这意味着，根据作为第一个参数输入的文件是否找到，将执行第二个参数（如果文件存在）或第三个参数（如果文件不存在）。
+
+\tex{readfile} 的用途之一是（在众多用途中）如果输入文件未找到，则在文档中放入一些信息性消息。例如，您可以使用\\
+\type{\readfile{Chap23}{}{Chap23 应该在这里！它在哪里？}} \\
+在最终文档中给读者留下一条相当明显的消息。
+
+\stopsubsection
+
+\stopsection
+
+
+\startsection
+    [title=\ConTeXt\ 项目本身,
+        reference=sec-projects]
+
+\ConTeXt\ 为多文件项目提供的第三种机制更加复杂和完整：它首先区分 \quotation{项目}文件、\quotation{产品}文件、\quotation{组件}文件和 \quotation{环境}文件。为了理解每种文件类型之间的关系和功能，我认为最好逐一解释它们。
+
+\startsubsection
+    [reference=environments, title={{\em 环境}文件}]
+\PlaceMacro{startenvironment}\PlaceMacro{environment}
+
+{\em 环境}文件是一种存储特定样式的宏和配置的文件，该样式旨在应用于多个文档，无论它们是完全独立的文档还是复杂文档的一部分。因此，环境文件可以包含我们通常在 \tex{starttext} 之前写入的所有内容；即：文档的全局配置。
+
+\startSmallPrint
+
+    我保留了 \quotation{环境文件} 这个术语，以便不偏离 \ConTeXt\ 官方术语，尽管我认为更好的术语可能是 \quotation{格式文件} 或 \quotation{全局配置文件}。
+
+\stopSmallPrint
+
+与所有 \ConTeXt\ 源文件一样，环境文件是文本文件，并假定扩展名为 \quotation{\type{.tex}}，尽管如果我们愿意，可以更改它，也许改为 \quotation{\type{.env}}。然而，通常在 \ConTeXt\ 中不这样做。最常见的是，环境文件通过以 \quote{env} 开头或结尾来标识。例如：\quotation{\type{MyMacros_env.tex}} 或 \quotation{\type{env_MyMacros.tex}}。这样的环境文件内部看起来类似于以下内容：
+
+\startframedtext\switchtobodyfont[small]
+\starttyping
+
+\startenvironment MyEnvironment
+
+  \mainlanguage[en]
+
+  \setupbodyfont
+    [modern]
+
+  \setupwhitespace
+    [big]
+
+  ...
+
+\stopenvironment
+
+\stoptyping
+\stopframedtext
+
+或者换句话说，定义和配置命令包含在 \tex{startenvironment} 和 \tex{stopenvironment} 之间。在 \tex{startenvironment} 之后，我们立即写入我们想要标识相关环境的名称，然后包含我们希望环境组成的所有命令。
+
+% TODO：wiki 说环境需要一个名称。测试这一点并在必要时修改。
+
+\startSmallPrint
+
+    关于环境的名称，根据我的测试，我们在 \tex{startenvironment} 之后立即添加的名称仅仅是指示性的，如果我们不提供名称，那么什么（坏）事也不会发生。
+
+\stopSmallPrint
+
+环境文件旨在与组件和产品（将在下一节中解释）一起工作。这就是为什么可以从组件或产品中使用 \tex{environment} 命令调用一个或多个环境的原因。但是，此命令如果用于任何 \ConTeXt\ 源文件的配置区域（导言区），即使它不是打算分部分编译的源文件，也能工作。
+
+\tex{environment} 命令可以使用以下两种格式之一调用：
+
+\type{\environment 文件}
+
+\type{\environment[文件]}
+
+在任何一种情况下，此命令的效果都是加载作为参数的文件的内容。如果找不到该文件，\ConTeXt\ 将继续正常编译而不产生任何错误。如果文件扩展名是 \quotation{\type{.tex}}，则可以省略。
+
+\stopsubsection
+
+
+\startsubsection
+    [reference=components and products, title=组件与产品]
+\PlaceMacro{startcomponent}\PlaceMacro{startproduct}\PlaceMacro{product}
+
+如果我们把一本书的每个章节放在不同的源文件中，那么我们可以说章节是 {\em 组件}，而书是 {\em 产品}。这意味着 {\em 组件} 是一个 {\em 产品} 的自主部分，能够拥有自己的样式并且可以独立编译。每个组件都在自己的文件中，此外，还会有一个产品文件将所有组件组合在一起。
+
+一个典型的组件文件如下：
+
+{\startframedtext\switchtobodyfont[small]
+\starttyping
+
+\environment MyEnvironment
+\environment MyMacros
+
+\startcomponent Chapter1
+
+  \startchapter[title={第 1 章}]
+
+  ...
+
+  \stopchapter
+
+\stopcomponent
+
+\stoptyping
+\stopframedtext}
+
+一个产品文件如下所示：
+
+{\startframedtext\switchtobodyfont[small]
+\starttyping
+
+\environment MyEnvironment
+\environment MyMacros
+
+\startproduct MyBook
+
+  \component Chapter1
+  \component Chapter2
+  \component Chapter3
+
+  ...
+
+\stopproduct
+
+\stoptyping
+\stopframedtext}
+
+注意，我们文档的实际内容将分布在各个 \quotation{组件} 文件中，而 \quotation{产品} 文件仅限于确定组件的顺序。另一方面，（单独的）组件和产品都可以直接编译。编译一个产品将生成一个包含该产品所有组件的 PDF 文件。相反，如果单独编译其中一个组件，它将生成一个仅包含已编译组件的 PDF 文件。
+
+在组件文件中，在 \tex{startcomponent} 命令之前，我们可以使用 \tex{environment 环境名称} 调用一个或多个环境文件。我们可以在产品文件中的 \tex{startproduct} 之前做同样的事情。可以同时加载多个环境文件。例如，我们可以将我们最喜欢的宏集合以及应用于我们文档的不同样式放在不同的文件中。但是请注意，当我们使用两个或多个环境时，它们按照被调用的顺序加载，因此，如果同一个配置命令包含在多个环境中，并且该命令在不同的环境中具有不同的值，则最后加载的环境的值将生效。另一方面，环境文件只加载一次，因此，在前面的示例中，从产品文件和特定组件文件中都调用了环境，如果我们编译产品，那就是加载环境的时候，并且按照那里指示的顺序；当从任何组件调用环境时，ConTeXt 将检查该环境是否已加载，如果已加载，则环境文件将不会被再次处理。
+
+从产品中调用的组件的名称必须是包含该组件的文件的名称，尽管如果此文件的扩展名是 \quotation{\type{.tex}}，则可以省略。
+
+\stopsubsection
+
+\startsubsection
+  [title=项目本身]
+\PlaceMacro{startproject}\PlaceMacro{project}
+
+在大多数情况下，产品和组件之间的区别就足够了。尽管如此，\ConTeXt\ 还有一个更高的级别，我们可以在其中对多个产品进行分组：这就是 {\em 项目}。
+
+一个典型的项目文件大致如下：
+
+{\startframedtext\switchtobodyfont[small]
+\starttyping
+
+\startproject MyCollection
+
+  \environment MyEnvironment
+  \environment MyMacros
+
+  \product Book01
+  \product Book02
+  \product Book03
+
+  ...
+
+\stopproject
+
+\stoptyping
+\stopframedtext}
+
+我们需要使用项目的情况是，例如，我们需要编辑一套具有相同格式规范的书籍；或者如果我们正在编辑一本期刊：书籍的合集或期刊本身将是项目；每本书或每期期刊将是一个产品；而一本书的每个章节或一期期刊的每篇文章将是一个组件。
+
+另一方面，项目不打算直接编译。考虑到根据定义，属于该项目的每个产品（合集里的每本书，或每期期刊）应该单独编译并生成自己的 PDF。因此，\tex{product} 命令实际上什么也不做：它只是一个给作者的提醒，提醒哪些产品属于该项目。
+
+显然，有人可能会问，既然项目不能编译，为什么还要有项目呢？答案是项目文件将某些环境与项目关联起来。这就是为什么，如果我们在组件或产品文件中包含 \PlaceMacro{project}\tex{project 项目名称} 命令，\ConTeXt\ 将读取项目文件并自动加载与其关联的环境。这就是为什么在项目中，\tex{environment} 命令必须放在 \tex{startproject} 之后；然而，在产品和组件中，\tex{environment} 必须放在 {\em 之前} \tex{startproduct} 或 \tex{startcomponent}。
+
+就像 \tex{environment} 和 \tex{component} 命令一样，\tex{project} 命令允许我们将项目名称放在方括号内或根本不使用方括号。这意味着 \tex{project 文件名} 和 \tex{project[文件名]} 是等效的命令。
+
+{\bf 加载环境的不同方式总结}
+
+从以上内容可知，可以通过以下任何过程加载环境：
+
+\startitemize[a, broad]
+
+  \item 在 \tex{starttext} 或 \tex{startcomponent} 之前插入 \tex{environment 环境名称} 命令。这将仅为了编译相关文件而加载环境。
+
+% TODO：上面一项的最后一句属实吗？
+
+  \item 在产品文件中的 \tex{startproduct} 之前插入 \tex{environment 环境名称} 命令。这将在编译产品时加载环境，但如果其组件单独编译则不会。
+
+  \item 在产品或环境中插入 \tex{project} 命令：这将加载与项目关联的所有环境（在项目文件中）。
+
+\stopitemize
+
+\stopsubsection
+
+
+\startsubsection
+    [title={环境、组件、产品和项目的共同方面}]
+
+\startdescription{环境、组件、产品和项目的名称：}
+
+我们已经看到，对于所有这些元素，在启动特定环境、组件、产品或项目的 \tex{start} 命令之后，直接输入其名称。通常，此名称必须与包含该环境、组件或产品的文件的名称一致，因为，例如，当 \ConTeXt\ 编译一个产品并且根据产品文件必须加载一个环境或组件时，我们无法知道该环境或组件在哪个文件中，除非该文件与要加载的元素具有相同的名称。
+
+否则，根据我的测试，在产品文件和环境文件中的 \tex{startproduct} 或 \tex{startenvironment} 之后写入的名称仅仅是指示性的。如果省略它，或者与文件名不匹配，什么坏事也不会发生。但是，对于组件，重要的是组件的名称与包含它的文件的名称匹配。
+
+\stopdescription
+
+\description{项目目录的结构：}
+
+我们知道，默认情况下，\ConTeXt\ 在工作目录和 {\tt TEXINPUTS} 变量指示的路径中查找文件。然而，当我们使用 \tex{project}、\tex{product}、\tex{component} 或 \tex{environment} 命令时，假定项目有一个目录结构，其中公共元素位于父目录中，特定元素位于某个子目录中。因此，如果在工作目录中找不到指示的文件，将在其父目录中搜索，如果在那里也找不到，则在该目录的父目录中搜索，依此类推。
+
+% TODO：这在 LMTX 中正确吗？
+
+\stopsubsection
+
+\stopsection
+
+\stopchapter
+
+\stopcomponent
+
+%%% Local Variables:
+%%% mode: ConTeXt
+%%% eval: (auto-fill-mode 1)
+%%% coding: utf-8-unix
+%%% TeX-master: "../introCTX_eng.tex"
+%%% End:
+%%% vim:set filetype=context tw=75 : %%%

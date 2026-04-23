@@ -1,0 +1,1407 @@
+%%% File:         b10_CharText.tex
+%%% Author:       Joaquín Ataz-López et al
+%%% Begun:        July 2020
+%%% concluded:    July 2020
+%%% Contents:     实际上，本章涉及的问题是一个大杂烩，将它们统一起来的标准有些牵强：第1节本可以放在专门讲源文件的章节中（事实上它最初就在那里）；第2节本可以放在字体章节中：因为尽管它们不是格式本身的特性，但它们有些类似。第3节讲的是水平间距；在最初的版本中，我把它和垂直间距一起放在一个名为“空白间距”的章节中。第4节和第5节更难定位。我最终选择了这个“杂烩”章节。
+%%%
+%%% Edited by: Emacs + AUCTeX - 有时也用 vim + context-plugin
+%%%
+
+\environment introCTX_env.tex
+
+\startcomponent b10_CharText.tex
+
+\startchapter
+    [title={字符、单词、文本与水平间距}]
+
+\TocChap
+
+所有文本文档的基本核心元素是字符：字符组成单词，单词又构成行，行形成段落，段落最终组成页面。
+
+本章从“字符”开始，解释 \ConTeXt 中与字符、单词和文本相关的一些实用工具。
+
+\startsection
+  [title={获取键盘上通常无法直接输入的字符}]
+
+在编码为 UTF-8 的文本文件中（参见 \in{Section}[sec:encoding]），我们可以使用任何字符或符号，无论是现存语言的还是许多已消亡语言的。但是，由于键盘的能力有限，UTF-8 允许使用的大多数字符和符号通常无法直接从键盘获得。这一点尤其适用于许多变音符号，即放置在特定字母上方（或下方）以赋予其特殊含义的符号，同时也适用于许多其他字符，如数学符号、传统连字等。我们可以通过 \ConTeXt\ 使用命令来获得其中许多字符。
+
+\startsubsection
+  [title={变音符号和特殊字母}]
+
+几乎所有西方语言都有变音符号（英语在很大程度上是个重要例外），通常键盘可以生成相应区域语言的变音符号。因此，西班牙语键盘可以生成西班牙语所需的所有变音符号（基本上是重音和分音符号），以及加泰罗尼亚语（钝重音和软音符）或法语（软音符、钝重音和扬抑符）等其他语言使用的一些变音符号；但无法生成葡萄牙语中使用的一些变音符号，例如在 \quotation{navegaç\~ao} 等单词中元音上的波浪号。
+
+\TeX\ 是在美国设计的，那里的键盘通常无法让我们获得变音符号，因此 Donald Knuth 为其提供了一组命令，使我们能够获得几乎所有已知的变音符号（至少在使用拉丁字母的语言中）。如果我们使用西班牙语键盘，使用这些命令来获得可以直接从键盘获得的变音符号并没有太大意义。然而，了解这些命令的存在及其内容仍然很重要，因为西班牙语（或意大利语、法语……）键盘无法让我们生成所有可能的变音符号。
+
+\placetable
+  [here]
+  [tbl:diacritics]
+  {\tfx 重音及其他变音符号}
+  {
+    \starttabulate[|l|l|l|l|]
+      \HL
+      \NC{\bf 名称}\NC{\bf 字符}\NC{\bf 缩写}\NC{\bf 命令}\NR
+      \HL
+      \NC 锐音\NC\'u\NC{\tt\backslash'u}\NC{\tt\backslash
+        uacute}\NR\PlaceMacro{aacute}\PlaceMacro{eacute}\PlaceMacro{iacute}\PlaceMacro{oacute}\PlaceMacro{uacute}
+      \NC 钝音\NC\`u\NC{\tt\backslash`u}\NC{\tt\backslash
+        ugrave}\NR\PlaceMacro{agrave}\PlaceMacro{egrave}\PlaceMacro{igrave}\PlaceMacro{ograve}\PlaceMacro{ugrave}
+      \NC 扬抑符\NC\^u\NC{\tt\backslash^u}\NC{\tt\backslash
+        ucircumflex}\NR\PlaceMacro{acircumflex}\PlaceMacro{ecircumflex}\PlaceMacro{icircumflex}\PlaceMacro{ocircumflex}\PlaceMacro{ucircumflex}
+      \NC 分音符或元音变音\NC\"u\NC{\tt\backslash”u}\NC{\tt\backslash udiaeresis, \backslash
+        uumlaut}\NR\PlaceMacro{adiaeresis}\PlaceMacro{ediaeresis}\PlaceMacro{idiaeresis}\PlaceMacro{odiaeresis}\PlaceMacro{udiaeresis}
+      \NC 波浪号\NC\~u\NC{\tt\backslash\lettertilde u}\NC{\tt\backslash
+        utilde}\NR\PlaceMacro{atilde}\PlaceMacro{etilde}\PlaceMacro{itilde}\PlaceMacro{otilde}\PlaceMacro{utilde}
+      \NC 长音符号\NC\=u\NC{\tt\backslash=u}\NC{\tt\backslash
+        umacron}\NR\PlaceMacro{amacron}\PlaceMacro{emacron}\PlaceMacro{imacron}\PlaceMacro{omacron}\PlaceMacro{umacron}
+      \NC 短音符\NC\u u\NC{\tt\backslash u u}\NC{\tt\backslash
+        ubreve}\PlaceMacro{u}\PlaceMacro{abreve}\PlaceMacro{ebreve}\PlaceMacro{obreve}\PlaceMacro{ibreve}\PlaceMacro{ubreve}\NR
+      \HL
+    \stoptabulate
+}
+
+在 \in{Table}[tbl:diacritics] 中，我们找到了获取这些变音符号的命令和缩写。在所有情况下，使用命令还是缩写并不重要。在表中，我使用了字母 \quote{u} 作为示例，但这些命令适用于任何元音以及一些辅音和半元音。
+
+\startitemize
+
+  \item 由于大多数缩写命令是 {\em 控制符号}（参见 \in{Section}[sec:commands themselves]），带有变音符号的字母可以紧跟在命令后面书写，也可以与命令分开书写。例如，要获得葡萄牙语的 \quote{\~a}，我们可以写入 \tex{~a} 或 \cmd{\lettertilde\textvisiblespace a} 字符。\footnote{请记住，在本文档中，当空白字符很重要时，我们用 \quote{\textvisiblespace} 来表示它。} 但对于短音符 (\tex{u})，由于它是一个 {\em 控制词}，空白字符是必需的。
+
+  \item 对于命令的长格式，带有变音符号的字母将是命令名称的第一个字母。例如，\tex{emacron} 将在小写 \quote{e} 上方放置长音符号 (\emacron)，\tex{Emacron} 将在大写 \quote{E} 上方执行相同操作 (\Emacron)，而 \tex{Amacron} 将在大写 \quote{A} 上方执行相同操作 (\Amacron)。
+
+\stopitemize
+
+虽然 \in{Table}[tbl:diacritics] 中的命令适用于元音和一些辅音，但还有其他命令可以生成一些仅适用于一个或几个字母的变音符号和特殊字母。它们显示在 \in{Table}[tbl:morediacritics] 中。
+
+{\switchtobodyfont[small]
+\placetable
+  [here]
+  [tbl:morediacritics]
+  {\tfx 更多变音符号和特殊字母}
+  {
+    \starttabulate[|l|l|l|l|]
+      \HL
+      \NC{\bf 名称}\NC{\bf 字符}\NC{\bf 缩写}\NC{\bf 命令}\NR
+      \HL
+      \NC 斯堪的纳维亚 O \NC\o, \O    \NC{\tt \backslash o, \backslash O}  \NR\PlaceMacro{o}
+      \NC 斯堪的纳维亚 A \NC\aring, \Aring  
+      	\NC{\tt \backslash aa, \backslash AA, \{\backslash r a\}, \{\backslash r A\}}
+        \NC{\tt \backslash aring, \backslash Aring}\NR\PlaceMacro{aa}\PlaceMacro{r}\PlaceMacro{aring}
+      \NC 波兰语 L  \NC\l, \L  \NC{\tt \backslash l, \backslash L}\NR\PlaceMacro{l}
+      \NC 德语 Eszett\NC\SS\NC{\tt \backslash ss, \backslash SS}\NR\PlaceMacro{ss}
+      \NC 不带点的 \quote{i} 和 \quote{j}  \NC\i, \j  
+	\NC{\tt \backslash i, \backslash j}\NR\PlaceMacro{i}\PlaceMacro{j}
+      \NC 匈牙利语 umlaut  \NC\H u, \H U  
+	\NC{\tt\backslash H u}, {\tt\backslash H U}\NC\NR\PlaceMacro{H}
+      \NC 软音符  \NC\c c, \c C \NC{\tt \backslash c c, \backslash c C}
+        \NC{\tt \backslash ccedilla, \backslash Ccedilla}\PlaceMacro{c}\PlaceMacro{ccedilla}\PlaceMacro{kcedilla}\PlaceMacro{lcedilla}\PlaceMacro{ncedilla}\PlaceMacro{rcedilla}\PlaceMacro{scedilla}\PlaceMacro{tcedilla}\NR
+      \HL
+    \stoptabulate
+  }
+}
+
+我想指出，上表中的一些命令是从其他字符生成字符的，而其他命令仅在我们使用的字体明确提供了该字符时才有效。因此，对于德语 Eszett (ß)，表中显示了两个命令但只有一个字符，因为我用于此文本的字体仅提供了大写版本的德语 Eszett（这很常见）。
+
+这大概也是我无法让 \tex{AA} 生成大写斯堪的纳维亚 A 的原因，尽管 \quotation{\type{{\r A}}} 和 \tex{Aring} 能正确工作。
+
+匈牙利语 umlaut 也适用于字母 \quote{o}，软音符适用于字母 \quote{k}、\quote{l}、\quote{n}、\quote{r}、\quote{s} 和 \quote{t}，无论大小写。要使用的命令是 \tex{kcedilla}、\tex{lcedilla}、\tex{ncedilla} 等。
+
+\stopsubsection
+
+
+\startsubsection
+  [
+    reference=sec:ligatures,
+    title={传统连字},
+  ]
+  % 应该还有另一个关于连字的章节
+  % 由 ConTeXt 作为字体特性自动生成。
+  % 但最终在字体章节中，我没有讨论
+  % 各种字体的特性，也没有地方放
+  % 这一节。
+
+连字是由两个或多个通常分开书写的字素结合而成。这种字符间的“融合”通常始于手写文本中的一种速记方式，直到最终获得了一定的排版独立性。其中一些甚至被纳入通常排印字体中定义的字符之列，例如 ampersand 符号 \quote{\&}，它最初是拉丁语系词（连词）\quotation{et} 的缩写，还有德语 Eszett (ß)，正如其名称所示，它最初是 \quote{s} 和 \quote{z} 的组合。在某些字体设计中，即使在今天，我们也能追溯这两个字符的起源；或者我之所以能看到，是因为我知道它们在那里。具体来说，使用 Pagella 字体的 \quote{\&} 和使用 Bookman 字体的 \quote{ß} 可以明显看出其起源。
+
+作为练习，我建议（在阅读 \in{Chapter}[sec:fontscol] 之后，其中解释了如何操作）尝试用这些字体以足够大的尺寸（例如 30 pt）打印这些字符，以便能直觉感受它们原有的组成部分。
+
+其他不那么流行但至今仍偶尔使用的传统连字是拉丁语词尾 \quotation{oe} 和 \quotation{ae}，它们有时被写成 \quote{\oe} 或 \quote{\ae} 以表示它们在拉丁语中构成双元音。这些连字可以通过 \in{Table}[tbl:ligatures] 中的命令在 \ConTeXt\ 中实现。
+
+\placetable
+  [here]
+  [tbl:ligatures]
+  {传统连字}
+{
+  \starttabulate[|l|l|l|]
+    \HL
+    \NC {\bf 连字}\NC {\bf 缩写}\NC {\bf 命令}\NR
+    \HL
+    \NC\ae, \AE \NC{\tt \backslash ae, \backslash AE}
+	\NC{\tt \backslash aeligature, \backslash AEligature}\NR\PlaceMacro{ae}\PlaceMacro{aeligature}
+    \NC\oe, \OE \NC{\tt \backslash oe, \backslash OE}
+	\NC{\tt \backslash oeligature, \backslash OEligature}\PlaceMacro{oe}\PlaceMacro{oeligature}\NR
+    \HL
+  \stoptabulate
+}
+
+西班牙语（卡斯蒂利亚语）中曾经有一个传统连字，如今通常不在字体中出现了，那就是 \quote{Đ}：它是 \quote{D} 和 \quote{E} 的缩写。据我所知，\ConTeXt\ 中没有命令让我们使用这个符号，\footnote{相比之下，在 \LaTeX\ 中，我们可以使用 \MyKey{fontenc} 包实现的 \tex{DH} 命令。} 但我们可以自己创建一个，如 \in{Section}[sec:create characters] 中所述。
+
+除了前面我称之为“传统”的连字（因为它们源于手写体）之外，印刷术发明后，还发展出了一些印刷文本连字，我称之为 \quotation{排印连字}。在 \ConTeXt\ 中，这些被视为字体 \quotation{实用工具}，并由程序自动管理，尽管我们可以通过 \PlaceMacro{definefontfeature}\tex{definefontfeature} 来影响这些字体实用工具的处理方式（包括连字）（本入门指南中不对此进行解释）。
+
+\stopsubsection
+
+\startsubsection
+  [title={希腊字母}]
+
+在数学和物理公式中经常使用希腊字符。这就是为什么 \ConTeXt\ 包含了生成全部大小写希腊字母的可能性。这里的命令基于所讨论的希腊字母的英文名称构建。如果第一个字符用小写书写，我们将获得小写希腊字母；如果使用大写书写，我们将获得大写希腊字母。例如，命令 \tex{mu} 将生成该字母的小写版本 (\mu)，而 \tex{Mu} 将生成大写版本 (\Mu)。在 \in{Table}[tbl:greekletters] 中，我们可以看到哪个命令生成希腊字母表中的每个字母，包括小写和大写。
+
+{\smallbodyfont
+\placetable
+  [here]
+  [tbl:greekletters]
+  {希腊字母表}
+{
+  \starttabulate[|l|l|l|]
+    \HL
+    \NC {\bf 英文名称}\NC {\bf 字符（小写/大写）}\NC {\bf 命令（小写/大写）}\NR
+    \HL
+    \NC Alpha\NC\alpha, \Alpha\NC{\tt \backslash alpha, \backslash Alpha}\NR\PlaceMacro{alpha}
+    \NC Beta\NC\beta, \Beta\NC{\tt \backslash beta, \backslash Beta}\NR\PlaceMacro{beta}
+    \NC Gamma\NC\gamma, \Gamma\NC{\tt \backslash gamma, \backslash Gamma}\NR\PlaceMacro{gamma}
+    \NC Delta\NC\delta, \Delta\NC{\tt \backslash delta, \backslash Delta}\NR\PlaceMacro{delta}
+    \NC Epsilon\NC\epsilon, \varepsilon, \Epsilon\NC{\tt \backslash epsilon, \backslash varepsilon, \backslash Epsilon}\NR\PlaceMacro{epsilon}\PlaceMacro{varepsilon}
+    \NC Zeta\NC\zeta, \Zeta\NC{\tt \backslash zeta, \backslash Zeta}\NR\PlaceMacro{zeta}
+    \NC Eta\NC\eta, \Eta\NC{\tt \backslash eta, \backslash Eta}\NR\PlaceMacro{eta}
+    \NC Theta\NC\theta, \vartheta, \Theta\NC{\tt \backslash theta, \backslash vartheta, \backslash Theta}\NR\PlaceMacro{theta}\PlaceMacro{vartheta}
+    \NC Iota\NC\iota, \Iota\NC{\tt \backslash iota, \backslash Iota}\NR\PlaceMacro{iota}
+    \NC Kappa\NC\kappa, \varkappa, \Kappa\NC{\tt \backslash kappa, \backslash varkappa, \backslash Kappa}\NR\PlaceMacro{kappa}\PlaceMacro{varkappa}
+    \NC Lambda\NC\lambda, \Lambda\NC{\tt \backslash lambda, \backslash Lambda}\NR\PlaceMacro{lambda}
+    \NC Mu\NC\mu, \Mu\NC{\tt \backslash mu, \backslash Mu}\NR\PlaceMacro{mu}
+    \NC Nu\NC\nu, \Nu\NC{\tt \backslash nu, \backslash Nu}\NR\PlaceMacro{nu}
+    \NC Xi\NC\xi, \Xi\NC{\tt \backslash xi, \backslash Xi}\NR\PlaceMacro{xi}
+    \NC Omicron\NC\omicron, \Omicron\NC{\tt \backslash omicron, \backslash Omicron}\NR\PlaceMacro{omicron}
+    \NC Pi\NC\pi, \varpi, \Pi\NC{\tt \backslash pi, \backslash varpi, \backslash Pi}\NR\PlaceMacro{pi}\PlaceMacro{varpi}
+    \NC Rho\NC\rho, \varrho, \Rho\NC{\tt \backslash rho, \backslash varrho, \backslash Rho}\NR\PlaceMacro{rho}\PlaceMacro{varrho}
+    \NC Sigma\NC\sigma, \varsigma, \Sigma\NC{\tt \backslash sigma, \backslash varsigma, \backslash Sigma}\NR\PlaceMacro{sigma}\PlaceMacro{varsigma}
+    \NC Tau\NC\tau, \Tau\NC{\tt \backslash tau, \backslash Tau}\NR\PlaceMacro{tau}
+    \NC Ypsilon\NC\upsilon, \Upsilon\NC{\tt \backslash upsilon, \backslash Upsilon}\NR\PlaceMacro{upsilon}
+    \NC Phi\NC\phi, \varphi, \Phi\NC{\tt \backslash phi, \backslash varphi, \backslash Phi}\NR\PlaceMacro{phi}\PlaceMacro{varphi}
+    \NC Chi\NC\chi, \Chi\NC{\tt \backslash chi, \backslash Chi}\NR\PlaceMacro{chi}
+    \NC Psi\NC\psi, \Psi\NC{\tt \backslash psi, \backslash Psi}\NR\PlaceMacro{psi}
+    \NC Omega\NC\omega, \Omega\NC{\tt \backslash omega, \backslash Omega}\PlaceMacro{omega}\NR
+    \HL
+
+  \stoptabulate
+}}
+
+请注意，对于某些字符（epsilon、kappa、theta、pi、rho、sigma 和 phi）的小写版本，存在两种可能的变体。
+
+\stopsubsection
+
+
+\startsubsection
+    [title={各种符号}]
+
+与我们刚刚看到的字符一起，\TeX\ （以及 \ConTeXt ）提供了生成无数符号的命令。这样的命令有很多；我在 \in{Appendix}[app:symbols] 中提供了一个扩展的（尽管不完整）列表。
+
+\stopsubsection
+
+
+\startsubsection
+  [
+    reference=sec:create characters,
+    title={定义字符}
+  ]
+  \PlaceMacro{definecharacter}
+
+如果我们需要使用任何无法从键盘直接输入的字符，我们总可以找到一个包含这些字符的网页，然后将它们复制到我们的源文件中。如果我们使用 UTF-8 编码（推荐），这几乎总是可行的。此外，在 \ConTeXt\ wiki 中有一个页面，包含各种可以简单地复制粘贴到我们文档中的符号。要获取它们，请单击 \goto{此链接}[url(wikisymbols)]。
+
+然而，如果我们需要多次使用某个字符，那么复制粘贴并不是最有效的方式。更好的做法是定义该字符，使其与一个命令相关联，每次运行该命令就会生成该字符。为此，我们使用 \tex{definecharacter}，其语法为：
+
+% 这与其他示例用法不一致：
+%{\tt \backslash definecharacter {\em Name} {\em Character}}
+
+\type{\definecharacter Name Character}
+
+其中：
+
+\startitemize
+
+  \item {\tt Name} 是与新字符关联的名称。它不应是现有命令的名称，否则会覆盖该命令。
+
+  \item {\tt Character} 是每次运行 \tex{Name} 时生成的字符。我们可以通过三种方式指明该字符：
+
+    \startitemize
+
+      \item 直接将其写入或粘贴到我们的源文件中（如果我们从其他电子文档或网页复制了它）。
+
+      \item 通过指明该字符在当前使用的字体中关联的编号。要查看字体中包含的字符及其关联的编号，我们可以使用 \tex{showfont[Font name]} 命令。
+
+      \item 使用我们接下来将立即看到的组合字符构建命令之一来构建新字符。
+
+    \stopitemize
+
+\stopitemize
+
+\startSmallPrint 与本入门指南中看到的其他 \ConTeXt\ 命令相比，\tex{definecharacter} 的语法非常不寻常。在 {\sc Knuth} 的原始 \TeX\ 中，通常编写其参数由空白字符分隔的命令。然而，\ConTeXt\ 的设计倾向于将参数括在方括号或花括号中，因此除非你学习如何编写自己的命令并决定使用这样的语法，否则你可能不会看到很多具有这种语法的命令。
+\stopSmallPrint
+
+作为第一种用法的示例，让我们暂时回到关于连字的章节（\in{Section}[sec:ligatures]）。在那里我提到了一个西班牙语中的传统连字，如今通常无法在字体中找到：\quote{Đ}。我们可以将这个字符关联到 \tex{decontract} 命令，这样每当我们写入 \tex{decontract} 时就会生成该字符。我们可以这样做：
+
+\type{\definecharacter decontract Đ}
+
+\startSmallPrint
+
+    要构建一个不在我们字体中、也无法从键盘获得的新字符，就像我刚才给出的例子那样，首先我们必须找到包含该字符的文本，复制它，并能够将其粘贴到我们的定义中。在我刚刚给出的实际示例中，我最初是从维基百科复制了 \quote{Đ}。
+
+\stopSmallPrint
+
+\ConTeXt\ 还包含一些允许我们创建组合字符的命令，这些命令可以与 \tex{definecharacter} 结合使用。我所说的组合字符是指那些带有变音符号的字符。命令如下：
+
+% \PlaceMacro{buildmathaccent}   \buildmathaccent Accent Character
+% /local/context/tex/texmf-context/tex/context/base/mkxl/enco-ini.mkxl 中的注释
+% 说 "Don't use this!"。好吧！
+\PlaceMacro{buildtextaccent}\PlaceMacro{buildtextbootomcomma}\PlaceMacro{buildtextbottomdot}\PlaceMacro{buildtextcedilla}\PlaceMacro{buildtextgrave}\PlaceMacro{buildtextmacron}\PlaceMacro{buildtexttognek}
+\starttyping
+  \buildtextaccent Accent Character
+  \buildtextbottomcomma Character
+  \buildtextbottomdot Character
+  \buildtextcedilla Character
+  \buildtextgrave Character
+  \buildtextmacron Character
+  \buildtextogonek Character
+\stoptyping
+
+例如：正如我们已经知道的，默认情况下 \ConTeXt\ 只有用于书写带有软音符的特定字母（c、k、l、n、r、s、t）的命令；这些字母是通常被纳入字体的带有软音符的版本。如果我们想使用带有软音符的 \quote{b}，我们可以使用 \tex{buildtextcedilla} 命令，如下所示：
+
+\type{\definecharacter bcedilla {\buildtextcedilla b}}
+
+\definecharacter bcedilla {\buildtextcedilla b}
+
+此命令将创建新的 \tex{bcedilla} 命令，该命令将生成带有软音符的 \quote{b}：\quote{\bcedilla}。这些命令真正地 \quotation{构建} 了新字符，即使我们的字体没有它，也会生成它。这些命令所做的是将一个字符叠加在另一个字符上，然后为该叠加命名。
+
+{\tt \backslash buildtextaccent} 接受两个字符作为参数，并将一个字符叠加在另一个字符上，同时将第一个字符稍微抬高。尽管它被称为 \quotation{buildtextaccent}，但作为参数的字符不一定非得是重音符号。然而，如果一个字符是重音符号，叠加效果会更好，因为在这种情况下，将重音符号叠加在字符上，重音符号不太可能覆盖字符。另一方面，在正常情况下具有相同基线的两个字符的叠加会受到以下事实的影响：该命令将一个字符略微抬高到另一个字符之上。这就是为什么我们不能使用此命令来获得上面提到的连字 \quote{Đ}，因为如果我们写入
+
+\type{\definecharacter decontract {\buildtextaccent D E}}
+\definecharacter decontract {\buildtextaccent D E}
+
+在我们的源文件中，此命令产生的相对于 \quote{D} 基线的轻微抬高意味着它产生的效果 (\quotation{\decontract}) 不是很好。但如果字符的高度允许，我们可以创建一个组合。例如，
+
+% 使用 \type{\definecharacter unusual {\buildtextaccent \_ "}} 时，\buildtextaccent 后面的空格消失了。
+% 我相信 \type 有选项可以做到这一点，但我现在找不到。
+\cmd{definecharacter unusual \{\backslash buildtextaccent \backslash _ "\}}
+\definecharacter unusual {\buildtextaccent \_ "}
+
+将定义字符 \quote{\unusual}，它与 \tex{unusual} 命令相关联。
+
+其余的 build 命令接受单个参数：将为其添加由每个命令生成的变音符号的字符。下面我将展示每个命令的一个示例，都基于字母 \quote{z}：
+
+\definecharacter zcomma {\buildtextbottomcomma z}
+\definecharacter zdot {\buildtextbottomdot z}
+\definecharacter zcedilla {\buildtextcedilla z}
+\definecharacter zgrave {\buildtextgrave z}
+\definecharacter zmacron {\buildtextmacron z}
+\definecharacter zogonek {\buildtextogonek b}
+
+
+\startitemize
+
+  \item {\tt \backslash buildtextbottomcomma} 在其所取字符下方添加一个逗号（\quote{\zcomma}）。
+  \item {\tt \backslash buildtextbottomdot} 在其所取字符下方添加一个点（\quote{\zdot}）。
+  \item {\tt \backslash buildtextcedilla} 在其所取字符下方添加一个软音符（\quote{\zcedilla}）。
+  \item {\tt \backslash buildtextgrave} 在其所取字符上方添加一个钝音重音（\quote{\zgrave}）。
+  \item {\tt \backslash buildtextmacron} 在其所取字符下方添加一个小横线（\quote{\zmacron}）。
+  \item {\tt \backslash buildtextogonek} 在其所取字符下方添加一个小钩（\quote{\zogonek}）。
+
+\stopitemize
+
+乍一看，{\tt \backslash buildtextgrave} 似乎是多余的，因为我们已经有了 {\tt \backslash buildtextaccent}。但是，如果你检查由这两个命令中的第一个生成的钝音重音，它看起来会好一些。下面的示例显示了两个命令的结果，字体大小足够大以分辨差异：
+
+\definecharacter zgraveb {\buildtextaccent ` z}
+
+{\switchtobodyfont[30pt]
+    \midaligned{\framed{\zgrave\ -- \zgraveb}}
+}
+
+\stopsubsection
+
+
+\startsubsection
+    [title={使用预定义符号集}]
+
+\useURL[wikiEmoji]
+       [https://wiki.contextgarden.net/Characters_words_and_fonts/Emoji_and_symbols]
+
+\ConTeXt\ 本身包含了许多预定义的符号集，我们可以在文档中使用。这些集合被称为 \MyKey{cc}、\MyKey{cow}、\MyKey{fontawesome}、\MyKey{jmn}、\MyKey{mvs} 和 \MyKey{nav}。（更多信息请参见 \from[wikiEmoji]。）这些集合中的每一个还包含一些子集：
+
+\startitemize[packed]
+
+  \item {\tt\bf cc}（Creative Commons）包含集合 \quotation{cc}。
+
+  \item {\tt\bf cow}（Cow-\TeX\ 徽标）包含 \quotation{cownormal} 和 \quotation{cowcontour}。
+
+  \item {\tt\bf fontawesome} 包含 \quotation{fontawesome}。
+
+  \item {\tt\bf jmn}（Janusz M. Nowacki 的导航符号）包含集合 \quotation{navigation~1}、\quotation{navigation~2}、\quotation{navigation~3} 和 \quotation{navigation~4}。
+
+  \item {\tt\bf mis}（排版项目符号）。
+
+  \item {\tt\bf mvs}（Martin Vogel 的符号）包含 \quotation{astronomic}、\quotation{zodiac}、\quotation{europe}、\quotation{martinvogel~1} 和 \quotation{martinvogel~2}。
+
+  \item {\tt\bf nav}（Hans Hagen 的导航符号）包含 \quotation{navigation~1}、\quotation{navigation~2} 和 \quotation{navigation~3}。
+
+  \item {\tt\bf was}（Roland Waldi 的符号）包含 \quotation{wasy general}、\quotation{wasy music}、\quotation{wasy astronomy}、\quotation{wasy astrology} 和 \quotation{wasy geometry}。
+
+\stopitemize
+
+要查看每个集合中包含的特定符号，使用以下语法：
+
+\PlaceMacro{usesymbols}\PlaceMacro{showsymbolset}
+\starttyping
+  \usesymbols[Set]
+  \showsymbolset[Subset]
+\stoptyping
+
+例如：如果我们想查看 \quotation{mvs/zodiac} 中包含的符号，那么在源文件中写入：
+
+\starttyping
+  \usesymbols[mvs]
+  \showsymbolset[zodiac]
+\stoptyping
+
+我们将得到以下结果：
+
+\usesymbols[mvs]
+%\startcolumns[n=2]
+
+  \showsymbolset[zodiac]
+
+%\stopcolumns
+
+请注意，每个符号的名称以及符号本身都被指示出来。\PlaceMacro{symbol}\tex{symbol} 命令允许我们使用任何符号。其语法为：
+
+{\tt \backslash symbol[Subset][SymbolName]}
+
+其中 subset 是我们之前用 \tex{usesymbols} 加载的任何集合相关联的子集之一。例如，如果我们想使用与水瓶座相关的占星符号（在 mvs/zodiac 中找到），我们需要写入：
+
+\starttyping
+  \usesymbols[mvs]
+  \symbol[zodiac][Aquarius]
+\stoptyping
+\usesymbols[mvs]
+
+这将给我们 \quotation{\symbol[zodiac][Aquarius]}，并且出于所有意图和目的，它将被视为一个 \quotation{字符}，因此会受到打印时活动的字体大小的影响。我们还可以使用 \tex{definecharacter} 将相关符号与命令关联起来。例如：
+
+\type{\definecharacter Aries {\symbol[zodiac][Aries]}}
+\definecharacter Aries {\symbol[zodiac][Aries]}
+
+这将创建一个名为 \tex{Aries} 的新命令，该命令将生成字符 \quotation{\Aries}。
+
+我们还可以在 itemize 环境中使用这些符号。例如：
+
+\starttyping
+\usesymbols[mvs]
+\definesymbol[1][{\symbol[martinvogel 2][PointingHand]}]
+\definesymbol[2][{\symbol[martinvogel 2][CheckedBox]}]
+\startitemize[packed]
+\item item1    \item item2
+ \startitemize[packed]
+ \item item3   \item item4
+ \stopitemize
+\item item5
+\stopitemize
+\stoptyping
+
+将产生
+
+{
+\usesymbols[mvs]
+\definesymbol[1][{\symbol[martinvogel 2][PointingHand]}]
+\definesymbol[2][{\symbol[martinvogel 2][CheckedBox]}]
+\startitemize[packed]
+  \item item1
+  \item item2
+    \startitemize[packed]
+      \item item3
+      \item item4
+    \stopitemize
+  \item item5
+\stopitemize
+}
+
+\stopsubsection
+
+\stopsection
+
+
+\startsection
+    [title={特殊字符格式}]
+
+严格来说，是影响所用字体、大小、样式或变体的 {\em 格式} 命令。这些命令在 \in{Chapter}[sec:fontscol] 中解释。然而，从更 {\em 宽泛} 的角度来看，我们也可以将那些以某种方式改变其参数所取字符（从而改变其外观）的命令视为格式命令。我们将在本节中探讨其中一些命令。其他命令，如下划线或文本上方/下方带线的文本（例如，我们想要提供空间来回答问题）将在 \in{Section}[sec:FramesLines] 中介绍。
+
+\startsubsection
+  [
+    reference=sec:Upper-Lower-Fake,
+    title={大写、小写与伪小型大写字母},
+  ]
+
+字母本身可以是大写或小写。对于 \ConTeXt 来说，大写和小写字母是不同的字符，因此原则上它会按照写入的样子排版字母。然而，有一组命令允许我们确保它们所取的文本始终以大写或小写书写：
+
+\startitemize[packed]
+
+  \item \PlaceMacro{word}\type{\word{text}}：将其所取的文本转换为小写。
+
+  \item \PlaceMacro{Word}\type{\Word{text}}：将其所取文本的第一个字母转换为大写。
+
+  \item \PlaceMacro{Words}\type{\Words{text}}：将其所取的每个单词的第一个字母转换为大写；其余部分为小写。
+
+  \item \PlaceMacro{WORD}\type{\WORD{text}} 或
+    \PlaceMacro{WORDS}\type{\WORDS{text}}：将其所取的文本写成大写。
+
+\stopitemize
+
+与这些命令非常相似的是 \PlaceMacro{cap}\tex{cap} 和 \PlaceMacro{Cap}\tex{Cap}。这些命令也会将其所取的文本大写，但随后会应用一个缩放因子，该因子等于字体更改命令中 \quote{x} 后缀所应用的缩放因子（参见 \in{Section}[sec:quick-change]）。对于大多数字体，这些大写字母的高度将与小写字母相同，从而产生一种 {\em 伪小型大写字母} 的效果。与真正的小型大写字母（参见 \in{Section}[sec:smallcaps]）相比，它们具有以下优点：
+
+\startitemize[n]
+
+  \item \tex{cap} 和 \tex{Cap} 适用于任何字体，而真正的小型大写字母仅适用于明确包含它们的字体和样式。
+
+  \item 真正的小型大写字母是字体的一种变体，因此与粗体、斜体或倾斜等其他任何变体都不兼容。然而，\tex{cap} 和 \tex{Cap} 与任何字体变体完全兼容。
+
+\stopitemize
+
+\tex{cap} 和 \tex{Cap} 的区别在于，前者将其参数中所有单词的字母都应用缩放因子，而 \tex{Cap} 不对每个单词的第一个字母应用缩放，从而实现了类似于在小型大写字母文本中使用真正大写字母的效果。如果 \quote{caps} 所取的文本包含多个单词，则每个单词第一个字母中的大写字母大小将保持不变。
+
+\page[bigpreference]
+
+因此，在下面的示例中：
+
+\startDoubleExample
+
+\starttyping
+The UN, whose \Cap{president} has his
+office at \cap{uN} headquarters...
+\stoptyping
+
+\column
+
+The UN, whose \Cap{president} has his
+office at \cap{uN} headquarters...
+
+\stopDoubleExample
+
+我们首先需要注意到，第一次写 \quotation{UN}（大写）和第二次写（小型大写字母，\quotation{\cap{UN}}）之间的大小差异。在示例中，我第二次写了 \type{\cap{uN}}，以便我们可以看到 \tex{cap} 的参数是大写还是小写并不重要：该命令将所有字母转换为大写，然后应用缩放因子。这与 \tex{Cap} 形成对比，后者不缩放第一个字母。
+
+这些命令也可以 {\em 嵌套}，在这种情况下，缩放因子将再次应用，导致进一步缩小，如下例所示，其中第一行的单词 \quotation{capital} 被再次缩放：
+
+\startDoubleExample
+
+\starttyping
+\cap{People who have amassed their
+\cap{capital} at the expense of others
+are more often than not
+{\bf decapitated} in revolutionary
+times}.
+\stoptyping
+
+\column
+
+\cap{People who have amassed their \cap{capital}
+at the expense of others are
+more often than not {\bf decapitated} in revolutionary
+times}.
+
+\stopDoubleExample
+
+% TODO: 这个示例显示 \nocap 并不能完全取消 \cap 的效果。
+% 实际情况是怎样的？wiki 上说 \nocap 主要是 MkII 的东西。
+% 嗯..
+% {\sc when} \cap{When I was one I had just begun, \nocap{nearly}} nearly
+
+应用于被 \tex{cap} 作用的文本的 \tex{nocap} 命令，会取消其参数文本中的 \tex{cap} 效果。例如：
+
+\startDoubleExample
+
+\starttyping
+\cap{When I was One I had just begun,
+when I was Two I was \nocap{nearly}
+new (A.A. Milne)}.
+\stoptyping
+
+\column
+
+\cap{When I was one I had just begun,
+when I was two I was \nocap{nearly}
+new (A.A. Milne)}.
+
+\stopDoubleExample
+
+我们可以使用 \PlaceMacro{setupcapitals}\tex{setupcapitals} 来配置 \tex{cap} 的工作方式，并且我们还可以定义该命令的不同版本，每个版本都有自己的名称和具体配置。我们可以使用 \PlaceMacro{definecapitals}\tex{definecapitals} 来做到这一点。
+
+这两个命令的工作方式类似：
+
+\starttyping
+\definecapitals[Name][Configuration]
+\setupcapitals[Name][Configuration]
+\stoptyping
+
+\tex{setupcapitals} 中的 \quotation{Name} 参数是可选的。如果不使用它，配置将影响 \tex{cap} 命令本身。如果使用它，我们需要提供之前用 \tex{definecapitals} 分配给某个实际配置的名称。
+
+在这两个命令中，配置允许三个选项：\quotation{{\tt title}}、\quotation{{\tt sc}} 和 \quotation{{\tt style}}，前两个允许 \quotation{yes} 和 \quotation{no} 作为值。使用 \quotation{{\tt title}} 我们指示大写是否也会影响标题（默认情况下会影响），使用 \quotation{{\tt sc}} 我们指示命令应使用真正的小型大写字母（\quotation{yes}）还是伪小型大写字母（\quotation{no}）。默认情况下，它使用伪小型大写字母，其优点是即使您使用的字体没有小型大写字母变体，该命令也能工作。第三个值 \quotation{{\tt style}} 允许我们指示一个样式命令，该命令将应用于受 \tex{cap} 命令影响的文本。
+
+\stopsubsection
+
+
+\startsubsection
+  [title={上标或下标文本}]
+
+我们已经知道（参见 \in{Section}[sec:reserved characters]），在数学模式下，保留字符 \MyKey{^} 和 \MyKey{_} 会将紧随其后的字符或组分别转换为上标或下标。为了在数学模式之外实现这种效果，\ConTeXt\ 包含以下命令：
+
+\startitemize
+
+  \item \PlaceMacro{high}\type{\high{Text}}：将其所取的文本写成上标，如下所示：normal\high{superscript}。
+
+  \item \PlaceMacro{low}\type{\low{Text}}：将其所取的文本写成下标，如下所示：normal\low{subscript}。
+
+  \item \PlaceMacro{lohi}\type{\lohi{Subscript}{Superscript}}：将两个参数上下书写：第一个参数在底部，第二个在顶部，这会产生一种奇特的效果：
+
+    \startDoubleExample
+
+        \starttyping
+      \lohi{below}{above}
+        \stoptyping
+
+        \column
+
+    \lohi{below}{above}
+
+\stopDoubleExample
+
+\stopitemize
+
+\stopsubsection
+
+
+\startsubsection
+  [
+    reference=sec:verbatim,
+    title={照排文本},
+  ]
+  \PlaceMacro{type}\PlaceMacro{starttyping}
+
+拉丁语表达 {\em verbatim}（源自 {\em verbum} $=$ {\em 词} + 后缀 {\em atim}），可以翻译为 \quotation{逐字地} 或 \quotation{原原本本地}，在像 \ConTeXt\ 这样的文本处理程序中使用，指那些根本不应该被处理，而应该原样转储到最终文件中的文本片段。\ConTeXt\ 提供了 \tex{type} 命令，适用于不超过一行的短文本，以及 {\tt typing} 环境，适用于多行文本。这些命令广泛用于计算机书籍中显示代码片段，\ConTeXt\ 会使用等宽字母（如打字机或计算机终端）来格式化这些文本。在这两种情况下，文本都会被发送到最终文档而 {\em 不经过处理}，这意味着它们可以使用保留字符或特殊字符，这些字符将 {\em 原样} 转录到最终文件中。同样，如果 \tex{type} 的参数或 \tex{starttyping} 的内容包含命令，该命令将被 {\em 写入} 最终文档，但不会执行。
+
+\tex{type} 命令具有以下特殊性：其参数 {\em 可以} 包含在花括号内（如同 \ConTeXt\ 中的常规做法），但也可以使用任何其他字符来分隔（包围）参数。
+
+\startSmallPrint
+
+    当 \ConTeXt\ 读取 \tex{type} 命令时，它假定命令名称后面紧随的第一个非空白字符将作为其参数的分隔符。如果此分隔符是左花括号 \quote{\type z{z}，\tex{type} 会将其与右花括号 \quote{\type z}z} 配对。否则，\tex{type} 认为参数内容从分隔符后面的字符开始，到该分隔符 {\em 下一次} 出现之前的字符结束。
+
+    一些示例将有助于我们更好地理解这一点：
+
+    \starttyping
+    \type {Tweedledum and Tweedledee}
+    \type 1Tweedledum and Tweedledee1
+    \type |Tweedledum and Tweedledee|
+    \type zTweedledum and Tweedledeez
+    \type (Tweedledum and Tweedledee(
+    \stoptyping
+
+    第一个示例展示了我们可能期望的花括号的普通用法。请注意，在第二个示例中，命令名称后的第一个非空白字符是 \quote{1}，第三个示例中是 \quote{\|}，第四个示例中是 \quote{z}；因此：在每种情况下，\ConTeXt\ 都会认为 \tex{type} 的参数是该字符与其下一次出现之间的所有内容。最后一个示例也是如此，它也非常有启发性，因为原则上我们可能会假设如果参数的开分隔符是 \quote{(}，那么闭分隔符应该是 \quote{)}，但事实并非如此，因为 \quote{(} 和 \quote{)} 是不同的字符，并且正如我所说，\tex{type} 会搜索与参数开头使用的字符相同的闭字符分隔符。
+
+    只有两种情况下 \tex{type} 允许开分隔符和闭分隔符不同：
+
+    \startitemize
+
+      \item 如果开分隔符是 \quote{\{} 字符，它会认为闭分隔符将是 \quote{\}}。
+
+      \item 如果开分隔符是 \quote{<<}，它会认为闭分隔符将是 \quote{>>}。这种情况也是唯一的，因为两个连续的字符被用作分隔符。
+
+    \stopitemize
+
+    然而：\tex{type} 允许任何分隔符的事实并不意味着我们应该使用 \quotation{奇怪} 的分隔符。从源文件的 {\em 可读性} 和 {\em 可理解性} 的角度来看，最好尽可能像 \ConTeXt\ 的常规做法一样，用花括号分隔 \tex{type} 的参数；当不可能时，因为 \tex{type} 的参数中有花括号，则使用一个符号：最好不是 \ConTeXt\ 保留字符的符号。例如：
+    \type Z\type *This is a closing curly bracket: '}'*Z。
+
+\stopSmallPrint
+
+\tex{type} 和 \tex{starttyping} 都可以用 \PlaceMacro{setuptype}\tex{setuptype} 和 \PlaceMacro{setuptyping}\tex{setuptyping} 进行配置。我们还可以使用 \PlaceMacro{definetype}\tex{definetype} 和 \PlaceMacro{definetyping}\tex{definetyping} 创建这些命令的自定义版本。关于这些命令的实际配置选项，我参考 \MyKey{setup-en.pdf}（位于 \ConTeXt\ 独立发行版的目录 {\tt tex/texmf-context/doc/context/documents/general/qrcs} 中）。
+
+与 \tex{type} 非常相似的两个命令是：
+
+\startitemize
+
+  \item \PlaceMacro{typ}\tex{typ}：工作方式类似于 \tex{type}，但不禁用断字。
+
+  \item \PlaceMacro{tex}\tex{tex}：一个旨在书写关于 \TeX\ 或 \ConTeXt\ 的文本的命令：它在其所取的文本前添加一个反斜杠。除此之外，此命令与 \tex{type} 的不同之处在于它会处理其参数中找到的一些保留字符。特别是，\tex{tex} 内部的花括号将按照它们在 \ConTeXt\ 中的通常方式处理。
+
+\stopitemize
+
+\stopsubsection
+
+\stopsection
+
+
+\startsection
+  [
+    reference=sec:horizontal space1,
+    title={字符间距与词间距},
+  ]
+
+\startsubsection
+    [title=自动设置水平间距]
+
+不同字符和单词之间的间距（在 \TeX\ 中称为 {\em 水平间距}）通常由 \ConTeXt\ 自动设置：
+
+\startitemize
+
+  \item 组成单词的字符之间的间距由字体本身定义，除了等宽字体的情况外，字体通常会根据要分隔的字符使用或多或少的空白，例如，\quote{A} 和 \quote{V} 之间的间距 (\quote{AV}) 通常小于 \quote{A} 和 \quote{X} 之间的间距 (\quote{AX})。然而，除了这些可能的变化（取决于所涉及的字母组合并由字体预定义）之外，组成单词的字符之间的间距通常是一个固定且不变的度量。
+
+  \item 相比之下，同一行中单词之间的间距可以更具弹性。
+
+    \startitemize
+
+      \item 对于一行宽度必须与段落中其余行宽度相同的行中的单词，单词间距的变化是 \ConTeXt\ 用来获得等宽行的机制之一，详见 \in{Section}[sec:lines]。在这些情况下，\ConTeXt\ 将在该行的所有单词之间建立完全相同的水平间距（除以下规则外），同时确保段落不同行中单词之间的间距尽可能相似。
+
+      \item 然而，除了需要拉伸或收缩单词间距以对齐行之外，根据活动的语言，\ConTeXt\ 会考虑某些排版规则，根据这些规则，在特定位置，与该语言相关的排版传统会添加一些额外的空白。例如，在英文排版传统的某些部分中，句号后会添加额外的空白。
+
+        \startSmallPrint
+
+            这种额外间距适用于英语，也可能适用于其他一些语言（尽管在某些情况下，如今的英语出版商选择不在句号后添加额外间距），但不适用于西班牙语，因为那里的排版传统不同。因此，我们可以使用 \PlaceMacro{setupspacing}\tex{setupspacing[broad]} 临时启用此功能，并使用 \tex{setupspacing[packed]} 禁用它。我们还可以更改西班牙语（以及任何其他语言，包括英语）的默认配置，如 \in{Section}[sec:langconfig] 中所述。
+
+        \stopSmallPrint
+
+    \stopitemize
+
+\stopitemize
+
+\stopsubsection
+
+
+\startsubsection
+    [title=改变单词内字符之间的间距]
+
+改变组成单词的字符的默认间距被认为是一种非常糟糕的排版实践，除非在标题和 headings 中。然而，\ConTeXt\ 提供了一个命令来改变单词内字符之间的间距\footnote{包含一个命令来做 \ConTeXt\ 文档本身建议不要做的事情，这非常符合 \ConTeXt\ 的理念。尽管追求排版完美，但目标也是让作者对其文档的外观拥有绝对控制权：无论好坏，归根结底都是作者的责任。}：\PlaceMacro{stretched}\tex{stretched}，其语法如下：
+
+\type{\stretched[Configuration]{Text}}
+
+其中 {\em Configuration} 允许以下任何选项：
+
+% 一些使用 factor=. 对 \stretched 的测试。
+% 它似乎产生了一条 \hsize 的线，因此这些示例类似于
+% \line{factor \hfill <number>}，但带有额外的字母间距。
+%%    \line{factor\hss}
+%%
+%%    \stretched[factor=0.0]{factor 0.0}
+%%
+%%    \stretched[factor=0.05]{factor 0.05}
+%%
+%%    \stretched[factor=0.10]{factor 0.10}
+%%
+%%    \stretched[factor=0.15]{factor 0.15}
+%%
+%%    \stretched[factor=0.20]{factor 0.20}
+%%
+%%    \stretched[factor=0.25]{factor 0.25}
+%%
+%%    \stretched[factor=0.30]{factor 0.30}
+
+% 测试 JAL 下面的评论是否仍然成立。2026年3月：是的！
+%% \stretched[width=0.8in]{some text}
+%% \stretched[width=0.9in]{some text}  % 与 0.8 相同
+%% \stretched[width=0.95in]{some text} % 比 0.9 稍宽
+%% \stretched[width=1in]{some text}
+%% \stretched[width=1.1in]{some text}
+%% \stretched[factor=0.25]{some text}
+
+% TODO：写一些关于 factor 和 width 不同行为的内容，
+%       它们对参数字符串的处理方式截然不同。
+
+\startitemize
+
+  \item {\tt factor}：一个整数或小数，表示所需的间距。这个数字不宜过大：0.05 的因子已经肉眼可见。因子为 0 产生的文本字母之间没有额外间距。
+
+  \item {\tt width}：指示提交给命令的文本必须具有的总宽度，这样命令本身将计算在该空间中分布字符所需的间距。
+
+    \startSmallPrint
+
+        根据我的测试，当使用 {\tt width} 选项设定的宽度小于使用 {\tt factor} 等于 0.25 表示文本所需的宽度时，{\tt width} 选项和这个因子会被忽略。我猜测这是因为 \tex{stretched} 只允许我们 {\em 增加} 单词内字符之间的间距，而不是减少它。但我不明白为什么表示文本所需的宽度（因子为 0.25）被用作 width 选项的最小度量，而不是文本的 {\em 自然宽度}（即因子为 0）。
+
+    \stopSmallPrint
+
+  \item {\tt\bf style}：应用于文本参数的样式命令或命令。
+
+  \item {\tt\bf color}：书写所取文本的颜色。
+
+\stopitemize
+
+当使用 {\tt factor} 时，默认情况下文本会被拉伸以适应该行的整个宽度。要仅按请求的因子拉伸文本，请向 \tex{stretched} 命令添加选项 {\tt width=}。
+
+因此，在下面的示例中，我们可以直观地看到该命令应用于同一句子但宽度不同时的效果：
+
+\startDoubleExample\smallbodyfont
+
+\starttyping
+\stretched[width=4cm]{\bf test text}
+\stretched[width=6cm]{\bf test text}
+\stretched[width=8cm]{\bf test text}
+\stretched[width=9cm]{\bf test text}
+\stoptyping
+
+\column
+
+\stretched[width=4cm]{\bf test text}
+\stretched[width=6cm]{\bf test text}
+\stretched[width=8cm]{\bf test text}
+\stretched[width=9cm]{\bf test text}
+
+\stopDoubleExample
+
+% 在我这里的 LMTX 中没有！
+%% \startSmallPrint
+%%
+%%     在这个示例中，可以看出不同字符之间的水平间距分布并不均匀。\quotation{text} 中的 \quote{x} 和 \quote{t}，以及 \quotation{test} 中的 \quote{e} 和 \quote{b}，它们之间的间距总是比其他字符之间紧密得多。我无法找出发生这种情况的原因。
+%%
+%% \stopSmallPrint
+
+不带参数使用时，该命令将使用行的整个宽度。另一方面，在此命令的参数文本中，命令 \type{\\} 被重新定义，不再表示换行，而是插入水平间距。例如：
+
+\starttyping
+\stretched{test\\text}
+\stoptyping
+
+产生：
+
+\blank	% 没有这个，示例输出周围不会有通常的间距。
+
+\stretched{test\\text}
+
+我们可以使用 \PlaceMacro{setupstretched}\tex{setupstretched} 自定义命令的默认配置。
+
+\startSmallPrint
+
+% TODO：进一步调查（并记录）。
+
+    没有 \PlaceMacro{definestretched}\tex{definestretched} 命令允许我们设置与 \Doubt 命令名称关联的自定义配置，然而，在官方命令列表中（参见 \in{Section}[sec:qrc-setup-en]），它说 \tex{setupstretched} 来自 \PlaceMacro{setupcharacterkerning}\tex{setupcharacterkerning}，并且有一个 \PlaceMacro{definecharacterkerning}\cmd{de\-fi\-ne\-cha\-rac\-ter\-ker\-ning} 命令。然而，在我的测试中，我未能通过后者为 \tex{stretched} 设置任何自定义配置，尽管我必须承认我也没有花太多时间尝试这样做。
+
+\stopSmallPrint
+
+\stopsubsection
+
+
+\startsubsection
+  [
+    reference=sec:horizontal space2,
+    title={用于在单词之间添加水平间距的命令},
+  ]
+
+我们已经知道，增加单词之间的间距时，添加两个或多个连续的空格是没有用的，因为正如 \in{Section}[sec:spaces] 中所述，\ConTeXt\ 会吸收所有连续的空格。如果我们希望增加单词之间的间距，我们需要使用以下允许我们这样做的命令之一：
+
+\startitemize
+
+  \item \tex{,} 在文档中插入一个非常小的空白（称为薄间距）。它用于，例如，分隔数字中的千位数（例如 1,000,000），或分隔单引号和双引号。例如：
+    \quotation{\color[darkmagenta]{\type{1\,473\,451}}} 将产生 \quotation{1\,473\,451}。
+
+  \item \PlaceMacro{\textvisiblespace}\PlaceMacro{space}\tex{space}
+    或 \quotation{\cmd{\textvisiblespace}}（反斜杠后跟一个空格，由于它是一个不可见字符，我将其表示为 \quotation{\textvisiblespace}）会引入一个额外的空格。
+
+  \item \PlaceMacro{enskip}\tex{enskip}、\PlaceMacro{quad}\tex{quad} 和 \PlaceMacro{qquad}\tex{qquad} 在文档中分别插入半个 {\em em}、1 {\em em} 或 2 {\em em} 的空白。请记住，{\em em} 是一个依赖于字体大小的度量（通常等于 \quote{M} 的宽度），通常与字体的磅值大小一致。在这种情况下，使用 12 磅字体，\tex{enskip} 将提供 6 磅的间距，\tex{quad} 提供 12 磅，\tex{qquad} 提供 24 磅。
+
+    \setbox0=\hbox{\quad}
+    \setbox1=\hbox{M}
+    
+    我们可以使用 \type{\setbox0=\hbox{\quad}} 后跟 \type{\the\wd0} 来发现 {\em em} 的实际宽度，结果为 \the\wd0。{\em 此} 字面中 \quote{M} 的实际宽度是 \the\wd1；差异必须由其他人解释。
+
+\stopitemize
+
+\need 2\baselineskip
+
+除了这些提供精确度量空白的命令外，\PlaceMacro{hskip}\tex{hskip} 和 \PlaceMacro{hfill}\tex{hfill} 命令还引入了可变尺寸的水平间距：
+
+\PlaceMacro{hskip}\tex{hskip} 允许我们精确指示要添加多少空白。因此：
+
+\startDoubleExample
+
+\starttyping
+This is \hskip 1cm 1 centimetre\\
+This is \hskip 2cm 2 centimetres\\
+This is \hskip 2.5cm 2.5 centimetres\\
+\stoptyping
+
+\column
+
+This is \hskip 1cm 1 centimetre\\
+This is \hskip 2cm 2 centimetres\\
+This is \hskip 2.5cm 2.5 centimetres\\
+
+\stopDoubleExample
+
+指示的间距可以是负数，这将导致一个文本叠加在另一个文本上。因此：
+
+\startDoubleExample
+
+\starttyping
+This is farce rather than
+\hskip -1cm comedy
+\stoptyping
+
+\column
+
+This is farce rather than \hskip -1cm comedy
+
+\stopDoubleExample
+
+\tex{hfill} 则会根据需要引入尽可能多的空白来占据整行，从而允许我们创建有趣的效果，如右对齐文本、居中文本或行两侧都有文本，如下例所示：
+
+\startDoubleExample
+\starttyping
+\hfill On the right\\
+On both\hfill sides\\
+\stoptyping
+
+\column
+
+\hfill On the right\\
+On both\hfill sides\\
+
+\stopDoubleExample
+
+% TODO：为了获得居中文本，JD 需要做
+% \hfill In the middle\hfill\null
+% 这引出了在行尾丢弃空白以及如何处理这个问题的丑陋问题。
+% 应该提到这一点吗？
+
+\stopsubsection
+
+\stopsection
+
+
+\startsection
+  [
+    reference=sec:compound words,
+    title=复合词,
+  ]
+
+在本节中，\quotation{复合词} 指的是形式上被理解为一个单词的词，而不是仅仅连接在一起的词。这并不总是一个容易区分的概念：\quotation{rainbow} 明显由两个词组成 (\quotation{rain + bow})，但英语使用者不会以任何其他方式看待这个组合词，只认为它是一个单词。另一方面，有些单词有时会借助连字符或反斜杠组合在一起。这两个词有不同的含义和用法，但它们被连接在一起（并且在某些情况下可能会变成一个单词，但还没有！）。因此，例如，我们可以找到像 \quotation{French||Canadian} 或 \quotation{(inter|)|communication} 这样的词（尽管我们也很可能找到 \quotation{intercommunication}，并发现说大众最终接受了这两个词成为一个单词。语言就是这样演变的）。
+
+复合词给 \ConTeXt\ 带来了一些问题，主要与它们在行末的潜在断词有关。如果连接元素是连字符，那么从排版角度来看，在该位置的行末断词没有问题，但我们需要避免在单词的第二部分再次断词，因为那会给我们留下两个连续的连字符，可能导致理解困难。
+
+\quotation{{\tt\|\|}} 命令可用于告诉 \ConTeXt\ 两个词构成一个复合词。这个命令异常地不以反斜杠开头，并允许两种不同的用法：
+
+% TODO：在西班牙语版本中，是 Hispanic||Argentine。这是否是更合适的翻译？
+
+\startitemize
+
+  \item 我们可以使用两个连续的竖线（有时称为 \quotation{pipes}）并写入，例如 \MyKey{Spanish\|\|Argentine} 以获得 \quotation{Spanish||Argentine}。
+
+  \item 两个竖线之间可以有连接/分隔项，例如 \MyKey{joining\|/\|separating}。
+
+\stopitemize
+
+在这两种情况下，\ConTeXt\ 都会知道它正在处理一个复合词，并将应用适用于此类词的适当断词规则。使用两个连续的竖线或在它们之间插入单词分隔符的区别在于，在第一种情况下，\ConTeXt\ 将使用预定义为 \PlaceMacro{setuphyphenmark}\tex{setuphyphenmark} 的分隔符，换句话说，即连字符，默认情况下是 \MyKey{-}。因此，如果我们写入 \MyKey{picture\|\|frame}，\ConTeXt\ 将生成 \quotation{picture||frame}。
+
+% TODO：如何让 \setuphyphenmark 起作用？无论我在这里用什么，我都看不到任何区别：
+%% \setuphyphenmark[-]
+%% 
+%% Spanish||Argentine Spanish||Argentine Spanish||Argentine
+%% Spanish||Argentine Spanish||Argentine Spanish||Argentine
+%% Spanish||Argentine Spanish||Argentine Spanish||Argentine
+%% Spanish||Argentine Spanish||Argentine Spanish||Argentine
+%% Spanish||Argentine Spanish||Argentine Spanish||Argentine
+%% Spanish||Argentine Spanish||Argentine Spanish||Argentine
+%% Spanish||Argentine Spanish||Argentine Spanish||Argentine
+%% Spanish||Argentine Spanish||Argentine Spanish||Argentine
+%% Spanish||Argentine Spanish||Argentine Spanish||Argentine
+%% Spanish||Argentine!
+
+使用 \tex{setuphyphenmark} 我们可以更改默认分隔符（在需要两个竖线的情况下）。此命令允许的值是 \MyKey{--}、\MyKey{---}、\MyKey{-}、\MyKey{~}、\MyKey{(}、\MyKey{)}、\MyKey{=} 和 \MyKey{/}。但请注意，\MyKey{=} 值变为 em 破折号（与 \MyKey{---} 相同）。
+
+\MyKey{\|\|} 的正常用法是使用连字符，因为这是复合词之间通常使用的。但偶尔分隔符可以是括号，例如，如果我们想要 \quotation{(inter)space}，或者可以是正斜杠，如 \quotation{input/output}。在这些情况下，如果我们希望应用复合词的标准断词规则，我们可以写入 \MyKey{(inter\|)\|space} 或 \MyKey{input\|/\|output}。如前所述，\MyKey{\|=\|} 被认为是 \MyKey{\|---\|} 的缩写，并插入一个 em 破折号作为分隔符 (---)。
+
+\stopsection
+
+
+\startsection
+  [
+    reference=sec:langdoc,
+    title={文本的语言},
+  ]
+
+字符构成单词，这些单词通常属于某种语言。\ConTeXt\ 知道我们正在使用的书写语言非常重要，因为许多重要事项都取决于此。主要是：
+
+\startitemize[packed]
+
+  \item 单词断字。
+  \item 某些单词的输出格式。
+  \item 与所讨论语言的排版传统相关的某些排版事项。
+
+\stopitemize
+
+\startsubsection
+    [title=设置和更改语言]
+
+\ConTeXt\ 假定语言是英语。有两种过程可以更改这一点：
+
+\startitemize
+
+  \item 使用 \PlaceMacro{mainlanguage}\tex{mainlanguage} 命令，在前言中使用以更改文档的主要语言。
+
+  \item 使用 \PlaceMacro{language}\tex{language} 命令，旨在更改文档中任何点的活动语言。
+
+\stopitemize
+
+两个命令都期望一个由任何语言标识符（或代码）组成的参数。为了标识语言，我们使用 ISO 639-1 中规定的两个字母的国际语言代码，该代码与例如在网络上使用的代码相同，或者使用所讨论语言的英文名称，或者有时使用英文名称的某些缩写。
+
+在 \in{Table}[tbl:languages] 中，我们找到了 \ConTeXt\ 支持的语言的完整列表，以及每种语言对应的 ISO 代码。此外，适当的地方还明确提供了某些语言变体的代码\footnote{\in{Table}[tbl:languages] 是使用以下命令获得的列表的摘要：\\
+  \PlaceMacro{usemodule}\type{\usemodule[languages-system]}\\
+  \PlaceMacro{loadinstalledlanguages}\type{\loadinstalledlanguages}\\
+  \PlaceMacro{showinstalledlanguages}\type{\showinstalledlanguages}\\
+  如果您在此文档上次更新（2026 年）之后很久阅读它，\ConTeXt\ 可能已经加入了其他语言，因此最好使用这些命令来显示更新的语言列表。}。
+
+% 2026 年 3 月更新：
+% \usemodule[languages-system]
+% \loadinstalledlanguages
+% \showinstalledlanguages
+
+{\switchtobodyfont[script]
+\placetable
+  [here]
+  [tbl:languages]
+  {\ConTeXt 中的语言支持}
+{\starttabulate[|l|l|p(.6\textwidth)|]
+\HL
+\NC{\bf 语言} \NC {\bf ISO 代码} \NC {\bf 语言（变体）}
+\NR
+\HL
+\NC 南非荷兰语
+\NC af, afrikaans
+\NR
+\NC 阿尔巴尼亚语
+\NC sq, als, albanian
+\NR
+\NC 古希腊语
+\NC agr, ala, ancientgreek
+\NR
+\NC 阿拉伯语
+\NC ar, arabic
+\NC ar-ae, ar-bh, ar-dz, ar-eg, ar-in, ar-ir, ar-jo, ar-kw, ar-lb, ar-ly, ar-ma, ar-om, ar-qa, ar-sa, ar-sd, ar-sy, ar-tn, ar-ye
+\NR
+\NC 亚美尼亚语
+\NC hy, hye, hwy, armenian
+\NR
+\NC 白俄罗斯语
+\NC be, belarussian
+\NR
+\NC 缅甸语
+\NC my, burmese
+\NR
+\NC 保加利亚语
+\NC bg, bulgarian
+\NR
+\NC 孟加拉语
+\NC bn, bengali
+\NR
+\NC 加泰罗尼亚语
+\NC ca, catalan
+\NR
+\NC 中文
+\NC cn, cnr, chinese
+\NC cnr-cyrl, cnr-latn
+% TODO："montenegrin" 被列在 Chinese 下面。这是怎么回事？
+% 并且 Croatian 没有被列出。该怎么办？
+\NR
+\NC 克罗地亚语
+\NC hr, croatian
+\NR
+\NC 捷克语
+\NC cs, cz, czech
+\NR
+\NC 丹麦语
+\NC da, danish
+\NR
+\NC 荷兰语
+\NC nl, nld, dutch
+\NR
+\NC 英语
+\NC en, eng, english
+\NC en-gb, en-ca, uk, ukenglish, en-us, usenglish
+\NR
+\NC 世界语
+\NC esperanto
+\NR
+\NC 爱沙尼亚语
+\NC et, estonian
+\NR
+\NC 波斯语
+\NC fi, fa, per, persian, farsi
+\NR
+\NC 芬兰语
+\NC fi, finnish
+\NR
+\NC 法语
+\NC fr, fra, french
+\NR
+\NC 盖尔语
+\NC ga, gaelic
+\NR
+\NC 德语
+\NC de, deu, german
+\NC de-at, de-ch, de-ed, deo
+\NR
+\NC 希腊语
+\NC gr, greek
+\NR
+\NC 古希腊语
+\NC agr, ancientgreek
+\NR
+\NC 古吉拉特语
+\NC gu, gujarati
+\NR
+\NC 希伯来语
+\NC he, yi, hebrew
+\NR
+\NC 印地语
+\NC hi, hindi
+\NR
+\NC 匈牙利语
+\NC hu, hungarian
+\NR
+\NC 印度尼西亚语
+\NC id, indonesian
+\NR
+\NC 意大利语
+\NC it, italian
+\NR
+\NC 日语
+\NC ja, japanese
+\NR
+\NC 卡纳达语
+\NC kn, kannada
+\NR
+\NC 韩语
+\NC kr, korean
+\NR
+\NC 拉丁语
+\NC la, latin
+\NR
+\NC 立陶宛语
+\NC lt, lithuanian
+\NR
+\NC 马其顿语
+\NC mk, macedonian
+\NR
+\NC 马来语
+\NC ms, malay
+\NR
+\NC 马拉雅拉姆语
+\NC ml, malayalam
+\NR
+\NC 摩尔多瓦语
+\NC mo, moldovan
+\NR
+\NC 挪威语
+\NC nb, bokmal, no, norwegian
+\NC nn, nynorsk
+\NR
+\NC 波斯语
+\NC pe, fa, persian
+\NR
+\NC 波兰语
+\NC pl, polish
+\NR
+\NC 葡萄牙语
+\NC pt, portughese
+\NC pt-br
+\NR
+\NC 罗马尼亚语
+\NC ro, romanian
+\NR
+\NC 俄语
+\NC ru, russian
+\NR
+\NC 梵语
+\NC sa, sanskrit
+\NR
+\NC 斯洛伐克语
+\NC sk, slovak
+\NR
+\NC 塞尔维亚语
+\NC sr, serbian
+\NC sr-cyrl, sr-latn
+\NR
+\NC 斯洛文尼亚语
+\NC sl, slovene, slovenian
+\NR
+\NC 西班牙语
+\NC es, sp, spanish
+\NC es-es, es-la
+\NR
+\NC 瑞典语
+\NC sv, swedish
+\NR
+\NC 泰米尔语
+\NC ta, tamil
+\NR
+\NC 泰卢固语
+\NC te, telugu
+\NR
+\NC 泰语
+\NC th, thai
+\NR
+\NC 土耳其语
+\NC tr, turkish
+\NC tk, turkmen
+\NR
+\NC 乌克兰语
+\NC ua, ukrainian
+\NR
+\NC 越南语
+\NC vi, vietnamese
+\NR
+\HL
+\stoptabulate
+}}
+
+因此，例如，要将西班牙语（卡斯蒂利亚语）设置为文档的主要语言，我们可以使用以下三种中的任何一种：
+
+\starttyping
+\mainlanguage[es]
+\mainlanguage[spanish]
+\mainlanguage[sp]
+\stoptyping
+
+要在文档 {\em 内部} 启用特定语言，我们可以使用 \tex{language[Language code]} 命令，或者使用激活该语言的特定命令。因此，例如，\PlaceMacro{en}\tex{en} 激活英语，\PlaceMacro{fr}\tex{fr} 激活法语，\PlaceMacro{es}\tex{es} 激活西班牙语，或 \PlaceMacro{ca}\tex{ca} 激活加泰罗尼亚语。一旦某种实际语言被激活，它将保持活动状态，直到我们明确切换到另一种语言，或者激活语言的组被关闭。因此，语言的工作方式类似于字体更改命令。但请注意，由 \tex{language} 命令或其缩写之一（\tex{en}、\tex{fr}、\PlaceMacro{de}\tex{de} 等）设置的语言不会影响打印标签所使用的语言（参见 \in{Section}[sec:labels]）。
+
+\startSmallPrint
+
+    尽管标记文档中所有不属于主要语言的单词和表达式的语言可能很费力，但如果我们希望获得一个排版正确的最终文档（尤其是在专业工作中），这样做很重要。我们不应该标记所有文本，而只标记不属于主要语言的部分。有时可以通过使用宏来自动化语言标记。例如，考虑本文档（最初是用西班牙语写的），其中不断引用 \ConTeXt\ 命令，而这些命令的原始语言是英语。我设计了一个宏，它除了以适当的格式和颜色书写命令外，还将其标记为英语单词。在我的专业工作中，我需要引用大量法语和意大利语参考文献，我在我的书目数据库中合并了一个字段来提取作品的语言，以便我可以在引用和参考文献列表中自动化语言指示。
+
+    如果文档使用两种具有不同字母表的语言（例如，西班牙语和希腊语，或英语和俄语），有一个技巧可以避免我们必须标记使用替代字母表的表达式的语言。具体来说，修改主要语言设置（参见下一节），使其同时加载使用不同字母表的语言的默认断字模式。例如，如果我们想使用英语和古希腊语，以下命令将使我们免于指定希腊文本的语言：
+
+    \type{\setuplanguage[en][patterns={en, agr}]}
+
+    这之所以有效，是因为英语和希腊语使用不同的字母表，因此两种语言的断字模式不可能发生冲突；因此我们可以同时加载它们。但是对于使用相同字母表的两种语言，同时加载断字模式将不可避免地导致错误的断字。
+
+\stopSmallPrint
+
+\stopsubsection
+
+
+\startsubsection
+  [
+    reference=sec:langconfig,
+    title=配置语言,
+  ]
+  \PlaceMacro{setuplanguage}
+
+\ConTeXt\ 将某些实用程序的功能与任何时候活动的特定语言相关联。可以使用 \tex{setuplanguage} 更改默认关联，其语法为：
+
+\type{\setuplanguage[Language][Configuration]}
+
+其中 {\tt Language} 是我们要配置的语言的语言代码，{\tt Configuration} 包含我们想要为该语言设置（或更改）的具体配置。具体来说，最多允许 32 个不同的配置选项，但我只讨论那些似乎适合本入门指南的选项。
+
+\startitemize
+
+  \item {\tt\bf date}：允许我们配置默认日期格式。关于此的更多信息，请参见 \at{page}[sec:dates]。
+
+  \item {\tt\bf lefthyphenmin, righthyphenmin}：支持单词断字时左侧或右侧必须有的最小字符数。例如 \tex{setuplanguage[en][lefthyphenmin=4]} 将不会以任何可能连字符左侧少于 4 个字符的方式断字。
+
+  \item {\tt\bf spacing}：此选项的可能值是 \MyKey{broad} 或 \MyKey{packed}。在第一种情况下（broad），将应用英语的单词间距规则，这意味着在句号后且后面跟有其他字符时，将添加一定量的额外空白。另一方面，\MyKey{spacing=packed} 将阻止应用这些规则。对于英语，broad 是默认值。
+
+  \item {\tt\bf leftquote, rightquote}：分别指示 \tex{quote} 将用于其参数文本左侧和右侧的字符（或命令）（关于此命令，请参见 \at{page}[sec:quote]）。
+
+  \item {\tt\bf leftquotation, rightquotation}：分别指示 \tex{quotation} 将用于其参数文本左侧和右侧的字符（或命令）（关于此命令，请参见 \at{page}[sec:quote]）。
+
+\stopitemize%%%@@@
+
+\stopsubsection
+
+
+\startsubsection
+  [
+    reference=sec:labels,
+    title=与特定语言关联的标签,
+  ]
+
+\ConTeXt\ 的许多命令会自动生成某些文本（或 {\em 标签}），例如，\tex{placetable} 命令在插入的表格下方写入标签 \quotation{Table xx}，或 \tex{placefigure} 插入标签 \quotation{Figure xx}。
+
+这些 {\em 标签} 对用 \tex{mainlanguage} 设置的语言敏感（但对用 \tex{language} 设置的语言不敏感），我们可以通过以下方式更改它们：
+
+\PlaceMacro{setuplabeltext}\type{\setuplabeltext[Language][Key=Label]}
+
+其中 {\tt Key} 是 \ConTeXt\ 识别标签的术语，{\tt Label} 是我们希望 \ConTeXt\ 生成的文本。因此，例如，
+
+\type{\setuplabeltext[es][figure=Imagen~]}
+
+将确保当主要语言是西班牙语时，用 \tex{placefigure} 插入的图像不被称作 \quotation{Figure x}，而是 \quotation{Imagen x}。请注意，在标签文本本身之后，必须留一个空格以确保标签不会附着到下一个字符上。在示例中，我使用了保留字符 \quotation{\lettertilde}；我也可以写成 \MyKey{[figure=Imagen\{ \}]}，将空格括在花括号中，以确保 \ConTeXt\ 不会将其去除。
+
+我们可以用 \tex{setuplabeltext} 重新定义哪些标签？\ConTeXt\ 的文档在这方面没有人们希望的那么完整。2013 年的参考手册（对这条命令解释得最多）提到了 \MyKey{chapter}、\MyKey{table}、\MyKey{figure}、\MyKey{appendix}\unknown\ \Conjecture，并补充了 \quotation{其他类似的文本元素}。我们可以假设这些名称将是所讨论元素的英文名称。
+
+\startSmallPrint
+
+    自由开源软件的一个优点是源文件可供用户使用；因此我们可以查看它们。我这样做了，通过 {\em 窥探} \ConTeXt\ 的源文件，我发现了文件 \MyKey{lang-txt.lua}，位于 {\tt tex/texmf-context/tex/context/base/mkiv}\footnote{您可能会惊讶地看到在 \ConTeXt\ LMTX 的入门指南中引用了 \ConTeXt\ Mark~IV 的文件。事实证明，LMTX 在某些情况下会从 Mark~IV \quotation{借用} 数据和代码，即当 Mark~IV 和 LMTX 之间没有变化时。可以预见，将来 LMTX 的更新和更改越多，它使用的 Mark~IV 文件就越少。}，我认为它包含了预定义的标签及其不同的翻译。如果任何时候 \ConTeXt\ 生成了我们想要更改的默认文本，要查看与该文本关联的标签名称，我们可以打开相关文件并找到我们想要更改的文本。这样我们就可以看到与之关联的标签名称。
+
+% TODO：这可能是虚假的。尽管 lang-txt.lua 中有 mastersthesis，但 \labeltext{mastersthesis} 是空字符串。
+% 了解这一点的人可能想重新审视这一节。
+
+    例如，如果我们在正在撰写的论文中看到标签 \quotation{Master's thesis}，查看 {\tt lang-txt.lua} 我们会看到标签的名称是 \MyKey{mastersthesis}。这对于说英语的人来说可能很容易猜到，但一个阿尔巴尼亚人想要知道 \quotation{Tema e diplomës} 的标签是什么，可能更难想象出 \quotation{mastersthesis}；搜索这个文件将提供答案。
+
+\stopSmallPrint
+
+如果我们想在文档的某处插入与某个标签关联的文本，我们可以使用 \PlaceMacro{labeltext}\tex{labeltext} 命令。因此，例如，如果我想引用一个表格，以确保我以与 \ConTeXt\ 在 \tex{placetable} 命令中调用它相同的方式来命名它，我可以写入：\quotation{{\tt Just as shown in the \ttbs labeltext\{table\}on the next page.}}。在 \tex{mainlanguage} 为英语的文档中，此文本将产生：\quotation{Just as shown in the \labeltext{table}on the next page.}
+
+\startSmallPrint
+
+    您可能已经注意到示例中单词 \quotation{on} 之前没有空格。回想一下，标签文本（默认情况下）是定义为后面带一个空格的。如果 \quotation{on} 前面有一个空格，我们将看到这是一个在输出中出现两个连续空格的情况。（这是因为在输入文本中空格彼此不相邻；确切的规则有些棘手。）
+
+    一些可以用 \tex{setuplabeltext} 重新定义的标签默认是空的；例如 \MyKey{chapter} 或 \MyKey{section}。这是因为默认情况下 \ConTeXt\ 不会向章节命令添加标签。如果我们想更改此默认操作，我们只需要在文档前言中重新定义这些标签，因此，例如，\tex{setuplabeltext[chapter=Chapter~]} 将确保章节前面带有单词 \quotation{Chapter} 和一个空格。
+
+\stopSmallPrint
+
+最后，重要的是要指出，尽管在 \ConTeXt\ 中，通常允许将多个逗号分隔的选项作为参数，最后一个选项可以以逗号结尾而不会出错。但在 \tex{setuplabeltext} 中，这会在编译时产生错误。
+
+\stopsubsection
+
+
+\startsubsection
+    [title={一些与语言相关的命令}]
+
+\startsubsubsection
+  [
+    reference=sec:dates,
+    title=与日期相关的命令,
+  ]
+  \PlaceMacro{currentdate}\PlaceMacro{date}\PlaceMacro{month}
+
+\ConTeXt\ 有三个与日期相关的命令，它们在运行时以活动语言生成输出。它们是：
+
+\startitemize
+
+  \item \tex{currentdate}：在主要语言为英语的文档中不带参数运行时，它以 \quotation{Day Month Year} 的格式返回系统日期。例如：\quotation{11 September 2020}。但我们也可以告诉它使用不同的格式（就像在美国和英语世界的其他一些地区那样，它们遵循将月份放在日期之前的系统，因此是臭名昭著的日期 9/11），或者包含星期几的名称（{\tt weekday}），或者只包含日期的某些元素（{\tt day, month, year}）。
+
+    要指示不同的日期格式，请使用 \MyKey{dd} 或 \MyKey{day} 表示月份的日期，\MyKey{mm} 表示月份数字，\MyKey{month} 表示月份名称，以及 \MyKey{MONTH} 表示大写的月份名称。关于年份，\MyKey{yy} 只写最后两位数字，而 \MyKey{year} 或 \MyKey{y} 写全部四位。例如
+
+    \type{\currentdate[weekday, day, month]}
+
+    如果在 2020 年 9 月 9 日运行，将输出 \quotation{Wednesday 9 September}。
+
+    如果您正在查看本文档的 PDF（而不是阅读 \ConTeXt\ 源代码），您会看到此 PDF 编译于 \hbox{\currentdate[day, month, { }, y]}。要像这样显示日期，有必要在月份和年份之间添加一个空格（否则 \currentdate[day, month, y] 会显示出来），这是通过以下方式完成的：\type{\currentdate[day, month, { }, y]}。如果我们希望日期组成部分之间有某些分隔元素，我们必须显式地写入它们。
+
+
+  \item \tex{date}：此命令不带任何参数运行时，产生与 \tex{currentdate} 完全相同的输出，即标准格式的实际日期。但是，可以给一个特定的日期作为参数。为此提供两个参数：使用第一个参数，我们可以指示要表示的日期对应的日（\MyKey{d}）、月（\MyKey{m}）和年（\MyKey{y}），而使用第二个参数（可选），我们可以指示要表示的日期的格式。例如，如果我们想知道约翰·列侬和保罗·麦卡特尼相遇的那天是星期几，根据维基百科，这一事件发生在 1957 年 7 月 6 日，我们可以写
+
+    \type{\date[d=6, m=7, y=1957][weekday]}
+
+    这样我们就会发现这一历史性事件发生在一个星期六。
+
+  \item \tex{month} 接受一个数字作为参数，并返回与该数字对应的月份名称。
+
+\stopitemize
+
+\stopsubsubsection
+
+
+\startsubsubsection
+  [title={\tex{translate} 命令}]
+  \PlaceMacro{translate}
+
+% TODO：我发现这里引入缓冲区和表格的使用大大混淆了 \translate 的用法。我认为这可以从大幅重写中受益。
+
+translate 命令支持一系列与特定语言关联的短语，这样，根据任何时候活动的语言，最终文档中将插入其中一个短语。在以下示例中，translate 命令用于将四个短语与西班牙语和英语关联起来，这些短语被保存在一个内存缓冲区中（关于 {\tt buffer} 环境，请参见 \in{Section}[sec:buffer]）：
+
+\starttyping
+\language[es]
+\startbuffer
+  \starttabulate[|*{4}{lw(.25\textwidth)|}]
+    \NC \translate[es=Su carta de fecha, en=Your letter dated]
+    \NC \translate[es=Su referencia, en=Your reference]
+    \NC \translate[es=Nuestra referencia, en=Our reference]
+    \NC \translate[es=Fecha, en=Date] \NC\NR
+  \stoptabulate
+\stopbuffer
+\stoptyping
+
+因此，如果在文档中激活西班牙语的位置插入 {\em 缓冲区}，则会显示西班牙语短语；但如果插入缓冲区的位置激活了英语，则会插入英语短语。因此：
+
+\startpacked
+% ANSSTODO
+% \language[es]
+\startbuffer
+  \starttabulate[|*{4}{lw(.25\textwidth)|}]
+    \NC \translate[es=Su carta de fecha, en=Your letter dated]
+    \NC \translate[es=Su referencia, en=Your reference]
+    \NC \translate[es=Nuestra referencia, en=Our reference]
+    \NC \translate[es=Fecha, en=Date] \NC\NR
+  \stoptabulate
+\stopbuffer
+
+\starttyping
+\language[es]
+\getbuffer
+\stoptyping
+
+将生成：
+
+\example{\getbuffer}
+
+而：
+\starttyping
+\language[en]
+\getbuffer
+\stoptyping
+
+将生成
+
+{\en\example{\getbuffer}}
+
+\stoppacked
+
+\stopsubsubsection
+
+
+\startsubsubsection
+  [
+    reference=sec:quote,
+    title={\tex{quote} 和 \tex{quotation} 命令},
+  ]
+  \PlaceMacro{quote}\PlaceMacro{quotation}
+
+文本文档中最常见的排版错误之一是引号（单引号或双引号）被打开但没有明确关闭。为避免这种情况发生，\ConTeXt\ 提供了 \tex{quote} 和 \tex{quotation} 命令，它们将为作为其参数的文本加上引号；\tex{quote} 将使用单引号，\tex{quotation} 将使用双引号。
+
+这些命令对语言敏感，因为它们使用为所讨论语言设置的默认字符或命令集来打开和关闭引号（参见 \in{Section}[sec:langconfig]）；因此，例如，如果我们想使用西班牙语作为双引号的默认样式——即西班牙语、意大利语和法语典型的角引号（尖括号）——我们将写：
+
+\type{\setuplanguage[es][leftquotation=«, rightquotation=»]}.
+
+然而，这些命令不管理嵌套引号；尽管我们可以利用 \tex{quote} 和 \tex{quotation} 是 \ConTeXt\ 所谓的 {\em delimitedtext} 的实际应用这一事实来创建实现此功能的实用程序，并且可以使用 \PlaceMacro{definedelimitedtext}\tex{definedelimitedtext} 定义进一步的应用。因此，以下示例：
+
+\starttyping
+\definedelimitedtext
+  [CommasLevelA]
+  [left=«, right=»]
+
+\definedelimitedtext
+  [CommasLevelB]
+  [left=“, right=”]
+
+\definedelimitedtext
+  [CommasLevelC]
+  [left=`, right=']
+\stoptyping
+
+将创建三个命令，允许最多三个不同级别的引用。第一级使用 \quotation{side} 引号，第二级使用双引号，第三级使用单引号。
+
+当然，如果我们使用英语作为主要语言，那么默认的单引号和双引号（弯引号，如本文档中所见，而不是直引号！）将自动使用。
+
+\stopsubsubsection
+
+\stopsubsection
+
+\stopsection
+
+\stopchapter
+
+\stopcomponent
+
+%%% Local Variables:
+%%% mode: ConTeXt
+%%% eval: (auto-fill-mode 1)
+%%% coding: utf-8-unix
+%%% TeX-master: "../introCTX_eng.tex"
+%%% End:
+%%% vim:set filetype=context tw=72 : %%%

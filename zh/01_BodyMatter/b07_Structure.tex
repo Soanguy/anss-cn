@@ -1,0 +1,722 @@
+%%% File:     b07_Structure.tex
+%%% Author:  Joaquín Ataz-López 等人
+%%% Begun:      2020年3月
+%%% Concluded: 2020年5月
+%%% Title:  这是我着手处理的第二章，在我看来也是最重要的一章。我逐一尝试了 setuphead 的各个选项，但未能弄清某些选项的作用或如何让它们工作。我猜想这是因为：(1) 我当时刚开始使用 ConTeXt，到了七八月份才感觉顺手很多，但那时一切都像天书一样；(2) 因为我在一个文档中进行了测试，其中我以经典风格编写章节（使用 \chapter 或 \section 而不是 \startchapter 或 \startsection）。
+%
+%%% Edited with: Emacs + AUCTeX - 有时也用 vim + context-plugin
+%%%
+
+\environment ../introCTX_env.tex
+
+\startcomponent b07_Structure.tex
+
+\startchapter
+  [
+    reference=cap:structure,
+    title=文档结构,
+  ]
+
+\TocChap
+
+\startsection
+    [title=文档中的结构划分]
+
+除了非常简短的文本（例如信件）之外，文档通常被组织成块或文本组，这些块或文本组通常遵循层级顺序。这些块的命名没有标准方式：例如在小说中，结构划分通常称为“章”，尽管有些较长的小说有更大的块，通常称为“部”，将若干章组合在一起。戏剧作品区分“幕”和“场”。学术手册有时分为“部分”和“课”、“专题”或“章”，而这些内部又常有进一步的划分；其他学术或技术文档（如解释计算机程序或系统的本文）中也常存在类似复杂的层级划分。甚至法律条文也结构化为“卷”（最长最复杂的，如法典）、“编”、“章”、“节”、“条”。科技文档的嵌套深度有时可达六、七层，甚至偶尔八层。
+
+本章重点分析 \ConTeXt\ 为支持这些结构划分所提供的机制。我将用“节”（section）这个总称来指代它们。
+
+\startSmallPrint
+
+    没有一个明确的术语可以让我们概括性地指代所有这些结构划分。我选择的“节”这个词侧重于结构划分而非其他，但缺点是 \ConTeXt\ 预定义的结构划分之一就叫做“节”（section）。我希望这不会造成混淆，相信从上下文中很容易判断我们是在泛泛指称结构划分，还是特指 \ConTeXt\ 称为 section 的那种具体划分。
+
+\stopSmallPrint
+
+每个（泛指的）“节”都意味着：
+
+\startitemize
+
+  \item 文档中一个相当大块的{\em 结构划分}，它本身可能包含其他更低层级的划分。从这个角度看，“节”意味着具有层级关系的文本块。从节的角度看，整个文档可以看作一棵树。文档{\em 本身}是树干，每个章节是一个树枝，树枝上又可以有细枝（节），细枝还可以再分（小节），依此类推。
+
+    拥有清晰的结构对于文档的阅读和理解非常重要。然而，这个任务取决于作者，而不是排字工。尽管让 \ConTeXt\ 把我们变成比实际更好的作者并非其职责，但它所包含的全范围的节命令（其中层级关系相当清晰）可以帮助我们写出结构更良好的文档。
+
+  \item 一个可以称为“标题”或“标签”的{\em 标题}。该标题会被打印：
+
+    \startitemize
+
+      \item 总是（或几乎总是）在文档中该结构划分开始的位置。
+
+      \item 有时也会出现在目录中，以及可能出现在该节所在页面的页眉或页脚中。
+
+    \stopitemize
+
+    \ConTeXt\ 允许我们自动完成所有这些任务，使得打印结构单元标题的格式特性只需指定一次，并且是否也应包含在目录、页眉或页脚中也只需指定一次。为此，\ConTeXt\ 只需要知道每个结构单元从哪里开始和结束、它的名称以及它的层级级别。
+
+\stopitemize
+
+\stopsection
+
+\startsection
+  [
+    reference=sec:sectiontypes,
+    title=节的类型及其层级,
+  ]
+
+\ConTeXt\ 区分{\em 编号}节和{\em 无编号}节。顾名思义，前者会自动编号并被发送到目录，有时也会发送到页眉和/或页脚。
+
+\ConTeXt\ 具有预定义的、按层级顺序排列的节命令，见\in{Table}[tbl:sectioned]。
+
+\placetable
+  [here]
+  [tbl:sectioned]
+  {\ConTeXt 中的节命令}
+{
+  \starttabulate[|l|l|l|]
+      \HL
+      \NC {\bf 层级}
+      \NC {\bf 编号节}
+      \NC {\bf 无编号节}
+      \NR
+      \HL
+      \NC 1
+      \NC{\tt \backslash part}\PlaceMacro{part}\PlaceMacro{startpart}
+      \NC --
+      \NR
+      \NC 2
+      \NC{\tt \backslash chapter}\PlaceMacro{chapter}\PlaceMacro{startchapter}
+      \NC{\tt \backslash title}\PlaceMacro{title}\PlaceMacro{starttitle}
+      \NR
+      \NC 3
+      \NC{\tt \backslash section}\PlaceMacro{section}\PlaceMacro{startsection}
+      \NC{\tt \backslash subject}\PlaceMacro{subject}\PlaceMacro{startsubject}
+      \NR
+      \NC 4
+      \NC{\tt \backslash subsection}\PlaceMacro{subsection}\PlaceMacro{startsubsection}
+      \NC{\tt \backslash subsubject}\PlaceMacro{subsubject}\PlaceMacro{startsubsubsubject}
+      \NR
+      \NC 5
+      \NC{\tt \backslash subsubsection}\PlaceMacro{subsubsection}\PlaceMacro{startsubsubsection}
+      \NC{\tt \backslash subsubsubject}\PlaceMacro{subsubsubject}\PlaceMacro{startsubsubsubject}
+      \NR
+      \NC 6
+      \NC{\tt \backslash subsubsubsection}\PlaceMacro{subsubsubsection}\PlaceMacro{startsubsubsubsection}
+      \NC{\tt \backslash subsubsubsubject}\PlaceMacro{subsubsubsubject}\PlaceMacro{startsubsubsubsubject}
+      \NR
+      \NC ...
+      \NC ...
+      \NC ...
+      \NR
+      \HL
+  \stoptabulate
+}
+
+关于预定义的节，需要澄清以下几点：
+
+\startitemize
+
+  \item 在\in{Table}[tbl:sectioned]中，节命令以传统形式展示。但我们很快就会看到，它们也可以作为{\em 环境}使用（例如 \tex{startchapter ... \stopchapter}），而且这实际上是推荐的方式。
+
+  \item 表中只列出了前6个节层级。然而，在我的测试中，我发现了多达12个层级：在 \tex{subsubsubsection} 之后是 \tex{subsubsubsubsection}，以此类推，直到 \tex{subsubsubsubsubsubsubsubsubsection} 或 \tex{subsubsubsubsubsubsubsubsubsubject}。
+
+    \startSmallPrint
+
+        但我们应该记住，上述那种（过深的）较低层级几乎无助于提高文本的可理解性！首先，我们很可能会遇到大的节不可避免地涉及多个事项，这会让读者难以{\em 把握}其内容。层级过深也可能导致读者失去对文本的整体感，产生的效果是所涉及材料的过度碎片化。我的理解是，一般来说四个层级就足够了；极偶尔可能需要用到六到七个层级，但更深的层次很少是个好主意。
+
+        从编写源文件的角度来看，为了创建更深子层级而需要在先前层级上再加一个“sub”，可能会使源文件几乎不可读：试图弄清楚名为“subsubsubsubsubsection”的命令的层级可不是开玩笑的，因为我得数清有多少个“sub”！所以我的建议是，如果我们真的需要这么多深度层级，从第五级（subsubsection）开始，我们最好定义自己的节命令（参见\in{Section}[sec:definehead]），给它们起比预定义命令更清晰的名称。
+
+    \stopSmallPrint
+
+  \item 最高的节层级（\tex{part}）只存在于编号标题，并且有一个特殊性：part 的标题不会被打印。然而，即使标题不被打印，也会引入一个空白页（可以假设用户重新配置命令后会在该页上打印标题），并且 {\em part} 的编号会被考虑用于计算 chapter 和其他节的编号。
+
+    \startSmallPrint
+
+        为什么 \tex{part} 的默认版本不打印任何内容？根据 \ConTeXt\ wiki 的说法，因为在这个层级上的标题几乎总是需要特定的布局；虽然这是事实，但在我看来这并不足以成为好理由，因为实际上 chapter 和 section 也经常被重新定义，而 part 不打印任何内容的事实会迫使新手用户{\em 深入研究}文档以查看哪里出了问题。
+
+    \stopSmallPrint
+
+  \item 尽管第一个节层级是“part”，但这只是理论上的和抽象的。在具体文档中，第一个节层级将是文档中第一个节命令对应的层级。也就是说，在包含 part 但不包含 chapter 的文档中，chapter 将是第一级。但如果文档也不包含 chapter，而只有 section，那么该文档的层级将从 section 开始。
+
+\stopitemize
+
+\stopsection
+
+
+\startsection
+  [
+    reference=sec:sectionsyntax,
+    title=节命令的通用语法,
+  ]
+
+所有节命令，包括用户创建的任何层级（参见\in{Section}[sec:definehead]），都允许以下替代语法形式（例如，如果我们使用 \MyKey{section} 层级）：
+
+\vbox{\starttyping
+\section [标签] {标题}
+\section [选项]
+\startsection [选项] [变量] ... \stopsection
+\stoptyping}
+
+在上述三种形式中，方括号内的参数是可选的，可以省略。我们将分别讨论它们，但首先需要明确的是，在 LMTX 中，推荐使用第三种方式。
+
+\startitemize
+
+  \item 在第一种语法形式中，我们可以称之为“{\em 经典}”形式，该命令接受两个参数：一个可选的方括号参数，一个必选的花括号参数。可选参数用于为命令关联一个标签，该标签将用于内部引用（参见\in{Section}[sec:references]）。花括号内的必选参数是节标题。
+
+  \item 另外两种语法形式更符合 \ConTeXt\ 的风格：命令所需了解的一切都通过方括号内引入的值和选项来传达。
+
+    \startSmallPrint
+
+        回忆一下，在\in{Section}[sec:command scope]和\in{Section}[sec:command options]中，我曾说过在 \ConTeXt\ 中，命令的作用域用花括号表示，其选项用方括号表示。但仔细想想，某个节命令的标题并不是它的应用范围，因此为了与通用语法一致，它不应该被放在花括号之间，而应该作为一个选项。\ConTeXt\ 允许这种例外，因为这是 \TeX\ 中的经典做法，但 \ConTeXt\ 提供了更符合其整体设计的替代语法形式。
+
+    \stopSmallPrint
+
+    这些选项属于赋值（键值）类型（\type{选项名=值}），具体如下：
+
+    \startitemize
+
+      \item {\tt\bf reference}：用于交叉引用的标签。
+
+      \item {\tt\bf title}：将在文档正文中打印的节标题。
+
+      \item {\tt\bf list}：将在目录中打印的节标题。
+
+      \item {\tt\bf marking}：将在页眉或页脚中打印的节标题。
+
+      \item {\tt\bf bookmark}：将转换为 PDF 文件中“书签”的节标题。
+
+      % TODO: 对于 ownnumber，wiki 上说是“要使用的节编号，而不是计算出的编号。”这与下面的说法不同。到底是哪个？
+
+      \item {\tt\bf ownnumber}：此选项用于未自动编号的节；在这种情况下，此选项指示分配给该节的编号。
+
+    \stopitemize
+
+    当然，\MyKey{list}、\MyKey{marking} 和 \MyKey{bookmark} 选项只应在希望使用不同的标题来替换通过 \MyKey{title} 选项设置的主标题时使用。这非常有用，例如当标题太长而不适合页眉时；尽管我们也可以使用 \PlaceMacro{nomarking}\tex{nomarking} 和 \PlaceMacro{nolist}\tex{nolist} 命令（非常类似）来实现这一点。另一方面，我们需要记住，如果标题文本（“title”选项）包含任何逗号，则整个标题需要用花括号括起来，以确保 \ConTeXt\ 知道逗号是标题的一部分。这同样适用于选项：“list”、“marking” 和 “bookmark”。因此，为了避免时刻留意标题中是否有逗号，我认为养成习惯，始终将这些选项的值用花括号括起来是个好主意。
+
+\stopitemize
+
+因此，例如，以下行将创建一个标题为“A Test Chapter”的章，并关联用于交叉引用的标签“test”，而页眉将使用“Chapter test”而不是“A Test Chapter”。
+
+\vbox{\starttyping
+\chapter
+  [
+    title={A Test Chapter},
+    reference={test},
+    marking={Chapter test}
+  ]
+\stoptyping}
+
+\tex{startSectionType} 语法将节变成了一个{\em 环境}。这更符合这样的事实：正如我在开头所说，在后台每个节都是一个差异化的文本块，尽管 \ConTeXt\ 默认不将节命令生成的{\em 环境}视为{\em 组}。尽管如此，这个方式是 LMTX 所推荐的；很可能是因为这种建立节的方式要求我们明确说明每个节的开始和结束，这使得结构更容易保持一致，并且很可能对 XML 和 EPUB 输出有更好的支持。事实上，对于 XML 输出，这是必不可少的。
+
+当我们使用 \tex{startSectionName} 时，允许在方括号之间使用一个或多个变量作为参数。然后可以在文档的其他位置使用 \PlaceMacro{structureuservariable}\tex{structureuservariable} 命令来使用这些变量的值。
+
+\startSmallPrint
+
+    拥有用户变量使得 \ConTeXt\ 可以有非常高级的用法，因为可以根据特定变量的值来决定是否编译某个片段、如何编译或使用哪个模板。然而，这些 \ConTeXt\ 工具超出了我在本介绍中打算处理的范围。
+
+\stopSmallPrint
+
+\stopsection
+
+\startsection
+  [
+    reference=sec:setuphead,
+    title=节及其标题的格式与配置,
+  ]
+
+\startsubsection
+    [title=\tex{setuphead} 和 \tex{setupheads} 命令]
+\PlaceMacro{setuphead}\PlaceMacro{setupheads}
+
+默认情况下，\ConTeXt\ 为每个节层级分配了某些特性，这些特性主要（但不限于）影响标题在文档正文中显示的格式，但不影响标题在目录或页眉页脚中的显示方式。我们可以使用 \tex{setuphead} 命令更改这些特性，其语法为：
+
+\type{\setuphead[节列表][选项]}
+
+其中：
+
+\startitemize
+
+  \item {\tt\bf 节列表} 指一个或多个节（用逗号分隔）的名称，这些节将受该命令影响。可以是：
+
+    \startitemize
+
+      \item 任何预定义的节（part, chapter, title 等），此时可以通过名称或层级来引用它们。要通过层级引用，我们使用单词“{\tt section-{\em 层级编号}}”，其中 {\em 层级编号} 是所涉节层级的数字。因此，\MyKey{section-1} 等同于 \MyKey{part}，\MyKey{section-2} 等同于 \MyKey{chapter}，依此类推。
+
+      \item 任何我们自己定义的类型。关于这一点，请参见\in{Section}[sec:definehead]。
+
+    \stopitemize
+
+  \item {\tt\bf 选项} 是配置选项。这些选项属于显式赋值类型（\type{选项名=值}）。可用的选项数量非常多（超过六十个！），因此我将按功能分组解释它们。但我必须指出，我未能确定其中一些选项的用途或使用方法。我不会讨论那些选项。
+
+\stopitemize
+
+之前我说过 \tex{setuphead} 会影响明确指定的节。但这并不意味着修改某个特定节不会以任何方式影响其他节，除非它们在命令中被明确提及。事实上，恰恰相反：修改一个节会影响{\em 与之关联的}其他节，即使没有在命令中明确说明。不同节之间的关联有两种：
+
+\startitemize
+
+  \item 无编号命令与同层级的相应编号命令相关联，因此更改编号命令的外观会影响同层级的无编号命令；但反过来则不行：更改无编号命令不会影响编号命令。这意味着，例如，如果我们更改 \MyKey{chapter}（第2级）的某个方面，我们也会更改 \MyKey{title} 的同一方面；但更改 \MyKey{title} 不会影响 \MyKey{chapter}。
+
+  \item 命令按层级关联，因此如果我们更改特定层级的{\em 某些特性}，该更改将影响其后的所有层级。这仅发生在某些特性上。例如颜色：如果我们设定 subsection 显示为红色，那么 subsubsection、subsubsubsection 等也会变成红色。但其他特性（如字体样式）则不会如此。
+
+\stopitemize
+
+除了 \tex{setuphead}，\ConTeXt\ 还提供了 \tex{setupheads} 命令，该命令全局影响所有节命令。\ConTeXt\ wiki 提到，有些人说这个命令不起作用。根据我的测试，该命令对某些选项有效，对另一些则无效。特别地，它对 \MyKey{style} 选项无效，这很令人惊讶，因为标题样式很可能正是我们想要全局更改以影响所有标题的东西。但根据我的测试，它对其他选项如 \MyKey{number} 或 \MyKey{color} 是有效的。因此，例如，\tex{setupheads[color=blue]} 将确保我们文档中的所有标题都打印为蓝色。
+
+由于我懒得去测试每个选项是否适用于 \tex{setupheads}（记住有六十多个），下面我只引用 \tex{setuphead}。
+
+最后：在检查具体选项之前，我们应注意 \ConTeXt\ wiki 中提到的一点，尽管可能没在正确的地方提到：某些选项只有在使用 \cmd{startSectionName} 语法时才有效。
+
+% TODO：以下段落我不理解。例如，“this information”是什么？我查看了西班牙语版本，也没有更明白。
+
+\startSmallPrint
+
+    此信息是与 \tex{setupheads} 相关的内容，而不是 \tex{setuphead}，而后者才是解释大部分选项的地方，并且如果只在一个地方说明，那似乎是最合理的地方。另一方面，该信息只提到了 \MyKey{insidesection} 选项，没有明确说明其他选项是否也会发生同样的情况。
+
+\stopSmallPrint
+
+\stopsubsection
+
+\startsubsection
+  [
+    reference=sec:title parts,
+    title=节标题的组成部分,
+  ]
+
+在深入讨论允许我们配置标题外观的具体选项之前，最好先指出一个节标题最多可以有三个不同的部分，\ConTeXt\ 允许我们单独或一起格式化这些部分。这些标题元素如下：
+
+\startitemize
+
+  \item {\bf 标题本身}，即标题的文本。原则上标题总是显示的，除了 \MyKey{part} 类型的节，默认情况下标题不显示。控制标题是否显示的选项是 \MyKey{placehead}，其值可以是 \MyKey{yes}、\MyKey{no}、\MyKey{hidden}、\MyKey{empty} 或 \Doubt\MyKey{section}。前两个的含义很清楚。但我不太确定此选项其余值的效果。
+
+    因此，如果我们希望标题在第一级节中显示，我们的设置应该是：
+
+  \starttyping
+    \setuphead
+        [part]
+        [placehead=yes]
+  \stoptyping
+
+    某些节的标题，正如我们已经知道的，可以自动发送到页眉和目录。使用节命令的 {\tt list} 和 {\tt marking} 选项，我们可以指定要发送的替代标题。也可以在编写标题时使用 \PlaceMacro{nolist}\tex{nolist} 或 \PlaceMacro{nomarking}\tex{nomarking} 命令，让标题的某些部分在目录或页眉中被省略号替换。例如：
+
+  \starttyping
+    \chapter{Influences of \nomarking{19th century} impressionism
+             \nomarking{in the 21st century}}
+  \stoptyping
+
+    将在页眉中写入“Influences of \unknown\ impressionism \unknown”。
+
+  \item {\bf 编号}：仅适用于编号节（part, chapter, section, subsection...），不适用于无编号节（title, subject, subsubject）。事实上，某个节是否编号取决于 \MyKey{number} 和 \MyKey{incrementnumber} 选项，其可能值为 \MyKey{yes} 和 \MyKey{no}。在编号节中，这两个选项都设为 {\tt yes}，在无编号节中设为 {\tt no}。
+
+    \startSmallPrint
+
+        为什么有两个选项来控制同一件事？因为实际上这两个选项控制两件事；一个指定节是否被编号（{\tt incrementnumber}），另一个指定编号是否显示（{\tt number}）。如果为某个节设置了 {\tt incrementnumber=yes} 和 {\tt number=no}，我们将得到一个外部（视觉上）无编号但内部仍被计数的节。这对于将这样的节包含在目录中很有用，因为通常目录只包含编号节。有关更多信息，请参见\in{Subsection}[sec:toc with unnumbered secs] 在 \in{Section} [sec:manual adjustments] 中。
+
+    \stopSmallPrint
+
+  \item {\bf 标题的标签}。原则上标题中的这个元素是空的。但我们可以为其关联一个值，在这种情况下，在编号和实际标题之前，将打印我们为此层级分配的标签。例如，在章标题中，我们可能希望打印“Chapter”这个词，或者在部分标题中打印“Part”一词。我们不是使用 \tex{setuphead} 来做这件事，而是使用 \tex{setuplabeltext} 命令。该命令允许我们为不同节层级的标签分配文本值。因此，例如，如果我们想在章标题之前写入“Chapter”，我们应该设置：
+
+    \starttyping
+    \setuplabeltext
+        [chapter=Chapter~]
+    \stoptyping 
+
+    在示例中，在分配的名称之后，我包含了保留字符“\lettertilde”，它会在单词后插入一个不间断空格。如果我们不介意标签和编号之间发生换行，可以只加一个（普通）空格。但无论哪种空格都很重要；没有它，编号就会与标签连在一起，我们会看到例如“Chapter1”而不是“Chapter 1”。
+
+\stopitemize
+
+\stopsubsection
+
+\startsubsection
+    [title=控制编号（在编号节中）]
+
+我们已经知道预定义的编号节（part, chapter, section...），以及某个节是否编号取决于用 \tex{setuphead} 设置的 \MyKey{number} 和 \MyKey{incrementnumber} 选项。
+
+默认情况下，各个层级的编号是自动的，除非我们将 \MyKey{ownnumber} 选项的值设为 \MyKey{yes}。当 \MyKey{ownumber=yes} 时，必须为每个命令指定编号。这可以通过以下方式完成：
+
+\startitemize
+
+  \item 如果使用“经典”语法调用命令，则在标题文本之前添加一个包含编号的参数来定义 \MyKey{ownnumber}。例如：\\
+    \cmd{chapter\{13\}\{Chapter title\}} 将生成一个手动分配了编号 13 的章。
+
+  \item 如果使用 \ConTeXt\ 特有语法（即 \tex{SectionType [Options]} 或 \tex{startSectionType [Options]}）调用命令，则通过 \MyKey{ownnumber} 选项定义。例如：\\
+    \type{\chapter[title={Chapter title}, ownnumber=13]}，将生成一个手动分配了编号 13 的章。
+
+%  \item 如果使用 \ConTeXt\ 特有语法（\tex{SectionType [Options]} 或 \tex{startSectionType [Options]}）调用命令，则通过 \MyKey{ownnumber} 选项。例如：\\
+%    \type{\chapter[title={Chapter title}, ownnumber=13]}，将生成一个手动分配了编号 13 的章。
+
+\stopitemize
+
+当 \ConTeXt\ 自动进行编号时，它使用内部计数器来存储不同层级的编号；因此有一个用于 part 的计数器，另一个用于 chapter，另一个用于 section，等等。每次 \ConTeXt\ 遇到一个节命令时，它会执行以下操作：
+
+\startitemize[packed]
+
+  \item 将与命令对应层级的计数器加 1。
+
+  \item 将该命令以下所有层级的关联计数器重置为 0。
+
+\stopitemize
+
+这意味着，例如，每次遇到新的 chapter 时，chapter 计数器加 1，所有 section、subsection、subsubsection 等命令的计数器重置为 0；然而，part 的计数器不受影响。
+
+要更改起始计数的数字，请使用 \PlaceMacro{setupheadnumber}\tex{setupheadnumber} 命令，如下所示：
+
+\type{\setupheadnumber[节类型][起始计数数字]}
+
+其中 {\em 起始计数数字} 是从此开始计算任何类型节的数字。因此，如果 {\em 起始计数数字} 等于 0，则第一个节将为 1；如果等于 10，则第一个节将为 11。
+
+% % TODO 这一段是错的。我写的下面这段可能（或未必）在某个时候是不正确的。
+% 该命令还允许我们更改自动递增的模式；因此我们可以，例如，让章节按 2 或 3 递增。因此，\tex{setupheadnumber[section][+5]} 使下一个节编号比原来多 5。
+% 将看到章节编号为 5 之五；而 \tex{setupheadnumber[chapter][14, +5]} 将看到第一个章节从 15 开始（14+1），第二个为 20（15+5），第三个为 25，依此类推。
+
+\startSmallPrint
+    除了使用无符号数字，您还可以使用类似 \tex{setupheadnumber[section][-5]} 的命令，这将使节编号减少 5，这意味着下一个节编号将比当前编号少 4（因为每次调用 \tex{section} 时节编号都会增加 1）。当然，这在任何“正常”情况下都不是您可能想要做的。此外，尽管 wiki（2026 年 3 月 20 日）说可以使用像“+10”这样的数字来将节编号增加 10，但在该日期的 LMTX 中这并未生效。
+\stopSmallPrint
+
+默认情况下，节编号显示阿拉伯数字，并包含所有先前层级的编号。也就是说：在包含 part、chapter、section 和 subsection 的文档中，特定的 subsection 将指示它属于哪个 part、chapter 和 section。因此，第一部分第三章第二节的第四个子节将编号为“1.3.2.4”。
+
+控制编号显示方式的两个基本选项是：
+
+\startitemize
+
+  \item {\tt\bf conversion}：控制将使用的编号类型。它允许许多值，具体取决于我们想要的编号类型：\reference[Num:conversion]{数字转换}
+
+    \startitemize
+
+      \item {\bf 阿拉伯数字编号}：经典编号：1, 2, 3, \unknown\ 通过值 {\tt n, N} 或 {\tt numbers} 获得。
+
+      \item {\bf 罗马数字编号}：有三种方式：
+
+        \startitemize[packed]
+
+          \item 大写罗马数字：{\tt I, R, Romannumerals}。
+          \item 小写罗马数字：{\tt i, r, romannumerals}。
+          \item 小型大写罗马数字：{\tt KR, RK}。
+
+        \stopitemize
+
+      \item {\bf 字母编号}：有三种方式：
+
+        \startitemize[packed]
+
+          \item 大写字母：{\tt A, Character}
+          \item 小写字母：{\tt a, character}
+          \item 小型大写字母：{\tt AK, KA}
+
+        \stopitemize
+
+      \item {\bf 单词编号}：写出表示数字的单词。例如，\quote{3} 变成 \quote{Three}。有两种方式：
+
+        \startitemize[packed]
+
+          \item 首字母大写的单词：{\tt Words}。
+          \item 全部小写的单词：{\tt words}。
+
+        \stopitemize
+
+      \item {\bf 符号编号}：基于符号的编号使用不同的符号集，每个符号被赋予一个数值。由于 \ConTeXt\ 使用的每个符号集的符号数量有限，只有当要达到的最大“数字”不太高时才适合使用这种编号类型。\ConTeXt\ 提供了四种不同的符号集：分别称为 {\tt set~0}、{\tt set~1}、{\tt set~2} 和 {\tt set~3}。下面是每个集合用于编号的符号。请注意，{\tt set~0} 和 {\tt set~1} 能达到的最大数字都是 9，而 {\tt set~2} 和 {\tt set~3} 都是 12：
+
+        \startitemize[empty, packed]\reference[examples of conversion set]{}
+          \item Set 0: \dorecurse{9}{\convertnumber{set 0}{#1}\quad}\par
+          \item Set 1: \dorecurse{9}{\convertnumber{set 1}{#1}\quad}\par
+          \item Set 2: \dorecurse{12}{\convertnumber{set 2}{#1}\quad}\par
+          \item Set 3: \dorecurse{12}{\convertnumber{set 3}{#1}\quad}\par
+
+        \stopitemize
+
+    \stopitemize
+
+  \item {\tt\bf sectionsegments}：此选项允许我们控制是否显示先前层级的编号。我们可以指示将显示哪些先前的层级。这是通过标识要显示的起始层级和结束层级来完成的。层级的标识可以通过其编号（part=1，chapter=2，section=3 等）或名称（part、chapter、section 等）进行。因此，例如，\MyKey{sectionsegments=2:3} 表示应显示 chapter 和 section 的编号。这与说 \MyKey{sectionsegments=chapter:section} 完全相同。如果我们想显示某个层级以上的所有编号，我们可以使用 \MyKey{optionsegments} 的值为 {\em 起始层级:all} 或 {\em 起始层级:*}。例如，\MyKey{sectionsegments=3:*} 表示从第 3 级（section）开始显示编号。
+
+\stopitemize
+
+因此，例如，假设我们希望 part 用大写罗马数字编号；chapter 用阿拉伯数字编号，但不包含所属 part 的编号；section 和 subsection 用包含 chapter 和 section 编号的阿拉伯数字编号；subsubsection 用大写字母编号（但不包含 part、chapter 或 section 编号）。在这种情况下，我们应该编写以下内容：
+
+\vbox{\starttyping
+  \setuphead[part][conversion=I]
+  \setuphead[chapter]     [conversion=n, sectionsegments=2]
+  \setuphead[section]     [conversion=n, sectionsegments=2:3]
+  \setuphead[subsection]  [conversion=n, sectionsgments=2:4]
+  \setuphead[subsubsection][conversion=A, sectionsegments=5]
+\stoptyping}
+
+\stopsubsection
+
+\startsubsection
+  [
+    reference=sec:titlestyle,
+    title=标题颜色和样式,
+  ]
+
+我们有以下选项来控制样式和颜色：
+
+\startitemize
+
+  \item {\bf 样式} 由 \MyKey{style}、\MyKey{numberstyle} 和 \MyKey{textstyle} 选项控制，具体取决于我们希望影响整个标题、仅编号还是仅文本。通过这些选项中的任何一个，我们可以包含影响字体的命令：即特定字体、样式（罗马、无衬线或打字机）、变体（斜体、粗体、倾斜等）和大小。如果我们只想指定一种样式特性，我们可以通过使用样式名称（例如，“bold”表示粗体）、或其缩写（“bf”）或生成它的命令（\tex{bf}，对于粗体）来实现。如果我们想同时指定多个特性，则必须通过生成它们的命令来实现，将它们一个接一个地写下来。另一方面，请记住，如果我们只指定一个特性，其余的样式特性将自动设置为文档的默认值，这就是为什么很少建议只设置一个样式特性。
+
+  \item {\bf 颜色} 通过 \MyKey{color}、\MyKey{numbercolor} 和 \MyKey{textcolor} 选项设置，具体取决于我们希望设置整个标题的颜色，还是仅设置编号或文本的颜色。此处指定的颜色可以是 \ConTeXt\ 的预定义颜色之一，或者是我们自己定义并事先分配了名称的其他颜色。但是，我们不能直接在此处使用颜色定义命令。
+
+\stopitemize
+
+除了这六个选项之外，还有五个选项可用于建立一些更复杂的功能，通过这些功能我们几乎可以做任何想做的事情。它们是：\MyKey{command}、\MyKey{numbercommand}、\MyKey{textcommand}、\MyKey{deepnumbercommand} 和 \MyKey{deeptextcommand}。我们先解释前三个：
+
+\startitemize
+
+  \item {\tt\bf command} 指示一个将接受两个参数（编号和节标题）的命令。它可以是普通的 \ConTeXt\ 命令，也可以是我们自己定义的命令。
+
+  \item {\tt\bf numbercommand} 类似于 \MyKey{command}，但这个命令只接受一个带有节编号的参数。
+
+  \item {\tt\bf textcommand} 也类似于 \MyKey{command}，但它只接受一个带有标题文本的参数。
+
+\stopitemize
+
+这三个选项使我们几乎可以做任何想做的事情。例如，如果我想要 section 右对齐、放在一个框架内，并且在编号和文本之间有一个换行，我可以简单地创建一个执行此操作的命令，然后将该命令指定为 \MyKey{command} 选项的值。这可以通过以下行实现：
+
+% TODO：这个以及其他用于保持文本在一起的 vbox（我假设）在 vbox 之后增加了明显的额外空间（如果不在之前也加一点的话）。最好的方法是什么？无框的框架？
+
+\vbox{\starttyping
+\define[2]\AlignSection
+  {\framed[frame=on, width=broad, align=flushright]{#1\\#2}}
+
+\setuphead
+  [section]
+  [command=\AlignSection]
+\stoptyping}
+
+当我们同时设置 \MyKey{command} 和 \MyKey{style} 选项时，命令会应用于带有其样式的标题。这意味着，例如，如果我们设置了 \MyKey{textstyle=\backslash em} 和 \MyKey{textcommand=\backslash WORD}，则命令 \tex{WORD}（将其参数文本大写）将应用于带有其样式的标题，即 \cmd{WORD\{\backslash em Title text\}}。如果我们希望反过来，即样式在命令应用之后应用于标题的内容，我们应该使用 \MyKey{deeptextcommand} 和 \MyKey{deepnumbercommand} 选项而不是 \MyKey{textcommand} 和 \MyKey{numbercommand}。在上面给出的示例中，这将生成 \MyKey{\color[darkmagenta]{\{\backslash em\backslash WORD\{Title text\}\}}}。
+
+在大多数情况下，以一种方式或另一种方式执行不会有区别；但在某些情况下可能会有区别。
+
+\stopsubsection
+
+
+\startsubsection
+  [title=编号和标题文本的位置]
+
+\tex{setuphead} 的 \MyKey{alternative} 选项同时控制两件事：编号相对于标题文本的位置，以及标题（包括编号和文本）相对于显示它的页面和节内容的位置。这是两件不同的事情，但由于它们都由同一个选项控制，因此它们被同时控制。
+
+标题相对于页面和节内容第一段的位置由 \MyKey{alternative} 的以下可能值控制：
+
+\startitemize
+
+  \item {\tt\bf text}：节标题与其内容的第一段整合在一起。效果类似于 \LaTeX\ 中使用 \tex{paragraph} 和 \tex{subparagraph} 产生的效果。
+
+  \item {\tt\bf paragraph}：节标题将是一个独立的“段落”。
+
+  \item {\tt\bf normal}：节标题将放置在 \ConTeXt\ 为特定类型节提供的默认位置。通常是 \MyKey{paragraph}。
+
+  \item {\tt\bf middle}：标题作为一个独立的居中段落书写。如果是编号节，则编号和文本分到不同的行，都居中。
+
+    使用 \MyKey{alternative=middle} 获得的效果类似于使用 \MyKey{align} 选项控制标题对齐获得的效果。\MyKey{align} 可以取 \MyKey{left}、\MyKey{middle} 或 \MyKey{flushright} 值。但是如果我们使用此选项将标题居中，编号和文本将出现在同一行。
+
+  \item {\tt\bf margintext}：此选项导致整个标题（编号和文本）打印在留作边距的空间中。
+
+\stopitemize
+
+编号相对于标题文本的位置由 \MyKey{alternative} 的以下可能值指示：
+
+\startitemize
+
+  \item {\tt\bf margin/inmargin}：标题是一个独立的“段落”。编号写在留作边距的空间中。我还没弄清楚使用 \MyKey{margin} 和使用 \MyKey{inmargin} 之间的区别。
+
+  \item {\tt\bf reverse}：标题构成一个独立的段落，但正常顺序颠倒，先打印文本，然后打印编号。
+
+  \item {\tt\bf top/bottom}：在标题文本占用多行的情况下，这两个选项控制编号是与标题的第一行对齐还是与最后一行对齐。
+
+\stopitemize
+
+\stopsubsection
+
+
+\startsubsection
+  [title=在打印标题之前或之后执行的命令或操作]
+
+可以指定一个或多个在打印标题之前（\MyKey{before} 选项）或之后（\MyKey{after} 选项）执行的命令。这些选项广泛用于视觉上标记标题。例如：如果我们想在标题和其前面的文本之间添加更多垂直空间，\MyKey{before=\backslash blank} 将添加一个空行。要添加更多空间，我们可以写成 \MyKey{before=\{\backslash blank[3*big]\}}。在这种情况下，我们用花括号将选项的值括起来以避免错误。
+% TODO: 嗯？？
+%我们还可以通过 \MyKey{before=\backslash hairline} 和 \MyKey{after=\backslash hairline} 在视觉上进一步分隔标题与前后文本，这将在标题前后画一条水平线。
+
+与 \MyKey{before} 和 \MyKey{after} 选项非常相似的是 \MyKey{commandbefore} 和 \Conjecture \MyKey{commandafter} 选项。根据我的测试，我推测区别在于前两者在开始排版标题本身之前和之后执行操作，而后两者指的是在排版{\em 标题文本}之前和之后执行的命令。
+
+如果我们想在标题之前插入分页，我们必须使用 \MyKey{page} 选项，该选项允许（除其他值外）使用 \quotation{yes} 插入分页，使用 \quotation{left} 插入尽可能多的分页以确保标题从偶数页开始，使用 \quotation{right} 确保标题从奇数页开始，或者使用 \quotation{no} 禁用强制分页。另一方面，对于低于 \MyKey{chapter} 的层级，此选项仅在同时使用 \MyKey{continue=no} 选项时才有效；否则，如果相关的 section、subsection 或命令位于某个 chapter 的第一页，它将不起作用。
+
+\startSmallPrint
+
+    默认情况下，\ConTeXt\ 中的 chapter 从新的一页开始。如果设定 section 也另起一页，就会出现问题：对于某个 chapter 的第一个 section（可能位于 chapter 的开头），如果该 section 也触发分页，我们最终会得到一个只包含 chapter 标题的页面，这不太美观。这就是为什么我们可以设置 \MyKey{continue} 选项（我得说这个名称对我来说不太清楚）：如果 \MyKey{continue=yes}，分页将不适用于位于 chapter 第一页上的 section。如果 \MyKey{continue=no}，分页仍然会被应用。
+
+\stopSmallPrint
+
+如果我们使用节环境（\cmd{start \unknown\ \backslash stop}）而不是节命令，我们还有 \MyKey{insidesection} 选项，通过它我们可以指定一个或多个命令，这些命令将在标题排版完毕并且我们已经进入节内部之后执行。例如，此选项允许我们确保在开始一个 chapter 后立即自动排版一个目录（通过 \MyKey{insidesection=\backslash placecontent}）。
+
+\stopsubsection
+
+
+\startsubsection
+    [title=其他可配置特性]
+
+除了我们已经看到的那些，我们还可以使用 \tex{setuphead} 配置以下附加特性：
+
+\startitemize
+
+  \item {\bf 行距}：由 \MyKey{interlinespace} 控制，其值是一个先前用 \tex{defineinterlinespace} 创建并用 \tex{setupinterlinespace} 配置的行距命令的名称。
+
+  \item {\bf 对齐}：\MyKey{align} 选项影响包含标题的段落的对齐方式。它可以具有以下值（包括其他值）：\MyKey{flushleft}（左对齐）、\MyKey{flushright}（右对齐）、\MyKey{middle}（居中）、\MyKey{inner}（内边距）和 \MyKey{outer}（外边距）。
+
+  \item {\bf 边距}：使用 \MyKey{margin} 选项，我们可以手动设置标题的边距。
+
+  \item {\bf 首段缩进}：\MyKey{indentnext} 选项的值（可以是 \quotation{yes}、\quotation{no} 或 \quotation{auto}）控制节的第一段的第一行是否缩进。是否应该缩进（在通常段落首行缩进的文档中）是一个品味问题。
+
+  \item {\bf 宽度}：默认情况下，标题占据其需要的宽度，除非此宽度大于行宽，在这种情况下标题将占据多行。但是使用 \MyKey{width} 选项，我们可以为标题指定特定宽度。\MyKey{numberwidth} 和 \MyKey{textwidth} 选项分别指定编号的宽度或标题文本的宽度。
+
+  \item {\bf 分隔编号和文本}：\MyKey{distance} 和 \MyKey{textdistance} 选项允许我们控制分隔编号与其文本的距离。
+
+  \item {\bf 节页眉和页脚的样式}：为此我们使用 \MyKey{header} 和 \MyKey{footer} 选项。
+
+\stopitemize
+
+\stopsubsection
+
+
+\startsubsection
+    [title=其他 \tex{setuphead} 选项]
+
+通过我们已经看到的选项，我们可以看到节标题的配置可能性几乎是无限的。然而，\tex{setuphead} 还有大约三十个我没有\Doubt 提到的选项。大多数是因为我还没有发现它们的用途或使用方法，但有一些是因为解释它们将迫使我涉及我不打算在本介绍中处理的方面。
+
+\stopsubsection
+
+\stopsection
+
+
+\startsection
+  [
+    reference=sec:definehead,
+    title=定义新的节命令,
+  ]
+\PlaceMacro{definehead}
+
+我们可以使用 \tex{definehead} 定义自己的节命令，其语法为：
+
+\type{\definehead[命令名][模型][配置]}
+
+其中：
+
+\startitemize
+
+  \item {\bf 命令名} 表示新节命令将具有的名称。
+
+  \item {\bf 模型} 是现有节命令的名称，新命令将最初从该模型继承其所有特性。
+
+    \startSmallPrint
+
+        事实上，新命令从模型继承的不仅仅是初始特性：它成为模型的一种定制实例，但与之共享例如控制编号的内部计数器。
+
+    \stopSmallPrint
+
+  \item {\bf 配置} 是我们新命令的定制配置。这里我们可以使用与 \tex{setuphead} 中完全相同的选项。
+
+\stopitemize
+
+不一定要在创建新命令时配置它。这可以稍后使用 \tex{setuphead} 完成，事实上，在 \ConTeXt\ 手册及其 wiki 给出的示例中，这似乎是正常的方式。
+
+\stopsection
+
+
+\startsection
+  [
+    reference=sec:macrostructure,
+    title=文档的宏观结构,
+  ]
+
+章节、节、小节、标题……组织文档；它们构建文档。但除了这些命令产生的结构之外，在某些印刷书籍中，特别是来自学术界的书籍，还存在一种书籍材料的“宏观排序”，考虑的不仅是其内容，而是这些大部分在书中所执行的功能。这就是我们区分以下部分的方式：
+
+\startitemize
+
+  \item 文档的开头部分，包含标题页、致谢页、题献页、目录，或许还有前言、介绍页等。
+
+  \item 文档的主体部分，包含文档的基本文本，分为部、章、节、小节等。这部分通常是最广泛和最重要的。
+
+  \item 由附录或附件组成的附加材料，这些材料展开或举例说明主体中处理的某些问题，或提供非主体作者撰写的附加文档等。
+
+  \item 文档的结尾部分，我们可以在其中找到参考文献、索引、词汇表等。
+
+\stopitemize
+
+在源文件中，我们可以通过 \in{Table}[tbl:macrostructure] 中看到的环境来划定每个部分。
+
+{\switchtobodyfont[small]
+\placetable
+  [here]
+  [tbl:macrostructure]
+  {反映文档宏观结构的环境}
+{\starttabulate[|l|l|]
+\HL
+\NC {\bf 文档部分}
+\NC {\bf 命令}
+\NR
+\HL
+\NC 开头部分
+\NC\cmd{startfrontmatter [Options] ... \backslash stopfrontmatter}
+\NR\PlaceMacro{startfrontmatter}
+\NC 主体部分
+\NC\cmd{startbodymatter [Options] ... \backslash stopbodymatter}
+\NR\PlaceMacro{startbodymatter}
+\NC 附录部分
+\NC\cmd{startappendices [Options] ... \backslash stopappendices}
+\NR\PlaceMacro{startappendices}
+\NC 结尾部分
+\NC\cmd{startbackmatter [Options] ... \backslash stopbackmatter}
+\PlaceMacro{startbackmatter}
+\NR
+\HL
+\stoptabulate
+}}
+
+这四个环境允许相同的四个选项：\MyKey{page}、\MyKey{before}、\MyKey{after} 和 \MyKey{number}，它们的值和用途与 \tex{setuphead} 中的相同（参见\in{Section}[sec:setuphead]），不过我们应注意，此处的 \MyKey{number=no} 选项将消除该环境内所有节命令的编号。
+
+在我们的文档中包含这些大部分中的任何一个，仅当要在它们之间建立某种区分时才有意义。例如开头部分中的页眉或页码编号。每个块的配置通过 \PlaceMacro{setupsectionblock}\tex{setupsectionblock} 实现，其语法为：
+
+\type{\setupsectionblock [块名称] [选项]}
+
+其中 {\em 块名称} 可以是 {\tt frontpart}、{\tt bodypart}、{\tt appendix} 或 {\tt backpart}，选项可以是刚刚提到的那些：\MyKey{page}、\MyKey{number}、\MyKey{before} 和 \MyKey{after}。因此，例如，为了确保在 {\em frontmatter} 中页面用罗马数字编号，在我们文档的导言中我们可以写：
+
+\starttyping
+\setupsectionblock
+  [frontpart]
+  [
+    before={\setuppagenumbering[conversion=romannumerals]}
+  ]
+\stoptyping
+
+尽管还有其他方法可以实现这一点。
+
+\ConTeXt\ 对这些块的默认配置意味着：
+
+\startitemize
+
+  \item 这四个块都从新的一页开始。
+
+  \item 每个块中的节编号会发生变化：
+
+    \startitemize
+
+      \item 在 {\tt frontmatter} 和 {\tt backmatter} 中，默认情况下所有编号节都是无编号的。
+
+      \item 在 {\tt bodymatter} 中，章使用阿拉伯数字编号。
+
+      \item 在 {\tt appendices} 中，章使用大写字母编号。
+
+  \stopitemize
+
+\stopitemize
+
+也可以使用 \PlaceMacro{definesectionblock}\tex{definesectionblock} 创建新的节块。
+
+\stopsection
+
+\stopchapter
+
+\stopcomponent
+
+%%% Local Variables:
+%%% mode: ConTeXt
+%%% eval: (auto-fill-mode 1)
+%%% coding: utf-8-unix
+%%% TeX-master: "../introCTX_eng.tex"
+%%% End:
+%%% vim:set filetype=context tw=72 : %%%

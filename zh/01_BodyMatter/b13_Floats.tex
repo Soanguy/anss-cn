@@ -1,0 +1,1002 @@
+%%% File:      b13_Floats
+%%% Author:    Joaquín Ataz-López et al
+%%% Begun:     August 2020
+%%% Concluded: August 2020
+%%% Contents:  写到这里时，我已经对本入门介绍感到厌倦了。因此，例如，这里只解释了一种表格。编写表格（在 TeX、LaTeX 或 ConTeXt 中）让我更加懒惰。另一方面，本章的组织结构有些异端（我想）。对我来说是清晰的，但我不确定公众是否会认为我所谓的巧妙“循环”不过是一种强大的精神障碍！
+%%% Edited with: Emacs + AUCTeX - 有时也使用 vim + context-plugin
+%%%
+
+\environment introCTX_env.tex
+
+\startcomponent b13_Floats.tex
+
+\startchapter
+  [
+      title={图像、表格及其他浮动对象},
+  ]
+
+\TocChap
+
+本章主要讨论浮动对象（floats）。但顺着这个概念，我们借此机会解释两种不一定是浮动对象、但通常被配置为浮动对象的对象类型：外部图像和表格。查看本章的目录，人们可能会认为这非常杂乱：它首先讨论浮动对象，然后讨论图像和表格，最后再次讨论浮动对象。这种杂乱的缘由是{\em 教学法上的}：图像和表格可以在不过分强调它们通常是浮动对象的情况下进行解释；然而，当我们开始审视它们时，发现我们已经了解了两种浮动对象，这会大有帮助。
+
+\startsection
+  [
+      reference=sec:floating objects,
+      title={什么是浮动对象，它们有什么作用？},
+  ]
+
+如果一个文档只包含{\em 普通}文本，分页将相对容易：知道页面文本区域的最大高度就足以测量不同段落的高度，从而知道在哪里插入分页符。问题在于，许多文档中存在对象、片段或不可分割的文本块，例如图像、表格、公式、带框段落等。
+
+有时这些对象会占据页面的大部分空间，这反过来又带来了一个问题：如果必须将其插入文档中的特定位置，它可能无法适应当前页面。在这种情况下，可能不得不突然中断页面，在底部留下大片空白，从而将相关对象及其后面的文本移到下一页。然而，良好的排版规则表明，除了章节的最后一页外，每页的文本量应该相同。
+
+因此，建议避免出现大的垂直空白；{\em 浮动}对象是实现这一目标的主要机制。\quotation{浮动对象}是指不必位于文档中特定位置，而是可以在文档中{\em 移动}或{\em 浮动}的对象。其理念是允许 \ConTeXt\ 从分页的角度决定放置这些对象的最佳位置，甚至允许它们移动到另一页；但始终确保它们不会偏离源文件中插入点太远。
+
+因此，没有对象本身必须是浮动的。但有些对象偶尔需要成为浮动对象。无论如何，决定权在于作者（或负责排版的人，如果不是同一个人的话）。
+
+毫无疑问，允许改变不可分割对象的精确位置，极大地促进了排版出平衡美观的页面。但随之而来的问题是，由于我们在编写原文时不知道这样的对象最终会出现在哪里，因此很难引用它。例如，如果我刚刚在文档中放入了一个插入图像的命令，并在下一段中想要描述它并写下类似\quotation{从上图可以看出}的内容，那么当图像{\em 浮动}时，它很可能被放置在我刚刚写的内容{\em 之后}，结果就会产生不一致：读者在引用它的文本{\em 之前}寻找图像，却找不到，因为浮动之后，图像{\em 最终}出现在该引用之后。
+
+这个问题通过给浮动对象{\em 编号}（将它们分类后）来解决，这样我们就不会将图像称为\quotation{上图}或\quotation{下图}，而是（例如）\quotation{图 1.3}，因为我们可以使用 \ConTeXt 的内部引用机制来确保图像编号始终保持最新（参见 \in{Section}[sec:references]）。此外，对这些对象进行编号使得创建它们的索引（表格索引、图形索引、图像索引、公式索引等）变得容易。具体操作方法请参见（\in{Section}[sec:lists]）。
+
+\ConTeXt 中处理浮动对象的机制相当复杂，并且达到了很高的抽象层次，可能不适合初学者。因此，在本章中，我将首先使用两个特例来解释它：图像和表格。然后，我会尝试进行一些概括，以便我们能够理解如何将该机制扩展到其他类型的对象。
+
+\stopsection
+
+
+\startsection
+    [
+        reference=sec:externalgraphics,
+        title={外部图像},
+    ]
+
+正如读者在这个阶段所知（因为在 \in{Section}[sec:ctx] 中已经解释过），\ConTeXt\ 与 MetaPost 完美集成，可以生成以与文本转换编程相同的方式{\em 编程}的图像和图形。还有一个用于 \ConTeXt\ 的扩展模块\footnote{\ConTeXt\ 扩展模块提供了额外的实用程序，但其描述未包含在本入门介绍中。}，允许它使用 TikZ\null.\footnote{这是一种图形编程语言，旨在与基于 \TeX\ 的系统一起工作。TikZ 是一个“递归缩写”，源自德语短语 \quotation{TikZ ist keinen Zeichenprogramm}，翻译过来意思是：\quotation{TikZ 不是一个绘图程序}。递归缩写是程序员的一种玩笑。撇开 MetaPost（我不知道如何使用它）不谈，我相信 TikZ 是一个很棒的图形编程系统。}但此类图像不在本入门介绍中讨论（因为那可能会使其长度加倍）。这里我指的是使用外部图像，这些图像位于我们计算机上的文件中，或者由 \ConTeXt\ 直接从互联网下载。
+
+\startsubsection
+    [title={直接插入图像}]
+    \PlaceMacro{externalfigure}
+
+要直接插入图像（不作为浮动对象），我们使用 \tex{externalfigure} 命令，其语法为
+
+\type{\externalfigure [Name] [Configuration]}
+
+其中：
+
+\startitemize
+
+  \item {\tt Name} 可以是包含图像的文件名，也可以是互联网上找到的图像的网址，或者是先前使用 \PlaceMacro{useexternalfigure}\tex{useexternalfigure} 命令与图像关联的符号名称；该命令的格式与 \tex{externalfigure} 类似，不过它的第一个参数是符号名称，用于与相关图像关联。
+
+  \item {\tt Configuration} 是一个可选参数，允许我们在将图像插入文档之前对其应用某些变换。我们将在 \in{Section}[sec:configimage] 中更仔细地研究这个参数。
+
+\stopitemize
+
+允许的图像格式有 {\tt pdf}、{\tt jpg}、{\tt jp2}（JPEG~2000）、{\tt jbig}、{\tt jbig2}、{\tt jb2}、{\tt png}、{\tt gif}、{\tt tif}、{\tt svg}、{\tt mps} 和 {\tt eps}。\ConTeXt\ 可以直接管理其中八种格式，而其余的（{\tt svg}、{\tt eps}、{\tt gif} 和 {\tt tif}）需要使用外部工具（因操作系统而异）进行转换，因此必须安装在系统上，以便 \ConTeXt\ 能够处理这些类型的文件。
+
+\startSmallPrint
+
+% TODO: 这个列表对于 LMTX 是最新的吗？
+
+    MkIV 注：\tex{externalfigure} 支持的格式中还包括一些视频格式。特别是：QuickTime（扩展名 {\tt .mov}）、Flash Video（扩展名 {\tt .flv}）和 MPEG~4（扩展名 {\tt .mp4}）。但大多数 PDF 阅读器不知道如何处理带有嵌入视频的 PDF 文件。对此我无法多言，因为我还没有做过任何测试。
+
+    LMTX 更新：测试表明，{\tt .mp4} 和 {\tt .mov} 文件可以成功嵌入到 \ConTeXt\ 的输出中，并且（在 Linux 上）PDF 阅读器 {\tt evince} 可以播放这些影片。其他成功案例如果被发现并报告，将在此处添加。
+
+\stopSmallPrint
+
+无需指明文件扩展名：\ConTeXt\ 将搜索具有指定名称和已知图像格式扩展名的文件。如果有多个候选文件，则首先使用 PDF 格式（如果存在），如果不存在则使用 MPS 格式（由 MetaPost 生成的图形）。如果这两者都不存在，则遵循以下顺序：
+% ANSS: jpeg, png, jp2, jbig and jbig2.
+% TODO: 此信息取自 .../tex/texmf-context/tex/context/base/mkxl/grph-inc.lmt 中的 "figures_order" 变量。
+{\tt jpg}、{\tt png}、{\tt jp2}、{\tt jbig}、{\tt svg}、{\tt eps}、{\tt tif} 以及最后的 {\tt gif}。
+
+\startSmallPrint
+
+    如果图像的实际格式与其存储文件的扩展名不符，\ConTeXt\ 将无法打开它，除非我们使用 {\tt method} 选项指明图像的实际格式。
+
+\stopSmallPrint
+
+如果图像不是单独放在段落之外，而是集成到文本段落中，并且其高度大于行距，则会调整行距以防止图像与前面的行重叠，如本行\externalfigure[cow-brown][width=2.5em]所附的例子所示。
+
+默认情况下，\ConTeXt\ 在工作目录、其父目录以及该目录的父目录中搜索图像。我们可以使用 \tex{setupexternalfigures} 命令的 {\tt directory} 选项来指示包含我们将使用的图像的目录位置，这会将那个目录添加到搜索路径中。如果我们希望搜索{\em 仅}在图像目录中进行，则还必须设置 {\tt location} 选项。因此，例如，为了让 \ConTeXt\ 在 \MyKey{img} 目录中查找所有需要的图像，我们应该写：
+
+\starttyping
+  \setupexternalfigures
+      [directory=img, location=global]
+\stoptyping
+
+\startSmallPrint
+
+    在 \tex{setupexternalfigures} 的 {\tt directory} 选项中，我们可以包含多个目录，用逗号分隔；但在这种情况下，我们需要将目录括在花括号中。例如 \MyKey{directory=\{img, \lettertilde/images\}}。
+
+    对于 {\tt directory} 选项，我们始终使用 \quote{/} 字符作为目录之间的分隔符，即使对于使用 \quote{\textbs} 作为目录分隔符的 Microsoft Windows 也是如此。
+
+\stopSmallPrint
+
+\tex{externalfigure} 也能够使用托管在互联网上的图像。因此，例如，以下片段将指示 \ConTeXt\ 从互联网直接插入 CervanTeX 徽标到文档中。CervanTeX 是西班牙语 \TeX\ 用户组：\footnote{互联网地址往往很长，并且没有太多空间来显示并排示例。因此，为了让左列中的命令合适地排布，我在网址内插入了一个换行。如果您复制并粘贴示例的 URL，如果不删除此换行，它可能无法工作（取决于您的操作系统、复制后的 URL 如何发送到您的 Web 浏览器，以及可能还有您的 Web 浏览器本身）。}
+
+\startbuffer
+\externalfigure
+[http://www.cervantex.es/files/
+cervantex/cervanTeXcolor-small.jpg]
+\stopbuffer
+\ShowAndExecute
+
+\startSmallPrint
+
+    当包含远程文件的文档首次编译时，它会从服务器下载并存储在 LuaMetaTeX 缓存目录中，对于独立的 \ConTeXt\ 发行版，该目录位于您的系统上安装 \ConTeXt\ 的位置的子目录 {\tt tex/texmf-cache/luametatex-cache/context/} 中。如果您使用的是 \TeX{}live，则缓存目录位于子目录 {\tt texmf-var/luametatex-cache/context/} 中。
+    缓存的文件在后续编译中使用。通常，如果缓存中的图像超过一天，则会重新下载远程图像。要更改此阈值，请参阅 \ConTeXt\ wiki 上的 \goto{此页面}[url(https://wiki.contextgarden.net/Graphics_and_media/Tutorials/Using_graphics)]。
+
+\stopSmallPrint
+
+如果 \ConTeXt\ 找不到应该插入的图像，不会产生错误，但会插入一个文本块来代替图像，其中包含关于应该放在那里的图像的信息。该块的大小将是图像大小（如果 \ConTeXt\ 知道的话），否则为标准大小。\in{Section}[sec:startcombination] 中有一个这样的例子。
+
+\stopsubsection
+
+
+\startsubsection
+  [
+    reference=sec:placefigure,
+    title={使用 \tex{placefigure} 插入图像},
+  ]
+  \PlaceMacro{placefigure}
+
+正如我们已经看到的，图像可以直接使用 \tex{externalfigure} 插入。但最好使用 \tex{placefigure} 插入图像。此命令使 \ConTeXt：
+
+\startitemize
+
+  \item 知道正在插入一个图像，该图像必须被纳入文档的图像列表中，以便后续我们可以根据需要生成图像索引；
+
+  \item 为图像分配一个编号，从而方便对其的内部引用；
+
+  \item 为图像添加标题，在图像及其标题之间创建一个文本块（这意味着它们不能被分开）；
+
+  \item 自动设置正确查看图像所需的空白（水平和垂直）；
+
+  \item 将图像放置在指示的位置，如有必要使文本围绕它流动；以及
+
+  \item 如果可能，根据其大小和位置规范，将图像转换为浮动对象。\footnote{后者是我的结论，因为在放置选项中，有些像 {\tt force} 或 \Conjecture {\tt split} 这样的选项是违背浮动对象的真正概念的。}
+
+\stopitemize
+
+此命令的语法如下：
+
+\type{\placefigure[Options] [Label] {Title} {Image}}
+
+各个参数的含义如下：
+
+\startitemize
+
+  \item {\tt Options} 是一组指示，通常涉及放置图像的位置。由于这些选项在此命令和其他命令中相同，我将在后面一起解释它们（在 \in{Section}[sec:placingobjects] 中）。目前，我将在示例中使用 {\tt here} 选项。它告诉 \ConTeXt，尽可能将图像精确地放置在文档中找到插入命令的位置。
+
+  \item {\tt Label} 是一个文本字符串，用于内部引用此对象，以便我们可以引用它（参见 \in{Section}[sec:references]）。
+
+  \item {\tt Title} 是要添加到图像的标题文本。
+
+  \item {\tt Image} 是插入图像的命令。
+
+\stopitemize
+
+例如：
+
+\startbuffer
+  \placefigure
+    [here]
+    [fig:texknuth]
+    {\TeX\ 徽标和 {\sc Knuth} 的照片}
+    {
+      \externalfigure
+        [https://i.ytimg.com/vi/8c5Rrfabr9w/maxresdefault.jpg]
+        [scale=600]
+    }
+\stopbuffer
+
+\typebuffer
+
+%\getbuffer
+
+正如我们在示例中看到的，通过插入图像（顺便说一下，这是直接从互联网上托管的图像完成的），与直接使用 \tex{externalfigure} 命令时相比，发生了一些变化。添加了垂直空间，图像居中，并添加了标题。这些是乍看之下显而易见的{\em 外部}变化。从内部角度来看，该命令也产生了其他同样重要的效果：
+
+\startitemize
+
+  \item 首先，图像已被插入到 \ConTeXt\ 为插入到文档中的对象内部维护的\quotation{图像列表}中。这反过来意味着该图像将出现在可以用 \tex{placelist[figure]} 生成的图像索引中（参见 \in{Section}[sec:lists]），尽管有两个特定的命令用于生成图像索引，它们是 \PlaceMacro{placelistoffigures}\tex{placelistoffigures} 或 \PlaceMacro{completelistoffigures}\tex{completelistoffigures}。
+
+  \item 其次，图像已链接到作为 \tex{placefigure} 命令第二个参数添加的标签，这意味着从现在起我们可以使用该标签对其进行内部引用（参见 \in{Section}[sec:references]）。
+    例如，\quotation{\type{See \in{Figure}[fig:texknuth]}} 的结果是 \quotation{参见 \in{Figure}[fig:texknuth]}。
+
+  \item 最后，图像变成了一个浮动对象，这意味着如果出于排版需要（分页）需要移动，\ConTeXt\ 会改变其位置。
+
+\stopitemize
+
+实际上，\tex{placefigure} 尽管名称如此，但不仅用于插入图像。我们可以用它插入任何东西，包括文本。然而，使用 \tex{placefigure} 插入到文档中的文本或其他项目，将被{\em 视为}图像一样对待，即使它们不是；它们将被添加到 \ConTeXt\ 内部管理的图像列表中，并且我们可以应用类似于用于图像的变换，例如缩放或旋转、添加框架等。因此，以下示例：
+
+% \backslash 在此使用，因为在这种情况下我们得到与 \textbs 相同的 \backslash，并且 \backslash 是一个普通的 ConTeXt 命令。
+
+\startbuffer
+\placefigure
+  [here, force]
+  [fig:testtext]
+  {使用 \backslash placefigure 进行文本变换}
+  {\rotate[rotation=180]{\framed{\tfd 测试文本}}}
+\stopbuffer
+
+\getbuffer
+
+这是通过以下方式实现的：
+
+\typebuffer
+
+\stopsubsection
+
+
+\startsubsection
+  [title={插入集成到文本块中的图像}]
+
+除了非常小的图像（可以集成到一行中而不会过多干扰段落间距）外，图像通常被插入到只包含它们自己的段落中（或者换句话说，图像可以被视为一个独立的段落）。如果图像是使用 \tex{placefigure} 插入的，并且其尺寸允许，根据我们关于其放置位置的指示（参见 \in{Section}[sec:placingobjects]），\ConTeXt\ 将允许前后段落的文本围绕图像流动。但是，如果我们想确保某个图像不会与某个文本分开，我们可以使用 {\tt \PlaceMacro{startfiguretext}figuretext} 环境，其语法如下：
+
+\starttyping
+  \startfiguretext
+    [Options]
+    [Label]
+    {Title}
+    {Image}
+
+    ... 文本
+
+  \stopfiguretext
+\stoptyping
+
+% TODO: left, bottom 在我的测试中没有起作用。如何使其工作？
+%       此外，在文本“经过”图形下方后，我没有让文本取消缩进。我做错了什么？
+
+该环境的参数与 \tex{placefigure} 完全相同，并且具有相同的含义。但这里的选项不再是浮动对象放置位置的选项，而是关于将图像集成到段落中的指示；因此，例如，\MyKey{left} 在此表示图像将放置在左侧，而文本将流向右侧，而 \MyKey{left, bottom} 将表示图像必须放置在与它关联的文本的左下侧。
+
+在环境内编写的文本将是围绕图像流动的文本。
+
+\stopsubsection
+
+
+\startsubsection
+  [
+    reference=sec:configimage,
+    title={插入图像的配置与变换},
+  ]
+
+\startsubsubsection
+  [title={导致图像某些变换的插入命令选项}]
+  \PlaceMacro{setupexternalfigures}
+
+\tex{externalfigure} 命令中的最后一个参数允许我们对插入的图像执行某些调整。我们可以进行这些调整：
+
+\startitemize
+
+  \item 一般情况下，对于要插入到文档中的所有图像；或者对于在某个点之后插入的所有图像。在这种情况下，我们使用 \tex{setupexternalfigures} 命令进行调整。
+
+  \item 对于要多次插入文档中的特定图像。在这种情况下，调整是在 \tex{useexternalfigure} 命令的最后一个参数中进行的，该命令将外部图形与符号名称关联起来。
+
+  \item 在插入特定图像的确切时刻。在这种情况下，调整是在 \tex{externalfigure} 命令本身中进行的。
+
+\stopitemize
+
+通过这种方式可以实现的图像更改如下：
+
+\startdescription{更改图像的大小。}
+
+我们可以这样做：
+
+\startitemize
+
+  \item {\em 通过指定精确的宽度或高度}，分别使用 {\tt width} 和 {\tt height} 选项；如果只调整两个值中的一个，另一个会自动调整以保持图像的纵横比。
+
+    我们可以指定特定的高度或宽度，也可以将其表示为页面高度或行宽的百分比。例如：
+
+    \type{width=.4\textwidth}
+
+    将确保图像的宽度等于行宽的 40\%。
+
+  \item {\em 缩放图像}：{\tt xscale} 选项将水平缩放图像；{\tt yscale} 将垂直缩放，而 {\tt scale} 将同时水平和垂直缩放。这三个选项需要一个代表缩放因子的数字乘以 1000。也就是说：{\tt scale=1000} 将保持图像原始大小，而 {\tt scale=500} 将其缩小一半，{\tt scale=2000} 将其大小加倍。
+
+    条件缩放，仅在图像超过特定尺寸时应用，通过 {\tt maxwidth} 和 {\tt maxheight} 选项实现，它们接受一个尺寸。例如，{\tt maxwidth=0.2\textbs textwidth} 将仅在图像宽度超过行宽的 20\% 时进行缩放。
+
+\stopitemize
+
+\stopdescription
+
+\startdescription{旋转图像。}
+
+    要旋转图像，我们使用 {\tt orientation} 选项，它接受一个指定将应用的旋转度数的值（例如，{\tt orientation=90}）。旋转是逆时针方向进行的。
+
+    % JD 注：我尝试将牛旋转 45 度，但遗憾的是，它失去了腿。所以我更新了 JAL 写的内容。
+
+    \startSmallPrint
+
+        wiki 暗示使用此选项可以实现的旋转必须是 90 的倍数（90、180 或 270），要实现不同的旋转，我们必须使用 \tex{rotate} 命令。
+%%        然而，我使用仅 {\tt orientation=45} 对图像应用 45 度旋转没有任何问题，无需使用 \tex{rotate} 命令。
+        使用 \ConTeXt\ LMTX 的测试表明，其他值也可以接受，但这样做{\em 可能}会损坏图像。因此，请谨慎使用其他值。
+
+    \stopSmallPrint
+
+\stopdescription
+
+\startdescription{为图像添加框架。}
+
+    我们还可以使用 {\tt frame=on} 选项用框架包围图像，并配置框架颜色（{\tt framecolor}）、框架与图像之间的距离（{\tt frameoffset}）、绘制框架的线条粗细（{\tt rulethickness}）或其角部形状（{\tt framecorner}），可以是圆角（{\tt round}）或矩形。
+
+\stopdescription
+
+\startdescription{图像的其他可配置方面。}
+
+    除了已经看到的涉及要插入图像变换的方面外，使用 \tex{setupexternalfigures} 我们还可以配置其他方面，例如在哪里查找图像（{\tt directory} 选项），是仅应在指定目录中搜索图像（{\tt location=global}）还是也应包括工作目录及其父目录（{\tt location=local}），以及图像是否将是交互式的（{\tt interaction}）等。
+
+\stopdescription
+
+\stopsubsubsection
+
+
+\startsubsubsection
+    [title={用于变换图像的特定命令}]
+
+\ConTeXt\ 中有三个命令可用于变换图像，并且可以与 \tex{externalfigure} 结合使用。它们是：
+
+\startitemize
+
+  \item {\em 镜像图像}：通过 \PlaceMacro{mirror}\tex{mirror} 命令实现。
+
+  \item {\em 裁剪}：通过 \PlaceMacro{clip}\tex{clip} 命令实现，其中给出裁剪的宽度（{\tt width}）、高度（{\tt height}）、水平偏移（{\tt hoffset}）和垂直偏移（{\tt voffset}）尺寸。例如，比较 {\tt minidoubt.jpg} 图像与裁剪版本：
+
+\startbuffer
+\externalfigure[minidoubt]
+      [width=2cm,frame=on,
+      framecolor=red]
+\stopbuffer
+\ShowAndExecute
+
+\startbuffer
+\clip [width=2cm, height=1cm, 
+   hoffset=3mm, voffset=2mm]
+  {\externalfigure[minidoubt]
+      [width=2cm,frame=on,
+       framecolor=red]}
+\stopbuffer
+\ShowAndExecute
+
+
+  \item {\em 旋转。} 第三个用于对图像应用变换的命令是 \PlaceMacro{rotate}\tex{rotate} 命令。这是一头倾斜 30 度的牛：
+
+\startbuffer
+\rotate[rotation=-30]
+   {\externalfigure[cow]
+                   [width=2cm]}
+\stopbuffer
+\ShowAndExecute
+
+%% JD 注释掉了这一点，因为他的实验表明并非如此。
+%%    但通常这不是必需的，因为后者有，正如我们所见，产生相同结果的 {\tt orientation} 选项。
+
+%?\startSmallPrint
+% TODO 西班牙语原文中是否有某些内容没有出现在英文版中？
+%?\stopSmallPrint
+
+\stopitemize
+
+这些命令的典型用途是与图像一起使用，但它们实际上作用于{\em 盒子}。这就是为什么我们可以将它们应用于任何文本，只需将其包围在一个盒子中（命令会自动执行），这将产生如下奇特的效果：
+
+% TODO: 有没有什么简单的方法可以使顶行的文本像另一行一样变成紫色？
+
+\startbuffer
+  \mirror{测试文本}\\
+  \rotate[rotation=20] {测试文本}
+\stopbuffer
+\ShowAndExecute
+
+\stopsubsubsection
+
+\stopsubsection
+
+\stopsection
+
+
+\startsection
+  [
+    reference=sec:tables,
+    title={表格},
+  ]
+
+\startsubsection
+    [title={关于表格及其在文档中放置的一般概念}]
+
+表格是结构化的对象，包含文本、公式甚至图像，排列在一系列{\em 单元格}中，使我们能够直观地看到每个单元格内容之间的关系。为此，信息被组织成行和列：同一行中的所有数据（或条目）彼此之间具有某种关系，同一列中的所有数据（或条目）也是如此。单元格是行与列的交点，如 \in{Figure}[fig:table] 所示。
+
+% TODO: 为什么标题*之后*有这么多短行？
+% height: 将图形顶部移动到基线以上
+% low: 这稍微减少了图形之后的短行数量。
+
+\placefigure
+  [right,height,low]  
+  [fig:table]
+  {简单表格的图像}
+  {\externalfigure[tablas_eng][width=.6\textwidth]}
+
+表格非常适合显示相互关联的文本或数据项，因为每个项都被封闭在自己的单元格中，即使其内容或其他单元格的内容发生变化，一个单元格相对于其他单元格的相对位置也不会改变。
+
+在所有涉及文本排版的任务中，在我看来，表格的创建是唯一一个在图形程序（文字处理器类型）中比在 \ConTeXt\ 中更容易完成的任务。因为{\em 绘制}表格（在文字处理程序中执行的操作）比{\em 描述}表格（我们使用 \ConTeXt\ 时所做的事情）更容易。每次行更改和列更改都需要一个命令的存在，这意味着实现表格需要花费更长的时间，而不是简单地说出我们想要多少行和列。
+
+\ConTeXt\ 有三种不同的机制来生成表格；一种是 {\tt tabulate} 环境，推荐用于简单表格，并且是直接受 \TeX\ 表格启发的。另一种是所谓的{\em 自然表格}，受 HTML 表格启发，适用于具有特殊设计需求的表格，例如，并非所有行都具有相同数量的列。第三种选择是所谓的{\em 极端表格}，明显基于 XML，推荐用于占据一页以上的中等或长表格。在这三种中，我将只解释第一种。自然表格在 \quotation{\ConTeXt\ Mark IV an excursion} 中有相当好的解释（但也可以在您的 \ConTeXt\ 发行版中查找名为 {\tt examples-naturaltables.pdf} 的文件），而对于{\em 极端表格}，在 \suite- 文档中有一篇关于它们的文档（查找名为 {\tt xtables-mkiv.pdf} 的文件）。
+
+与图像类似的情况也发生在表格上：我们可以在文档中的某个点简单地编写必要的命令来生成表格，并将其精确地插入到那个点，或者我们可以使用 \PlaceMacro{placetable}\tex{placetable} 命令来插入表格。后一种方法有一些优点：
+
+\startitemize
+
+  \item \ConTeXt\ 将为表格编号并将其添加到表格列表中，允许对表格进行内部引用（通过其编号），并将其包含在（最终的）表格索引中。
+
+  \item 将获得在文档中放置表格的灵活性，从而简化分页任务。
+
+\stopitemize
+
+\tex{placetable} 的格式类似于我们看到的 \tex{placefigure}（参见 \in{Section}[sec:placefigure]）：
+
+\type{\placetable[Options] [Label] {Title} {table}}
+
+关于与表格放置和标题配置相关的选项，我请读者参考 \in{Sections}[sec:placingobjects] 和 \in{}[sec:confcaptions]。然而，其中有一个选项似乎是专为表格设计的。这就是 \MyKey{split} 选项，当设置时，它授权 \ConTeXt\ 将表格扩展到两页或更多页，在这种情况下，表格不能再是浮动对象。
+
+一般来说，我们可以使用 \PlaceMacro{setuptables}\tex{setuptables} 命令设置表格的配置。此外，与图像一样，可以使用 \PlaceMacro{placelistoftables}\tex{placelistoftables} 或 \PlaceMacro{completelistoftables}\tex{completelistoftables} 生成表格索引。有关打印此类列表的更多信息，请参见 \in{Section}[sec:variouslists]。
+
+\stopsubsection
+
+
+\startsubsection
+  [title={使用 {\tt tabulate} 环境创建简单表格}]
+\PlaceMacro{starttabulate}
+
+最简单的表格是使用 {\em tabulate} 环境实现的，其格式为：
+
+\vbox{\starttyping
+  \starttabulate[表格列布局]
+    ... % 表格内容
+    ...
+    ...
+  \stoptabulate
+\stoptyping}
+
+其中方括号中的参数（以代码形式）描述了表格将具有的列数，并且（有时间接地）指示了它们的宽度。我说该参数{\em 以代码形式}描述了设计，因为乍一看它似乎非常神秘：它由一系列字符组成，每个字符都有特殊的含义。我将一步一步地解释它，因为我认为这样更容易理解。
+
+\startSmallPrint
+
+    这是典型的情况，我们可以配置的方面数量巨大，这意味着需要大量的文本来描述它。这看起来极其困难。事实上，对于实践中构建的大多数表格，第 1 点和第 2 点就足够了。其余的是额外的可能性，知道它们的存在是有用的，但并非排版大多数表格所必需知道的。
+
+\stopSmallPrint
+
+\startsubsubsection
+  [title={{\tt tabulate} 环境的表格列布局}]
+
+我们首先解释如何在 {\tt tabulate} 环境中描述列。完成此操作后，我们将描述如何将实际数据输入到表格中（\in{Subsubsection}[subsubsec:column-data-entry]）。
+
+\startitemize[n]
+
+  \item {\bf 列分隔符}：使用 \MyKey{\|} 字符来分隔表格列。因此，例如，\MyKey{[\|lT\|rB\|]} 将描述一个两列的表格，其中第一列将具有与指示符 \MyKey{l} 和 \MyKey{T}（我们马上会看到）相关联的特性，第二列将具有与 \MyKey{r} 和 \MyKey{B} 相关联的特性。例如，一个简单的三列表格，其中每列中的数据左对齐，将被描述为 \MyKey{[\|l\|l\|l\|]}。
+
+  \item {\bf 确定列中单元格的基本性质：}当我们构建表格时，首先要决定的是我们想要给定单元格的内容始终写在一行上，还是相反，给定单元格的文本可以分布在两行或更多行上（如果文本太长而无法容纳在一行上）。在 {\tt tabulate} 环境中，这个问题不是逐个单元格决定的，而是被视为列的特性。
+
+    \startitemize[a]
+
+      \item {\em 单行单元格：}如果一列中的单元格内容，无论其长度如何，都要写在一行上，我们必须指定该列中文本的对齐方式，可以是左对齐（\MyKey{l}）、右对齐（\MyKey{r}）或居中对齐（\MyKey{c}）。
+
+        \startSmallPrint
+
+            原则上，这些列的宽度将根据需要容纳最宽的单元格。但是我们可以使用 \MyKey{w(Width)} 说明符来限制列的宽度。例如，\MyKey{[\|rw(2cm)\|c\|c\|]} 将描述一个两列的表格，第一列右对齐且精确宽度为 2 厘米，另外两列居中且没有宽度限制。
+
+            需要注意的是，单行列的宽度限制可能会导致一列中的文本与下一列中的文本重叠。因此，我的建议是，当需要固定宽度的列时，始终使用多行单元格列。
+
+        \stopSmallPrint
+
+      \item {\em 如果需要可以占用多行的单元格：}\MyKey{p} 说明符（\quotation{段落}）生成的列中，每个单元格的文本将根据需要占用尽可能多的行。如果我们只指定 \MyKey{p}，列的宽度将是可用的全部宽度（考虑到其他列所需的宽度）。但也可以指示 \MyKey{p(Width)}，在这种情况下，宽度将是指定的宽度。考虑以下示例：
+
+        \starttyping
+\starttabulate[|l|r|p|]
+\starttabulate[|l|p(4cm)|]
+\starttabulate[|r|p(.6\textwidth)|]
+\starttabulate[|p|p|p|]
+        \stoptyping
+
+        第一个示例将创建一个三列表格，第一列和第二列为单行，分别左对齐和右对齐，第三列将占据剩余宽度以及容纳其所有内容所需的高度。在第二个示例中，第二列的宽度正好是四厘米，无论其内容如何；但如果内容不适合该空间，它将占用多行。第三个示例根据行的最大宽度按比例计算第二列的宽度，在最后一个示例中，将有三列平均分配可用宽度。
+
+    \stopitemize
+
+% TODO: 我认为可能有一种比下一段更好的方式来表达想要表达的意思。有人吗？
+
+    \startSmallPrint
+
+        注意，实际上，如果一个单元格是一个四边形，\MyKey{p} 说明符所做的就是根据文本的长度授权列中单元格具有可变高度。
+
+    \stopSmallPrint
+
+  \item {\bf 在列的描述中添加关于要使用的字体样式和变体的指示：}一旦决定了列的基本性质（宽度和高度，自动或固定），我们仍然可以在列内容的描述中添加一个代表{\em 格式}的字符，该字符表示必须书写该列的格式。这些字符可以是 \MyKey{B} 表示粗体，\MyKey{I} 表示斜体，\MyKey{S} 表示倾斜，\MyKey{R} 表示罗马字体，或 \MyKey{T} 表示{\em 打字机}字体。
+
+% TODO: 为什么这个项目之前以 \starthead 开头？
+% (JD 将其改为 \item 以保持一致性，也因为 ':' 单独打印在下一行。)
+%    \starthead {\bf 可以在表格列描述中指定的其他附加方面}：
+%    \stophead
+
+    \item {\bf 可以在表格列描述中指定的其他附加方面}：
+
+    \startitemize[1]
+
+      \item {\em 包含数学公式的列：}\MyKey{m} 和 \MyKey{M} 说明符启用列中的数学模式，而无需在其每个单元格中指定。此列中的单元格将无法容纳普通文本。
+
+        \startSmallPrint
+
+            尽管 \ConTeXt\ 的前身 \TeX\ 是为排版任何类型的数学而生的，但到目前为止，我几乎没有说过关于编写数学的内容。在数学模式中（我不会解释），\ConTeXt\ 会改变我们的正常规则，甚至使用不同的字体。数学模式有两种变体：一种我们可以称之为{\em 线性}，公式包含在包含普通文本的行内（\MyKey{m} 指示符），另一种是{\em 完整数学模式}，在一种没有普通文本的环境中显示公式。在表格中，这两种模式的主要区别基本上是公式书写的大小以及其周围的水平和垂直空间。
+
+        \stopSmallPrint
+
+% TODO(?) 我根据一些实验更改了 JAL 关于（例如）'j1' 增加多少的说法。
+% 没有 j0：比没有任何 j 说明符少 6 磅
+%    j1：比没有说明符多 6 磅（所以 12pt != 比 j0 多 1em）
+%    j2：比 j1 多 12 磅
+% 经过一些实验后，我大幅重写了这一段。
+
+      \item {\em 调整列单元格内容周围的水平空白量}。默认情况下，{\tt tabulate} 环境会在列之间添加一点额外的空间，以确保两个相邻单元格的内容不会相互接触。（请注意，它{\em 不会}在最左侧列的左侧或最右侧列的右侧添加额外空间，如果您的表格设计在左侧或右侧使用垂直线，这一点最为明显。）可以使用类似于 \type{\setuptabulate{unit=10mm}} 的命令来设置此空间量，这将设置{\em 列间}空间为 10mm，在两列之间均匀分布。我们可以使用 \MyKey{in}、\MyKey{jn} 和 \MyKey{kn} 指示符来删除此额外空间或增加它。每个指示符分别用 {\tt n} 乘以 {\tt unit} 空间（默认为 1~em）来替换通常在列的左侧、右侧或两侧（分别）提供的空间量。因此，例如，\MyKey{\|j2r\|} 指定了一列，该列将右对齐，并且我们希望在该单元格内容之后有一个宽度为 2 {\em em} 的空白。如果需要 {\tt unit} 空间的小数倍数，请将小数括在花括号中，如本例所示：\type{j{1.5}}。
+
+      \item {\em 在列的每个单元格的内容之前或之后添加文本}。{\tt b\{Text\}} 和 {\tt a\{Text\}} 说明符导致花括号之间的文本在单元格内容之前（\MyKey{b}，来自 {\em before}）或之后（\MyKey{a}，来自 {\em after}）写入。
+
+      \item {\em 将格式命令应用于整个列}。我们之前提到的 \MyKey{B}、\MyKey{I}、\MyKey{S}、\MyKey{R}、\MyKey{T} 指示符并未涵盖所有格式可能性：例如，没有小型大写字母、{\em 无衬线}或影响字体大小的指示符。使用 \MyKey{f\backslash Command} 指示符，我们可以指定一个格式命令，该命令会自动应用于列中的所有单元格。例如，\MyKey{\|lf\backslash sc\|} 将以小型大写字母排版列的内容。
+
+      \item {\em 将任何命令应用于列中的所有单元格}。最后，\MyKey{h\backslash Command} 指示符将指定的命令应用于列中的所有单元格。
+
+    \stopitemize
+
+\stopitemize
+
+在 \in{Table}[tbl:examplestabulate] 中显示了一些表格格式规范字符串的示例。
+
+\placetable
+  [here]
+  [tbl:examplestabulate]
+  {指定 {\tt tabulate} 中列格式的一些示例}
+{\starttabulate[|lT|p(.6\textwidth)|]
+\HL
+\NC{\bf\rm 格式说明符}
+\NC{\bf 含义}
+\NR
+\HL
+\NC \|l\|
+\NC 生成宽度自动、左对齐的列。
+\NR
+\NC \|rB\|
+\NC 生成宽度自动、右对齐且为粗体的列。
+\NR
+\NC \|cIm\|
+\NC 生成启用数学内容的列。居中且为斜体。
+\NR
+\NC \|j4cb\{---\}\|
+\NC 此列的内容将居中，以长破折号 (---) 开头，右侧有 4 {\tt units} 的空白。
+\NR
+\NC \|l\|p(.7\tex{textwidth})\|
+\NC 生成两列：第一列左对齐且宽度自动。第二列占据行总宽度的 70\%。
+\NR
+\HL
+\stoptabulate}
+
+\stopsubsubsection
+
+
+\startsubsubsection
+  [title={{\tt tabulate} 环境的列条目},
+  reference=subsubsec:column-data-entry]
+
+一旦设计好表格，就需要输入其内容。为了解释如何做到这一点，我将首先描述如何填充一个有行分隔线和列分隔线的表格：
+
+\startitemize
+
+  \item 我们通常先绘制一条水平线。在表格中，这是通过 \PlaceMacro{HL}\tex{HL} 命令（来自 {\em Horizontal Line}）完成的。
+
+  \item 然后我们写第一行：在每个单元格的开头，我们必须指示一个新的单元格开始。这可以通过 \tex{NC} 命令（来自 {\em Next Column}）完成，或者如果需要垂直线，可以使用 \PlaceMacro{VL}\tex{VL} 命令（来自 {\em Vertical Line}）。所以我们以此命令开始，然后写入每个单元格的内容。每次更改单元格时，我们使用 \tex{NC} 或 \tex{VL} 命令（根据需要）。
+
+  \item 在一行的末尾，我们明确指示将使用 \PlaceMacro{NR}\tex{NR} 命令（来自 {\em Next Row}）开始新的一行。在 \tex{NR} 之后，我们重复 \tex{HL} 以绘制新的水平线（如果需要）。
+
+  \item 就这样，一行一行地写出表格的所有行。完成后，我们添加一个 \tex{NR} 命令，如果需要，再添加一个 \tex{HL} 以用底部水平线关闭网格。
+
+\stopitemize
+
+一旦掌握了窍门，这并不特别困难，尽管当我们查看表格的源代码时，很难想象它会是什么样子。在 \in{Table}[tbl:tablecommands] 中，我们看到了可以在表格内使用（且必须使用）的命令。有一些我没有解释，但我认为我给出的描述已经足够了。\ConTeXt\ wiki 上关于 \tex{starttabulate} 的页面有一些此处未解释的选项。
+
+\placetable
+  [here, force]
+  [tbl:tablecommands]
+  {表格内使用的命令}
+{\starttabulate[|l|p(.6\textwidth)|]
+\HL
+\NC {\bf 命令}
+\NC {\bf 含义}
+\NR
+\HL
+\NC \tex{HL}
+\NC 插入一条水平线
+\NR
+\NC \tex{NC}
+\NC 开始新的一列
+\NR
+\NC \tex{NR}
+\NC 开始新的一行
+\NR
+\NC \tex{VL}
+\NC 插入分隔列的垂直线（用于代替 \tex{NC}）
+\NR
+\NC \PlaceMacro{NN}\tex{NN}
+\NC 在数学模式下开始一列（用于代替 \tex{NC}）
+\NR
+\NC \PlaceMacro{TB}\tex{TB}
+\NC 在两行之间添加一些额外的垂直空间
+\NR
+\NC \PlaceMacro{NB}\tex{NB}
+\NC 指示下一行开始一个不可分割的块，在该块内不能有分页
+\NR
+\HL
+\stoptabulate}
+
+现在，作为示例，我将转录编写 \in{Table}[tbl:tablecommands] 的代码。
+
+\starttyping
+\placetable
+  [here]
+  [tbl:tablecommands]
+  {表格内使用的命令}
+{\starttabulate[|l|p(.6\textwidth)|]
+\HL
+\NC {\bf 命令}
+\NC {\bf 含义}
+\NR
+\HL
+\NC \tex{HL}
+\NC 插入一条水平线
+\NR
+\NC \tex{NC}
+\NC 开始新的一列
+\NR
+\NC \tex{NR}
+\NC 开始新的一行
+\NR
+\NC \tex{VL}
+\NC 插入分隔列的垂直线（用于代替 \tex{NC}）
+\NR
+\NC \tex{NN}
+\NC 在数学模式下开始一列（用于代替 \tex{NC}）
+\NR
+\NC \tex{TB}
+\NC 在两行之间添加一些额外的垂直空间
+\NR
+\NC \tex{NB}
+\NC 指示下一行开始一个不可分割的块，在该块内不能有分页
+\NR
+\HL
+\stoptabulate}
+\stoptyping
+
+读者会注意到，我通常为每个单元格使用一行（或两行）文本。在真实的源文件中，我会为每个单元格只使用一行文本；在示例中，我拆分了太长的行。为每个单元格使用一行使我更容易编写表格，因为我所做的是写入每个单元格的内容，没有行或列分隔命令。写完所有内容后，我选择表格中的文本，并要求我的文本编辑器在每行的开头插入 \quotation{\tex{NC }}。之后，每两行（因为表格有两列），我插入一行添加 \tex{NR} 命令，因为每两列开始新的一行。最后，我手动在我希望出现水平线的位置插入 \tex{HL} 命令。我描述它所用的时间几乎比实际做它还要长！
+
+但也要注意，在表格中，我们可以使用 \ConTeXt\ 的普通命令。特别是在此表格中，我们不断使用 \tex{tex}，这在 \in{Section}[sec:verbatim] 中有解释。
+
+\stopsubsubsection
+
+\stopsubsection
+
+\stopsection
+
+
+\startsection
+    [title={图像、表格及其他浮动对象的共同方面}]
+
+我们已经知道，图像和表格不一定是浮动对象，但它们是很好的候选对象，尽管它们必须通过 \tex{placefigure} 或 \tex{placetable} 命令插入到文档中。除了这两个命令之外，在 \ConTeXt\ 中，我们还有 \PlaceMacro{placechemical}\tex{placechemical} 命令（用于插入化学公式）、\PlaceMacro{placegraphic}\tex{placegraphic} 命令（用于插入图形）和 \PlaceMacro{placeintermezzo}\tex{placeintermezzo} 命令，用于插入 \ConTeXt\ 称之为{\em 间奏曲}的结构。\footnote{在书籍中，间奏曲是分隔较长段落的短小插曲。} 所有这些命令又是一个更通用命令的具体应用，该命令称为 \PlaceMacro{placefloat}\tex{placefloat}，其语法如下：
+
+\type{\placefloat [Name] [Options] [Label] {Title} {Contents}}
+
+请注意，\tex{placefloat} 与 \tex{placefigure} 和 \tex{placetable} 相同，除了第一个参数，在 \tex{placefloat} 中它接受浮动对象的名称。这是因为{\em 每种类型的浮动对象都可以通过两个不同的命令插入到文档中}：\tex{placefloat[TypeName]} 或 \tex{placeTypeName}。换句话说：\tex{placefloat[figure]} 和 \tex{placefigure} 是完全相同的命令，就像 \tex{placefloat[table]} 与 \tex{placetable} 是相同的命令一样。
+
+因此，从现在起，我将讨论 \tex{placefloat}，但请注意，我所说的一切也将适用于 \tex{placefigure} 或 \tex{placetable}，它们是该命令的具体应用。
+
+\tex{placefloat} 的参数是：
+
+\startitemize
+
+  \item {\tt Name}：指的是相关的浮动对象。它可以是一些预定义的浮动对象（{\tt figure, table, chemical, intermezzo}）或由我们自己使用 \tex{definefloat} 创建的浮动对象（参见 \in{Section}[sec:definefloat]）。
+
+  \item {\tt Options}：一系列符号词，告诉 \ConTeXt\ 应该如何插入对象。其中绝大多数涉及{\em 在哪里}插入它。我们将在下一节中看到这一点。
+
+  \item {\tt Label}：用于内部引用此对象的标签。
+
+  \item {\tt Title}。要添加到对象的标题文本。关于其配置，请参见 \in{Section}[sec:confcaptions]。
+
+  \item {\tt Contents}。这当然取决于对象的类型。对于图像，通常是一个 \tex{externalimage} 命令；对于表格，是创建表格的命令；对于{\em 间奏曲}，是一个（可能带有框架的）文本片段；等等。
+
+\stopitemize
+
+前三个参数在方括号中引入，是可选的。最后两个（在花括号之间引入）是必需的，尽管它们可以为空。因此，例如：\cmd{placefloat\{\}\{\}} 将在文档中插入：
+
+\placefloat{}{}
+
+（此处框架的大小显示了当选项或内容未指定大小时 \ConTeXt\ 的默认大小。）
+
+\startitemize
+
+    {\bf 注意：}我们看到 \ConTeXt\ 认为要插入的对象是图像，因为它被编号为图像并包含在 \Conjecture 图像列表中。这让我假设图像是默认的浮动对象。
+
+\stopitemize
+
+\startsubsection
+  [
+    reference=sec:placingobjects,
+    title={浮动对象插入选项},
+  ]
+
+\tex{placefigure}、\tex{placetable} 和 \tex{placefloat} 中的 {\tt Options} 参数控制与插入这些类型对象相关的不同方面，主要是对象将插入到页面上的位置。这里支持几个值，每个值具有不同的性质：
+
+\startitemize
+
+  \item 一些插入位置是相对于页面元素建立的（{\tt top}、{\tt bottom}、{\tt inleft}、{\tt inright}、{\tt inmargin}、{\tt margin}、{\tt leftmargin}、{\tt rightmargin}、{\tt leftedge}、{\tt rightedge}、{\tt innermargin}、{\tt inneredge}、{\tt outeredge}、{\tt inner}、{\tt outer}）。当然，它必须是一个能够适应其预期放置区域的对象，并且必须在页面布局中为该元素预留了空间。关于这一点，请参见章节 \in{}[sec:page-elements] 和 \in{}[sec:pagelayout]。
+
+  \item 其他可能的插入位置更与对象周围的文本相关，并且是关于对象应放置在哪里以便文本围绕它流动的指示。基本上，这些是 {\tt left} 和 {\tt right} 值。
+
+  \item {\tt here} 选项被解释为一种建议，即将对象保留在源文件中所在的位置。如果分页要求不允许，则此{\em 建议}将不会被尊重。如果我们添加 {\tt force} 选项，此指示会得到加强，其确切含义是：强制在该点插入对象。请注意，通过强制在特定点插入，该对象将不再是浮动的。
+
+  \item 其他可能的选项与要插入对象的页面有关：\MyKey{page} 将其插入新页面；\MyKey{opposite} 将其插入当前页的对面页；\MyKey{leftpage} 将其插入偶数页；\MyKey{rightpage} 将其插入奇数页。
+
+\stopitemize
+
+有一些选项与对象的位置无关。其中包括：
+
+\startitemize
+
+  \item {\tt none}：此选项抑制标题。
+
+  \item {\tt split}：此选项允许对象扩展到一页以上。当然，它必须是一个本质上可分割的对象，例如表格。当使用此选项并且对象被分割时，它不能再被称为浮动对象。
+
+\stopitemize
+
+\stopsubsection
+
+
+\startsubsection
+  [
+    reference=sec:confcaptions,
+    title={配置浮动对象标题},
+  ]
+
+除非我们在 \tex{placefloat} 中使用 \MyKey{none} 选项，否则默认情况下，浮动对象会关联一个由三个元素组成的标题：
+
+\startitemize
+
+  \item 相关对象类型的名称。该名称与对象类型的名称完全相同；因此，例如，如果我们定义了一个名为 \quotation{sequence} 的新浮动对象，并将一个 \quotation{sequence} 作为浮动对象插入，标题将是 \quotation{Sequence~1}。这仅仅是对象名称的首字母大写。
+
+    \startSmallPrint
+
+        尽管刚刚说了，但如果文档的主要语言不是英语，预定义对象（例如 \MyKey{figure} 或 \MyKey{table} 对象）的英文名称将被翻译。因此，例如，在西班牙语文档中，\MyKey{figure} 对象被称为 \MyKey{Figura}，而 \MyKey{table} 对象被称为 \MyKey{Tabla}。可以使用 \tex{setuplabeltext} 更改预定义对象的这些西班牙语名称，如 \in{Section}[sec:labels] 中所述。
+
+    \stopSmallPrint
+
+  \item 其编号。默认情况下，对象按章节编号，因此第 3 章的第一个表格将是 \quotation{Table~3.1}。
+
+  \item 其内容。这是作为 \tex{placefloat} 的一个参数引入的。
+
+\stopitemize
+
+使用 \PlaceMacro{setupcaptions}\tex{setupcaptions} 或 \PlaceMacro{setupcaption}\tex{setupcaption[Object]}，我们可以更改编号系统和标题本身的外观。第一个命令将影响所有对象的所有标题，第二个命令将仅影响特定类型对象的标题：
+
+\startitemize
+
+  \item 至于编号系统，这由 {\tt number}、{\tt way}、{\tt prefixsegments} 和 {\tt numberconversion} 选项控制：
+
+    \startitemize
+
+      \item {\tt number} 可以采用 {\tt yes}、{\tt no} 或 {\tt none} 值，并控制是否会有编号。
+
+      \item {\tt way} 指示编号是贯穿整个文档连续编号（{\tt way=bytext}），还是在每章开头重新开始（{\tt way=bychapter}）或每节开头重新开始（{\tt way=bysection}）。在重新开始的情况下，将此选项的值与 {\tt prefixsegments} 选项协调是适当的。
+
+      \item {\tt prefixsegments} 指示编号是否会有{\em 前缀}，以及前缀是什么。因此，{\tt prefixsegments=chapter} 导致对象编号始终以章节编号开头，而 {\tt prefixsegments=section} 将在对象编号前加上节编号。
+
+      \item {\tt numberconversion} 控制编号的类型。此选项的值可以是：阿拉伯数字（\MyKey{numbers}）、小写字母（\MyKey{a}、\MyKey{characters}）、大写字母（\MyKey{A}、\MyKey{Characters}）、小型大写字母（\MyKey{KA}）、大写罗马数字（\MyKey{I}、\MyKey{R}、\MyKey{Romannumerals}）、小写罗马数字（\MyKey{i}、\MyKey{r}、\MyKey{romannumerals}）或小型大写罗马数字（\MyKey{KR}）。
+
+    \stopitemize
+
+  \item 标题本身的外观由众多选项控制。我将列出它们，但关于每个选项含义的详细解释，我请读者参考 \in{Section}[sec:titlestyle]，其中解释了节命令外观的控制，因为这些选项基本相同。相关选项是：
+
+    \startitemize
+
+      \item 控制标题所有元素的格式：{\tt style}、{\tt color}、{\tt command}。
+
+      \item 仅控制对象类型的名称格式：{\tt headstyle}、{\tt headcolor}、{\tt headcommand}、{\tt headseparator}。
+
+      \item 仅控制编号格式：{\tt numbercommand}。
+
+      \item 仅控制标题本身的格式：{\tt textcommand}。
+
+    \stopitemize
+
+  \item 我们还可以控制其他方面，例如构成标题的不同元素之间的距离、标题的宽度、其相对于对象的位置等。关于可以使用此命令配置的选项，我请读者参考 \goto{\ConTeXt\ wiki}[url(wiki)] 中的信息。
+
+\stopitemize
+
+\stopsubsection
+
+
+\startsubsection
+  [
+    reference=sec:startcombination,
+    title={两个或多个对象的组合插入},
+  ]
+
+要在文档中插入两个或多个不同的对象，使得 \ConTeXt\ 将它们保持在一起并视为单个对象，我们使用 \PlaceMacro{startcombination}\tex{startcombination} 环境，其语法为：
+
+\type{\startcombination[Ordering] ... \stopcombination}
+
+其中 {\tt Ordering} 指示对象应如何排序：如果它们都需要水平排序，{\tt Ordering} 仅指示要组合的对象数量。但是，如果我们想将对象组合成两行或更多行，我们将不得不指示每行的对象数量，然后是行数，并用 \quote{*} 字符分隔这两个数字。例如：
+
+\starttyping
+\startcombination[3*2]
+  {\externalfigure[test1]}
+  {\externalfigure[test2]}
+  {\externalfigure[test3]}
+  {\externalfigure[test4]}
+  {\externalfigure[test5]}
+  {\externalfigure[test6]}
+\stopcombination
+\stoptyping
+
+这将产生以下图像对齐。
+
+\startcombination[3*2]
+  {\externalfigure[test1]}
+  {\externalfigure[test2]}
+  {\externalfigure[test3]}
+  {\externalfigure[test4]}
+  {\externalfigure[test5]}
+  {\externalfigure[test6]}
+\stopcombination
+
+在前面的示例中，我组合的图像实际上并不存在（在本文档的源代码中），这就是为什么 \ConTeXt\ 生成了带有它们信息的文本框来代替图像。
+
+另一方面，请注意，\tex{startcombination} 中的每个要组合的元素都被括在花括号内。
+
+实际上，\tex{startcombination} 不仅允许我们连接和对齐图像，还允许任何类型的{\em 盒子}，例如 \tex{startframedtext} 环境中的文本、表格等。要配置组合，我们可以使用 \tex{setupcombination} 命令，并且还可以使用 \PlaceMacro{definecombination}\tex{definecombination} 创建预配置的组合。
+
+\stopsubsection
+
+
+\startsubsection
+    [title={浮动对象的一般配置}]
+
+我们已经看到，使用 \tex{placefloat} 我们可以控制正在插入的浮动对象的位置和一些其他细节。也可以配置：
+
+\startitemize
+
+  \item 特定类型浮动对象的全局特性。这是通过 \PlaceMacro{setupfloat}\cmd{setupfloat[Name of type of floating object]} 完成的。
+
+  \item 我们文档中所有浮动对象的全局特性。这是通过 \PlaceMacro{setupfloats}\tex{setupfloats} 完成的。
+
+\stopitemize
+
+请记住，正如 \tex{placefloat[figure]} 等同于 \tex{placefigure} 一样，\tex{setupfloat[figure]} 等同于 \tex{setupfigures}，而 \tex{setupfloat[table]} 等同于 \tex{setuptables}。
+
+关于这些命令的可配置选项，我请读者参考 \ConTeXt\ 官方命令列表（\in{Section}[sec:qrc-setup-en]）。
+
+\stopsubsection
+
+
+\startsection
+  [
+    reference=sec:definefloat,
+    title={定义额外的浮动对象},
+  ]
+  \PlaceMacro{definefloat}
+
+\tex{definefloat} 命令允许我们定义自己的浮动对象。其语法为：
+
+\type{\definefloat [Singular name] [Plural name] [Configuration]}
+
+其中 {\tt Configuration} 参数是一个可选参数，允许我们在创建时指示此新对象的配置。我们也可以稍后使用 \tex{setupfloat[Name in the singular]} 进行配置。
+
+由于我们以本节结束本入门介绍，我将借此机会更深入地探讨 \ConTeXt\ 命令看似{\em 丛林}的现象，一旦理解了，它就不再是那么一个{\em 丛林}，实际上是非常合理的。
+
+让我们首先问问自己，对于 \ConTeXt 来说，浮动对象到底是什么，答案是它是一个具有以下特征的对象：
+
+\startitemize
+
+  \item 相对于其在页面上的位置，它有一定的自由空间。
+
+  \item 它有一个关联的{\em 列表}，允许对这些对象进行编号，并最终生成它们的索引。
+
+  \item 它有一个标题。
+
+  \item 当对象确实可以浮动时，它必须被视为一个不可分割的单位，即（用 \TeX\ 术语来说）{\em 封闭在一个盒子中}。
+
+\stopitemize
+
+换句话说，浮动对象实际上由三个元素组成：对象本身、与其关联的列表以及标题。要控制对象本身，我们只需要一个命令来设置其位置，另一个命令将对象插入文档；要设置列表方面，通用列表控制命令就足够了；要设置标题方面，通用标题控制命令就足够了。
+
+而这正是 \ConTeXt\ 的精妙之处：它本来可以设计成一个简单的命令来控制浮动对象（\tex{setupfloats}），以及一个简单的命令来插入浮动对象：\tex{placefloat}；但 \ConTeXt\ 所做的是：
+
+\startitemize[n]
+
+  \item 设计一个命令来将名称链接到特定的浮动对象配置。这就是 \tex{definefloat} 命令，它实际上不链接一个名称，而是链接两个名称，一个单数形式和一个复数形式。
+
+  \item 与全局浮动对象配置命令一起，创建一个允许仅配置特定类型对象的命令：\tex{setupfloat[Object]}。
+
+  \item 在浮动对象位置命令（\tex{placefloat}）中添加一个参数，允许区分对象类型：(\tex{placefloat[Object]})。
+
+  \item 为浮动对象的所有操作创建包含对象名称的命令。其中一些命令（实际上是其他更通用命令的克隆）将使用对象的单数名称，而其他命令将使用其复数名称。
+
+\stopitemize
+
+因此，当我们创建一个新的浮动对象并告诉 \ConTeXt\ 其单数和复数名称时，\ConTeXt：
+
+\startitemize
+
+  \item 在内存中保留一个空间来存储该对象类型的特定配置。
+
+  \item 使用该对象类型的单数名称创建一个新列表，因为浮动对象与列表相关联。
+
+  \item 创建一个链接到此新对象类型的新\quotation{标题}类型，以维护这些标题的定制配置。
+
+  \item 最后，它创建一组特定于该新对象类型的新命令，其名称实际上是更通用命令的同义词。
+
+\stopitemize
+
+在 \in{Table}[tbl:floatcommands] 中，我们可以看到当我们定义一个新的浮动对象时自动创建的命令，以及它们同义的更通用命令：
+
+\placetable
+  [here]
+  [tbl:floatcommands]
+  {创建新浮动对象时自动创建的命令}
+{\switchtobodyfont[small]
+\starttabulate[|lT|lT|lT|]
+\HL
+\NC{\bf\rm 命令}
+\NC{\bf\rm 同义词}
+\NC{\bf\rm 示例}
+\NR
+\HL
+\NC\backslash completelistof<复数名称>
+\NC\backslash completelist[复数名称]
+\NC\backslash completelistoffigures
+\NR
+\NC\backslash place<单数名称>
+\NC\backslash placefloat[单数名称]
+\NC\backslash placefigure
+\NR
+\NC\backslash placelistof<复数名称>
+\NC\backslash placelist[复数名称]
+\NC\backslash placelistoffigures
+\NR
+\NC\backslash setup<单数名称>
+\NC\backslash setupfloat[单数名称]
+\NC\backslash setupfigure
+\NR
+\HL
+\stoptabulate
+}
+
+\startSmallPrint
+
+    实际上，还会创建一些与前述命令同义的附加命令，由于我没有将它们包含在本章的解释中，因此我从 \in{Table}[tbl:floatcommands] 中省略了它们，它们是：\tex{start<单数名称>}、\tex{start<单数名称>text} 和 \tex{startplace<单数名称>}。
+
+\stopSmallPrint
+
+我使用了用于图像的命令（\quotation{figures}）作为定义新浮动对象时创建的命令的示例；我这样做是因为图像、表格以及 \ConTeXt\ 预定义的其余浮动对象都是 \tex{definefloat} 的实际案例：
+
+\starttyping
+\definefloat[chemical][chemicals]
+\definefloat[figure][figures]
+\definefloat[table][tables]
+\definefloat[intermezzo][intermezzi]
+\definefloat[graphic][graphics]
+\stoptyping
+
+最后，我们看到，实际上 \ConTeXt\ 绝不控制包含在每个特定浮动对象中的任何类型的材料；它假定这是作者的工作。这就是为什么我们也可以使用 \tex{placefigure} 或 \tex{placetable} 命令插入文本。然而，使用 \tex{placefigure} 输入的文本被包含在图像列表中，如果使用 \tex{placetable} 输入，则被包含在表格列表中。
+
+\stopsection
+
+\stopchapter
+
+\stopcomponent
+
+%%% Local Variables:
+%%% mode: ConTeXt
+%%% eval: (auto-fill-mode 1)
+%%% coding: utf-8-unix
+%%% TeX-master: "../introCTX_eng.tex"
+%%% End:
+%%% vim:set filetype=context tw=75 : %%%

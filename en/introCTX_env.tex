@@ -1,0 +1,510 @@
+%%% vim: set tw=72 %%%
+%%% File:      introCTX_env.tex
+%%% Author:    Joaquín Ataz-López et al
+%%% Created:   March 2020
+%%% File edited with: Emacs + AUCTeX - vim
+%
+% This file contains the preamble of the introduction to ConTeXt.  In
+% the beginning I copied it from the source of the file about.pdf,
+% included in the documentation on ConTeXt Standalone, and from there
+% some things were changed in accordance with need.
+
+\startenvironment introCTX_env.tex
+
+    \mainlanguage[en] % Main language = English
+
+    \setupbodyfont[modern] % The document's main (body) font
+
+    % Page layout
+
+    \setuplayout
+        [
+            width=middle,
+            height=middle,
+            topspace=2.5cm,
+            backspace=3cm,
+            header=1cm,
+            headerdistance=0.5cm,
+            footer=0.5cm
+        ]
+
+    % Use Roman numerals for the frontmatter:
+    \defineconversionset[frontpart:pagenumber]
+                        []
+                        [romannumerals]
+
+    % And when we start the bodymatter, reset page number to 1:
+    \startsectionblockenvironment[bodypart]
+        \setupuserpagenumber[number=1]
+    \stopsectionblockenvironment
+
+    \setupexternalfigures[directory=img, location=global] % Image directory
+
+    \setupwhitespace[big] % Larger vertical space
+
+    \setupitemize[indenting=none] % First line of paragraphs not indented
+
+    \setupcaptions[headstyle=\bfx, style=\tfx] % Style of table and image titles
+
+    \definecolor[maincolor] 
+                [.6(orange)] % Title colour
+
+    \definecolor[purple] 
+                [.5(darkblue)] % Cover colour
+
+    % Writing commands and code snippets
+    \setuptype[color=darkmagenta]
+    \setuptyping[color=darkmagenta, style={\switchtobodyfont[small, tt]}]
+
+    % Labels
+    \setuplabeltext
+        [en]
+        [
+            chapter=Chapter~,
+            appendix=Appendix~,
+            part=Part~
+        ]
+
+    % Footnotes
+    \setupnotation
+        [footnote]
+        [way=bypage, numberconversion=n, after={\blank[small]}]
+
+    % Page number location on non-"/title/chapter/section/" pages:
+    \setuppagenumbering[location={header, right}]
+    % The cover page does not get a number (apparently \startXYZmakeup pages
+    % don't get page numbers), but conceptually it is page 'i'.
+    % Set the page number to 2 to take this unnumbered page into account.
+    % (TODO: This is wrong when the cover page has not been included; fix!)
+    \setupuserpagenumber[number=2]
+
+    % Empty initial footers
+    \setupfootertexts[]
+
+    % CONFIGURATION OF PARTS, CHAPTERS, SECTIONS, ETC.
+
+    % This snippet defines a footer with page numbers. A name is assigned
+    % to it, and then, when section commands are configured, this name is
+    % assigned to the first page of part and chapter.
+    \definetext[ChapterFirstPage]
+               [footer]
+               [pagenumber]
+
+    \setuphead
+        [part]
+        [
+            placehead=yes,
+            alternative=middle,
+            conversion=I,
+            style={\switchtobodyfont[40pt]\bf},
+            color=purple,
+            before={\ \godown[4cm]},
+            header=high,
+            footer=ChapterFirstPage,
+        ]
+
+    \setuphead
+        [title, chapter]
+        [
+            style={\switchtobodyfont[30pt]\bf},
+            align=flushright,
+            before={\blank[5*big, force]},
+            after={\blank[2*big]},
+            color=maincolor,
+            sectionsegments=2:2,
+            commandbefore={\blank[small]},
+            header=high,
+            footer=ChapterFirstPage,
+        ]
+
+    % JD note: I hate seeing a section or subsection start right at the
+    % bottom of a page, maybe leaving no lines of text after the title.
+    % So add `\need' to the following setups.  
+    % Why not \testpage[...]?  Good question.  See definition of \need below.
+    % (And yes, the definition is plain TeX-y, not ConTeXt-y.  Mea culpa.)
+    %
+    % The \need 10\baselineskip below says "don't start a new section
+    % within 10 lines of the bottom of the page".
+    % Ditto (but smaller amounts) for subsection and subsubsection.
+    \setuphead
+        [section, subject]
+        [
+            style={\bfc},
+            before={\blank[2*big]\need 10\baselineskip\relax },
+            after=\blank,
+            color=maincolor,
+            sectionsegments=2:3,
+        ]
+
+    \setuphead
+        [subsection, subsubject]
+        [
+            style={\bfb},
+            before=\blank\need 8\baselineskip\relax,
+            after=\blank,
+            color=maincolor,
+            sectionsegments=2:4,
+        ]
+
+    \define[1]\PlacePoint{#1.}
+
+    \setuphead
+        [subsubsection, subsubsubject]
+        [
+            sectionsegments=5:5,
+            conversion=A,
+            style=\bfa,
+            before=\need 5\baselineskip\relax,
+            color=black,
+            numbercommand=,
+        ]
+
+    \setuphead
+        [subsubsection]
+        [numbercommand=\PlacePoint]
+
+
+    % Structures defined by me
+
+    \definedescription
+        [description]
+        [
+            alternative=hanging,
+            width=fit,
+            distance=0.3cm,
+            headstyle=\bf
+        ]
+
+    \definedescription
+        [semitable]
+        [
+            alternative=left,
+            width=fit,
+            distance=1cm,
+            headcolor=darkmagenta,
+            headstyle=\tt,
+        ]
+
+
+    % ENVIRONMENTS
+
+    % DoubleExample: For two column examples. It gave some errors when
+    % defining it with \definestartstop (due to my lack of knowledge) and
+    % in the end what I did was to define a TeX style command for opening
+    % it, and another command for closing it.
+    \def\startDoubleExample
+    {
+        \startframedtext
+            [frame=off]
+            \switchtobodyfont[small]
+            \setuptyping[style=tt]
+            \startcolumns
+                [
+                    n=2,
+                    tolerance=verytolerant,
+                    distance=0.5cm,
+                    separator=rule,
+                    rulecolor=darkmagenta
+                ]
+    }
+    \def\stopDoubleExample{\stopcolumns\stopframedtext}
+
+    % Small print
+    \definestartstop[SmallPrint]
+                    [
+                        before={\startnarrower\switchtobodyfont[small,ss]},
+                        after={\stopnarrower},
+                    ]
+
+
+    % Commands and abbreviations
+
+    % An alternative "non-environment" for showing side-by-side examples of
+    % code and results.  The code must be stored in a buffer.
+    % The output is wrapped in a frame so that it stays together on a page.
+    % Ironically, this uses some "beyond introductory"-level stuff.
+    % Usage: \ShowAndExecute          --- \typebuffer, \getbuffer
+    % Usage: \ShowAndExecute[Buf]     --- \typebuffer[Buf], \getbuffer[Buf]
+    % Usage: \ShowAndExecute[Buf1][Buf2] --- \typebuffer[Buf1], \getbuffer[Buf2]
+    %        (third case used when it you need to "cheat" for some good reason).
+
+    \defineparagraphs[ShowAndExecute]
+                     [n=2, rule=on, rulecolor=darkmagenta, 
+                      distance=0.75cm, tolerance=verytolerant]
+    \unprotect % Allow _ and @ in macro names
+    \tolerant\def\ShowAndExecute [#1]#*[#2]
+    {
+        \startnarrow[middle=15pt]
+            % Use a frame here to keep things together on one page.
+            \startframedtext[offset=none,width=local,frame=off]
+                \startparagraphs[ShowAndExecute]
+                    \ifparameter#1\or
+                        \typebuffer[#1]
+                        \nextShowAndExecute
+                        \switchtobodyfont[small]
+                        % By default \\ means "start a new paragraph" in
+                        % the paragraphs environment, but that is not
+                        % desired in this case.  Deal with it.
+                        \let\\=\crlf
+                        \ifparameter#2\or
+                            \getbuffer[#2]
+                        \else
+                            \getbuffer[#1]
+                        \fi
+                    \else
+                        \typebuffer
+                        \nextShowAndExecute
+                        \let\\=\crlf			% See above
+                        \switchtobodyfont[small]
+                        \getbuffer
+                    \fi
+                \stopparagraphs
+        \stopframedtext
+            \stopnarrow
+     }
+     \protect
+
+
+    % A (non-environment) command to show an *externally* typeset example
+    % next to the corresponding code.
+    % A frame is drawn around the typeset code to help visualize the page.
+    % This was written to demonstrate footnotes; in MkIV footnote text
+    % did not "migrate" out of a columns environment, but in LMTX it
+    % does, so there had to be some updating of the examples in that
+    % chapter.
+    %
+    % The size of the body font was chosen to make the text in the
+    % typeset code more or less match that in ordinary side-by-side
+    % examples.  This size (26pt at time of writing) is a function of the
+    % font used by \ShowAndExecute and DoubleExample (small at time of
+    % writing) as well as the width argument of \typesetbuffer (namely,
+    % 0.45tw).
+    %
+    % This command requires 0, 1 or 2 buffers inside []:
+    % 0: use the unnamed buffer for both sides
+    % 1: use the argument buffer for both sides
+    % 2: use #1 for the left (typed) side, #2 for the right (executed) side.
+    %    (This is in case the typeset version needs a bit of "cheating"
+    %    to make the output look good.)
+    %
+    % The optional third argument, which must be in {}, is used to
+    % over-ride [...=...] arguments of \definepapersize.
+    % See the macro itself for the default width and height.
+    % Caution: typeset page is (currently) hard-coded to occupy 0.45tw,
+    %          increasing the width of the typeset page using this parameter
+    %          doesn't make the right side bigger, but it will make the
+    %          text look smaller.
+    %
+    % TODO: this produces an overfull \hbox (8.51683pt).
+    %       Where is that heppening, and how can it be fixed.
+    %       The right edge is a bit closer (~=8pt) to the right margin
+    %       than the left edge is to the left margin, but otherwise
+    %       there is no apparent problem with the overfullness.    
+
+    \defineparagraphs[ShowAndTypeset]
+                     [n=2, rule=on, rulecolor=darkmagenta,
+                      distance=0.75cm, tolerance=verytolerant]
+    \unprotect % Allow _ and @ in macro names
+    \tolerant\def\ShowAndTypeset[#1]#*[#2]#:#*#={%
+        \ifparameter#1\or\def\_SAT_B{#1}\else\def\_SAT_B{{}}\fi
+        \ifparameter#2\or\def\_SAT_BB{#2}\else\edef\_SAT_BB{\_SAT_B}\fi
+
+        \startluacode
+	  local preamble = [[
+            \definepapersize[ShowAndTypeset]
+                            [width=200mm, height=100mm, #3]
+            \setuppapersize[ShowAndTypeset]
+            % Margins: roughy 1" margins scaled down to 200/textwidth.
+            % Top and bottom: leave just a bit of white space.
+            \setuplayout[backspace=12mm, rightmargindistance=12mm,
+                         edgedistance=0mm, margin=0mm, edge=0mm,
+                         width=fit,
+                         topspace=2mm, footer=2mm, footerdistance=2mm, 
+                         height=fit]
+            % This makes the text roughly the same as "small":
+            \switchtobodyfont[26pt]
+            % No need for a page number in these examples.
+            \setuppagenumbering[location=]
+            % Without this, footnotes are teeny-tiny
+            \starttext
+          ]]
+          context.tobuffer("TypesetEnvironment", preamble)
+        \stopluacode
+
+        \startnarrow[middle=15pt]
+            % Use a frame here to keep things together on one page.
+            \startframedtext[offset=none,width=local,frame=off]
+                \startparagraphs[ShowAndTypeset]
+                    \ifparameter#1\or
+                        \typebuffer[#1]
+                        \nextShowAndTypeset
+                        \switchtobodyfont[small]
+                        \ifparameter#2\or
+                            \typesetbuffer[TypesetEnvironment,#2]
+                            		  [frame=on,width=0.45tw]
+                        \else
+                            \typesetbuffer[TypesetEnvironment,#1]
+                              		  [frame=on,width=0.45tw]
+                        \fi
+                    \else
+                        \typebuffer
+                        \nextShowAndTypeset
+                        \switchtobodyfont[small]
+                        \typesetbuffer[TypesetEnvironment,{}]
+                              	      [frame=on,width=0.45tw]
+                    \fi
+                \stopparagraphs
+            \stopframedtext
+        \stopnarrow
+    }
+    \protect
+
+
+    % Assumption: Print the assumption icon in the margin
+    \define\Conjecture
+        {\inmargin[line=1]{\externalfigure[miniconjecture.jpg][width=1cm]}}
+
+    % Doubt: Print the doubt icon in the margin
+    \define\Doubt
+        {\inmargin[line=1]{\externalfigure[minidoubt.jpg][width=1cm]}}
+
+    % Example: Show in red and in small print the result of compiling an
+    % earlier code snippet.
+    \define[1]\example{\color[red]{\tfx#1}}
+
+    % ConTeXt Standalone
+    \def\suite-{\quotation{\ConTeXt\ Standalone}}
+
+    % cmd: to be used in place of \tex when, in the source file, there is a
+    % line break in an argument.
+    % ALSO: it isn't verbatim, in that it evaluates the arguments.
+    % JAL had this, but it uses the wrong font for \:
+    %    {{\en\tt\color[darkmagenta]{\backslash #1}}}
+    \define[1]\cmd
+        {{\en\tt\color[darkmagenta]{\tex{}#1}}}
+
+    % Since JAL uses \backslash a lot where he wants {\tt \}, define a
+    % command to produce the correct character for (pseudo-)verbatim text
+    % ("text back slash")
+    % A horrible hack to get a \.  What is The True ConTeXt Way of doing this?
+    \define\ttbs{\char92}
+    \define\textbs{\char92}
+
+    % PalClave:  tt and guillemets (angle quotes)
+    % \define[1]\PalClave{«{\tt #1}»}
+
+    % MyKey: tt and double inverted commas
+    \define[1]\MyKey{\quotation{\tt #1}}
+
+    % Partial chapter table of contents:
+    \def\Separate#1{#1;}
+    \def\TocChap
+    {
+        \startnarrower\switchtobodyfont[small, sl]
+            {\bf Table of Contents:}
+            \setuplist
+                [section, subsection, subsubsection]
+                [pagenumber=no, textcommand=\Separate]
+            \setuplist[section][style=bold]
+            \placecontent[alternative=d]
+        \stopnarrower
+    }
+
+    % A command to forcibly eject this page if there is not the given
+    % amount of space left on the current page.
+    % In principle, in LMTX we should be able to \testpage[...], but
+    % when I tried that in b03_Commands.tex context errored out.
+    % In the fullness of time this should be investigated, but for
+    % expediency here is a less sophisticated test that doesn't error out.
+    % Usage:  \need <dimem>    E.g., \need 1cm
+    \def\need{\afterassignment\zneed\dimen0=}
+    \def\zneed{\relax
+        \ifnum\pagetotal>\pagegoal  % Page may be full, but not yet gone
+            % See if we can easily (0.3\pageshrink?) shrink the page to fit...
+            % If so, bite the bullet & eject the page
+            \dimen0=\pagetotal
+            \advance\dimen0 by -0.3\pageshrink
+            \ifnum\dimen0<\pagegoal
+                \page % was \eject in plain TeX
+            \else
+                % V 1.23 change, see comments above
+                \penalty-500
+            \fi
+        \else
+            \vskip 0pt \par
+            \ifnum\pagetotal>\pagegoal
+                % At great risk, assume a \page is safe here, since all
+                % we've added is glue to get past the end of the page
+                \page % was \eject in plain TeX
+            \fi
+            \advance\dimen0 by \pagetotal
+            \ifdim\dimen0>\pagegoal
+                \page % was \vfill\eject in plain TeX
+            \fi
+        \fi
+     }    
+
+    % Index
+    \defineregister[macro]
+    \define[1]\PlaceMacro{\macro[#1]{\backslash #1}}
+
+    % INTERACTIVITY
+
+    \setupinteraction
+      [
+        state=start,
+        color=darkblue,
+        contrastcolor=darkblue,
+        style=,
+        title={A Not So Short Introduction to ConTeXt LMTX (Community Edition)},
+        author={Joaquín Ataz-López et al},
+      ]
+
+    \setupurl [color=blue, style=\tt]
+
+    \useurl[pragma]
+           [http://www.pragma-ade.com/]
+
+    \useurl[wiki]
+           [https://www.contextgarden.net/]
+
+    % Formerly [https://wiki.contextgarden.net/Symbols/utf8], but then 
+    % Garulfoo changed things.
+    \useurl[wikisymbols]
+           [https://wiki.contextgarden.net/Characters_words_and_fonts/Emoji_and_symbols/utf8]
+
+    % This must come after \setupinteraction.  Ask me not why.
+    \placebookmarks[chapter, section, subsection, subsubsection]
+
+    % TWO INSTRUCTIONS ADDED BY J. TO ELIMINATE MOST HYPHENATION AND GET
+    % BETTER INTERWORD SPACING AS WELL
+
+    % JD note: I have seen cases where using 'hz' causes anomalous line
+    % breaking when paragraphs are being formed.  Specifically, increasing one
+    % inter-word space from "normal size" to "sentence ending size" (which
+    % causes the line to get slightly longer), made the algorithm add yet
+    % another word to that line.  Which is at least counterintuitive.
+    % TODO: I wonder whether we want it or whether we are better off without it.
+    \setupalign[hz, lesshyphenated, verytolerant, stretch]
+
+    % JD: I disagree with this one... I believe the advice "don't use two
+    % spaces after a period" is coming from the word processor world, which
+    % doesn't have the same smarts as TeX about having *slightly* larger
+    % spaces following full stops; TeX doesn't use "two spaces" anyway.
+    % I personally find slightly larger spaces makes reading easier.
+    % So until such time as I am shouted down...
+    % \setuplanguage[en][spacing=packed]% This avoids an extra space
+    %% after full stops (periods) which is no longer 'de rigeur' in printed
+    %% material in English.
+
+    \useURL[SourceCode]
+           [https://codeberg.org/anss-ce/ANSS-CE][][]
+
+\stopenvironment
+
+%%% Local Variables:
+%%% mode: ConTeXt
+%%% eval: (auto-fill-mode 1)
+%%% TeX-master: "introCTX_eng.tex"
+%%% coding: utf-8-unix
+%%% End:

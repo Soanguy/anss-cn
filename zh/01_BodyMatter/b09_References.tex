@@ -1,0 +1,767 @@
+%%% File:      b09_References.tex
+%%% Author:    Joaquín Ataz-López et al
+%%% Begun:     July 2020
+%%% Concluded: August 2020
+%%% Contents:  与前一章类似，本章最初被认为是第12章的一节。但当我开始写作时，我发现它影响了整个文档，因此改变了位置。本章的信息主要来自wiki。
+%%%
+%%% Edited with: Emacs + AUCTeX - 有时也使用 vim + context-plugin
+%%%
+
+% TODO: JAL 使用“label”一词来表示 ConTeXt 所称的“reference”，因为他觉得这样更清晰。
+% 但写到本章约三分之二处时，他注意到这个决定带来了问题，因为 ConTeXt 中也有“label”。
+% 问：是否应该在整个本章中更改术语以匹配 ConTeXt？
+
+\environment introCTX_env.tex
+
+\startcomponent b09_References.tex
+
+\startchapter
+    [title=引用与超链接]
+
+\TocChap
+
+\startsection
+    [title=引用类型]
+
+科技文献中充满了各种引用：
+
+\startitemize
+
+  \item 有时这些引用指向其他文档，这些文档是所述内容的基础，或者与所述内容相矛盾，或者对所述观点进行展开或进一步细化。在这些情况下，该引用被称为{\em 外部引用}，如果文档要求学术严谨，则该引用采用文献{\em 引文}的形式。
+
+  \item 但文档中也常见到，在某个节中引用文档的另一节，此时该引用被称为{\em 内部引用}。当文档中的某一点评论特定图像、表格、注释或类似元素的某个方面，并通过其编号或所在页码来指代时，也属于内部引用。
+
+    为了精确起见，内部引用需要指向文档中精确且易于识别的位置。因此，这类引用总是引用编号元素（例如，当我们说\quotation{见表3.2}或\quotation{第7章}）或页码。像\quotation{如前所述}或\quotation{后文将见}这样的模糊引用不是真正的引用，排版它们没有特殊要求，也没有专门的工具来处理。此外，我个人不鼓励我的博士生或硕士生习惯性地使用这种做法。
+
+\startSmallPrint
+
+内部引用通常也被称为\quotation{交叉引用}，但在本文档中，我通常只使用\quotation{引用}一词，需要明确时则使用\quotation{内部引用}。
+
+\stopSmallPrint
+
+\stopitemize
+
+为了澄清我在引用中使用的术语，我将引入引用的点称为{\em 源点}，将其指向的位置称为{\em 目标点}。这样来看，当源点和目标点位于同一文档中时，该引用称为内部引用；当它们位于不同文档中时，称为外部引用。
+
+从文档排版的角度来看：
+
+\startitemize
+
+  \item 外部引用不构成特殊问题，因此原则上不需要任何工具来引入它们：我需要的来自目标文档的所有数据都是可用的，可以直接在引用中使用。然而，如果源文档是电子文档，并且目标文档也可在网络上访问，则可以在引用中包含超链接，以便直接跳转到目标。在这种情况下，源文档可以说是{\em 交互式}的。
+
+  \item 相比之下，内部引用确实对文档排版构成了挑战，因为任何有准备中等长度科技文档经验的人都知道，页面、节、图像、表格、定理等的编号几乎不可避免地会在文档准备过程中发生变化，这使得手动保持更新非常困难。
+
+    \startSmallPrint
+
+        在计算机出现之前，作者会避免使用内部引用；而那些不可避免的引用，例如目录（如果附带各节的页码，则它是内部引用的一个例子），会在最后才编写。
+
+    \stopSmallPrint
+
+\stopitemize
+
+即使是最受限的排版系统，如文字处理器，也允许包含某种内部交叉引用，例如目录。但这与 \ConTeXt 中包含的全面引用管理机制相比微不足道，该机制还可以将旨在保持引用更新的内部引用管理机制与超链接的使用结合起来，而超链接显然并非外部引用所独有。
+
+\stopsection
+
+
+\startsection
+  [
+    reference=sec:references,
+    title=内部引用,
+  ]
+
+建立内部引用需要两样东西：
+
+\startitemize[n]
+
+  \item 在目标点处的一个标签或标识符。在编译时，\ConTeXt\ 会将特定的数据与该标签关联起来。关联什么数据取决于标签的类型；它可以是节编号、注释编号、图像编号、与编号列表中特定项关联的编号、节标题等。
+
+  \item 在源点处的一个命令。该命令访问与目标点标签相关联的数据，并将其插入到源点处。命令的选择取决于我们希望从标签中提取哪种数据插入到源点。
+
+\stopitemize
+
+当我们考虑引用时，我们是从\quotation{源点~\longrightarrow~目标点}的角度思考的，因此似乎应该先解释与源点相关的事项，然后再解释与目标点相关的。然而，我认为如果反过来解释，会更容易理解引用的逻辑。
+
+\startsubsection
+  [
+    reference=sec:target labels,
+    title=引用目标中的标签,
+  ]
+
+在本章中，我所说的{\em 标签}是指一个文本字符串，它将与引用的目标点相关联，并在内部用于检索有关引用目标点的某些信息，例如页码、节编号等。实际上，与每个标签关联的信息取决于创建它的过程。\ConTeXt\ 称这些标签为{\em 引用}，但我认为“引用”这个术语含义更广，不够清晰。
+
+与引用目标关联的标签：
+
+\startitemize
+
+  \item 要求文档中每个潜在的目标点具有唯一性，以便能够无歧义地识别。如果对不同的目标点使用相同的标签，\ConTeXt\ 不会抛出编译错误，但会导致所有引用都指向它找到的第一个标签（在源文件中），这会产生副作用：我们的一些引用可能是错误的，更糟糕的是，我们可能注意不到。因此，在创建标签时，确保我们分配的新标签之前没有被分配过是很重要的。
+
+% 注意下一段的重排格式，我们希望保留第二段引用中的额外空格。
+
+  \item 可以包含字母、数字、标点符号、空格等。当存在空格时，\ConTeXt\ 关于此类字符的一般规则仍然适用（参见 \in{Section}[sec:spaces]），因此，例如 \quotation{\tt My nice label} 和 \quotation{\tt My \ \ \
+        \ nice \ \ \ \ label} 被视为相同，即使它们使用了不同数量的空格。
+
+\stopitemize
+
+由于标签可以包含哪些字符或多少个字符没有限制，我的建议是使用清晰且有助于我们理解源文件的标签名称，尤其是在我们可能很久之后重新阅读源文件时。这就是为什么我之前给出的例子（\MyKey{My nice label}）不是一个好例子，因为它没有告诉我们标签指向的目标的任何信息。例如，对于本节，使用标签 \MyKey{sec:Target labels} 会好得多。
+
+要将特定目标与标签关联起来，主要有两种方法：
+
+\startitemize[n]
+
+  \item 通过用于创建标签所指向的元素的参数或命令选项。从这个角度来看，所有创建某种结构或文本元素的命令（这些元素可以成为引用目标）都包含一个称为 \MyKey{reference} 的选项，用于包含标签。有时，标签本身就是整个参数的内容，而不是{\em 选项}。
+
+    我在节命令中找到了一个很好的例子来说明这一点，如（\in{Section}[sec:sectionsyntax]）所知，节命令允许使用多种语法。在经典语法中，命令写作：
+
+    \type{\section[Label]{Title}}
+
+    而在 \ConTeXt\ 特有语法中，命令写作
+
+    \starttyping
+\startsection
+  [title=Title, reference=Label, ... ]
+    \stoptyping
+
+    在这两种情况下，该命令都提供了引入一个标签的途径，该标签将与相应的节（或章、小节等）关联。
+
+    % TODO: 西班牙语原文是“lists”，不是“numbered lists”。是否需要修改下一段？
+
+    我说过，这种可能性存在于{\em 所有允许我们创建可以作为引用目标的文本元素的命令}中。这些是所有可以编号的文本元素，包括节、各种浮动对象（表格、图像等）、脚注或尾注、引用、编号列表、描述、定义等。
+
+    \startSmallPrint
+
+        当标签直接作为参数输入，而不是作为赋值的选项时，\ConTeXt\ 允许将多个标签与同一个目标关联。例如：
+
+        \type{\chapter[label1, label2, label3] {My chapter}}
+
+        我不清楚让一个目标拥有多个不同标签有什么优势，并且{\em 猜测}这样做不是因为它能提供优势，而是因为 \ConTeXt\ 的某些{\em 内部}要求适用于某些类型的参数。
+
+    \stopSmallPrint
+
+  \item 通过 \PlaceMacro{pagereference}\tex{pagereference}、\PlaceMacro{reference}\tex{reference} 或 \PlaceMacro{textreference}\tex{textreference} 命令，其语法如下：
+
+    \starttyping
+\pagereference[Label]
+\reference[Label]{Text}
+\textreference[Label]{Text}
+    \stoptyping
+
+    \startitemize
+
+      \item 使用 \tex{pagereference} 创建的标签允许我们检索页码。
+
+      \item 使用 \tex{reference} 和 \tex{textreference} 创建的标签允许我们检索页码以及作为参数包含的任何关联文本。
+
+        在 \tex{reference} 和 \tex{textreference} 中，与标签关联的文本不会出现在命令所在位置（引用目标点）的最终文档中，但可以在引用的源点处被检索并打印出来。
+
+    \stopitemize
+
+\stopitemize
+
+我之前说过，每个标签都关联着关于目标点的某些信息。这些信息是什么取决于标签的类型：
+
+% TODO: “remember”应该用引号还是斜体？
+
+\startitemize
+
+  \item 所有标签都{\em 记住}（即它们使得检索成为可能）创建它们的命令所在的页码。对于可能跨多页的节，该页码将是该节开始的页码。
+
+  \item 使用创建编号文本元素（节、注释、表格、图像等）的命令插入的标签，{\em 记住}与该元素关联的编号（节编号、注释编号等）。
+
+  \item 如果该元素有一个{\em 标题}（如节的情况，以及使用 \tex{placetable} 命令插入的表格等），它们将{\em 记住}这个标题。
+
+  \item 使用 \tex{pagereference} 创建的标签仅{\em 记住}页码。
+
+  \item 使用 \tex{reference} 或 \tex{textreference} 创建的标签还会记住这些命令作为参数所带的关联文本。
+
+    \startSmallPrint
+
+        实际上我不确定 \tex{reference} 和 \tex{textreference} 命令之间的真正区别。我想{\em 猜测}，这三个允许创建标签的命令的设计试图与三个允许从标签检索信息的命令（我们稍后会看到）保持平行；但事实上，根据我的测试，\tex{reference} 和 \tex{textreference} 似乎是冗余的命令。
+
+    \stopSmallPrint
+
+\stopitemize
+
+\stopsubsection
+
+% TODO: 这个子节的标题需要简化。
+
+\startsubsection
+    [title=在引用源点用于检索目标点数据的命令]
+
+我接下来要解释的命令从标签中检索信息，并且，如果我们的文档是交互式的，还会生成到引用目标的连接。但这些命令的重点是从标签中检索到的信息。如果我们只想生成连接，而不从标签中检索任何信息，则必须使用 \in{Section}[sec:createlinks] 中解释的 \tex{goto} 命令。
+
+\startsubsubsection
+    [title=从标签检索信息的基本命令]
+
+考虑到与目标点关联的每个标签可以存储不同的信息项，\ConTeXt\ 包含三个不同的命令来检索这些信息是合乎逻辑的；根据我们想要从引用目标点检索哪种信息，我们选择以下命令之一：
+
+\startitemize
+
+  \item \tex{at} 命令允许我们检索标签的页码。
+
+  \item 对于除了页码之外还记住元素编号（节编号、注释编号、项编号、表格编号等）的标签，\tex{in} 命令允许我们检索这个编号。
+
+  \item 最后，对于记住与标签关联的文本（节标题、使用 \tex{placefigure} 插入的图像标题等）的标签，\tex{about} 命令允许我们检索这个文本。
+
+\stopitemize
+
+这三个 \PlaceMacro{at}\tex{at}、\PlaceMacro{in}\tex{in} 和 \PlaceMacro{about}\tex{about} 命令具有相同的语法：
+
+\starttyping
+\at{Text}[Label]
+\in{Text}[Label]
+\about{Text}[Label]
+\stoptyping
+
+\startitemize
+
+  \item \MyKey{Label} 是我们希望从中检索信息的标签。
+
+  \item \MyKey{Text} 是写在我们要用命令检索的信息之前的文本。在文本和命令检索到的标签数据之间，将插入一个不间断空格，并且如果交互功能被启用，使得该命令除了检索信息外还生成一个允许跳转到目标点的链接，那么作为参数包含的文本将成为链接的一部分（它将是可点击的文本）。
+
+\stopitemize
+
+因此，在下面的例子中，我们看到 \tex{in} 检索节编号，\tex{at} 检索页码。
+
+\startDoubleExample
+\starttyping
+In \in{Section}[sec:target labels], 
+that begins on \at{page}
+[sec:target labels], the
+characteristics of labels used for
+internal references are explained.
+\stoptyping
+
+\column
+
+在 \in{Section}[sec:target labels] 中，该节开始于 \at{page} [sec:target labels]，解释了用于内部引用的标签的特性。
+
+\stopDoubleExample
+
+注意 \ConTeXt\ 自动创建了超链接（参见 \in{Section}[sec:interactivity]），并且 \tex{in} 和 \tex{at} 作为参数接受的文本是链接的一部分。但如果我们以另一种方式书写，结果将是：
+
+\startDoubleExample
+\starttyping
+In section \in{}[sec:target
+labels], that begins on page \at{}
+[sec:target labels], the
+characteristics of labels used for
+internal references are explained.
+\stoptyping
+
+\column
+% TODO: 解释 \about 的作用。
+
+在 section \in{}[sec:target labels] 中，该节开始于 page \at{} [sec:target labels]，解释了用于内部引用的标签的特性。
+
+\stopDoubleExample
+
+文本保持不变，但前面的“section”和“page”这两个词不再包含在链接中，因为它们不再是命令的一部分。
+
+如果 \ConTeXt\ 无法找到 \tex{at}、\tex{in} 或 \tex{about} 命令指向的标签，不会导致编译错误，但在最终文档中本应显示这些命令检索到的信息的位置，我们会看到 \quotation{??}。
+
+\startSmallPrint
+
+    \ConTeXt\ 找不到标签有两个原因：
+
+    \startitemize[n]
+
+      \item 我们写标签时犯了错误（无论是在源点还是目标点）。
+
+      \item 我们只编译了文档的一部分，而标签指向尚未编译的部分（参见 \in{Sections}[input] 和 \in{}[sec-projects]）。
+
+    \stopitemize
+
+    在第一种情况下，需要修复错误。因此，当我们完成整个文档的编译（且第二种情况不再存在）后，最好在 PDF 中搜索所有出现的 \quotation{??}，以检查文档中是否存在{\em 损坏的}引用。
+
+\stopSmallPrint
+
+\stopsubsubsection
+
+
+\startsubsubsection
+    [title=使用 \tex{ref} 命令检索与标签关联的信息]
+\PlaceMacro{ref}
+
+\tex{at}、\tex{in} 和 \tex{about} 各自检索标签的特定元素。另一个命令允许我们检索给定标签的任何元素。这就是 \tex{ref} 命令，其语法为：
+
+\type{\ref[Element to retrieve][Label]}
+
+其中第一个参数可以是：
+
+\startitemize
+
+  \item {\tt text}：返回与标签关联的文本。
+
+  \item {\tt title}：返回与标签关联的标题。
+
+  \item {\tt number}：返回与标签关联的编号。例如，在节中，返回节编号。
+
+  \item {\tt page}：返回页码。
+
+  \item {\tt realpage}：返回实际页码。
+
+  \item {\tt default}：返回 \ConTeXt\ 认为是标签的{\em 自然}元素。通常这与 {\tt number} 返回的内容一致。
+
+\stopitemize
+
+% TODO: 下面的“preamble”用“frontmatter”可能更好？本书前面用了哪个词？
+
+实际上，\tex{ref} 比 \tex{at}、\tex{in} 或 \tex{about} 精确得多；例如，它区分页码和实际页码。如果文档的页码从1500开始（因为本文档是前一个文档的续篇），或者前言部分使用罗马数字编号并在前言结束后重新开始编号，那么页码可能与实际页码不一致。同样，\tex{ref} 区分与引用关联的{\em 文本}和{\em 标题}，而 \tex{about} 则不做区分。
+
+如果使用 \tex{ref} 请求一个不具备特定信息的标签（例如，与脚注关联的标签的标题），该命令将返回一个空字符串。
+
+\stopsubsubsection
+
+
+\startsubsubsection
+    [title=检测链接指向的位置]
+
+\ConTeXt\ 还有两个对{\em 链接方向}敏感的命令。我所说的\quotation{链接方向}，是指确定源文件中的链接目标是在源点之前还是之后。例如：我们正在编写文档，想要引用一个节，该节在最终的目录结构中可能出现在当前节之前或之后——我们还没有决定。在这种情况下，拥有一个命令，能够根据目标在最终文档中最终出现在源点之前还是之后来写入两种不同文本之一，将非常有用。针对此类需求，\ConTeXt\ 提供了 \PlaceMacro{somewhere}\tex{somewhere} 命令，其语法为：
+
+\type{\somewhere{Text if before}{Text if after}[Label]}.
+
+\page[preference]
+
+例如，在下面的文本中，我在源文件中使用了本章中的两个实际标签。一个出现在以下文本之前，一个出现在之后。（以下文本中的“before”和“after”这两个词不是红色的，不是因为 \tex{somewhere} 命令，而是因为它们是链接，已被配置为具有示例中看到的特定颜色。）
+
+\starttyping
+The hyperlink's address can also be detected by the \type{\somewhere} command.
+This way we can also find chapters or other text elements
+\somewhere {before}{after} [sec:references] and discuss their descriptions
+in some other place \somewhere{before}{after} [sec:interactivity].
+\stoptyping
+
+\startnarrower\switchtobodyfont[small]
+
+    \color[red]{超链接的地址也可以通过 \type{\somewhere} 命令检测。这样我们就可以找到章节或其他文本元素 \somewhere {before}{after}[sec:references]，并在其他地方讨论它们的描述 \somewhere {before}{after}[sec:interactivity]。}
+
+\stopnarrower
+
+另一个能够检测其指向的标签是在前还是在后的命令是 \PlaceMacro{atpage}\tex{atpage}，其语法为：
+
+\type{\atpage[label]}
+
+这个命令与前一个非常相似，但它不让我们自己根据标签在前还是在后来编写文本，而是为两种情况分别插入默认文本，并且如果文档是交互式的，还会插入一个超链接。
+
+% TODO: 我认为 \atpage 的解释非常需要一个例子。
+
+\tex{atpage} 插入的文本是与其作为参数的 {\tt label} 相关的内容：如果标签在命令{\em 之前}，则插入与 \MyKey{precedingpage} 标签关联的文本；在相反的情况下，则插入与 \MyKey{hereafter} 关联的文本。
+
+\startSmallPrint
+
+    当我写到这一点时，我被之前的一个决定所困扰：在本章中，我决定将 \ConTeXt\ 称为 \quotation{reference} 的东西称为 \quotation{label}。这在我看来更清晰。但是，由 \ConTeXt\ 命令（例如 \tex{atpage}）生成的某些文本片段也被称为 \quotation{labels}（这次是另一种含义）。（参见 \in{Section}[sec:labels]）。我希望读者不会感到困惑。我认为上下文可以让我们正确区分我在每种情况下所指的 {\em label} 的不同含义。
+
+\stopSmallPrint
+
+因此，我们可以像更改任何其他标签的文本一样更改 \tex{atpage} 插入的文本：
+
+\starttyping
+\setuplabeltext[en][precedingpage=New text ]
+\setuplabeltext[en][hereafter=New text ]
+\stoptyping
+
+\startSmallPrint
+
+% TODO: 需要针对 LMTX 复核此点。
+
+    在这一点上，我认为 \suite-（我正在使用的发行版）中有一个小错误。检查 \ConTeXt\ 中可以用 \tex{setuplabeltext} 更改的预定义标签名称，有两对标签可能是 \tex{atpage} 使用的候选：
+
+    \startitemize[packed]
+
+      \item \MyKey{precedingpage} 和 \MyKey{followingpage}。
+      \item \MyKey{hencefore} 和 \MyKey{hereafter}。
+
+    \stopitemize
+
+    我们可以假设 \tex{atpage} 会使用第一对或第二对。但实际上，对于前面的项，它使用 \MyKey{precedingpage}，对于后面的项，它使用 \MyKey{hereafter}，我认为这是不一致的。
+
+\stopSmallPrint
+
+\stopsubsubsection
+
+\stopsubsection
+
+
+% TODO: 我找不到下面所指的内容。来自 ANSS 的 URL 是 https://wiki.contextgarden.net/References。在 Garulfoo 重组 wiki 后，旧 URL 显示一个页面，指向下面的 URL。但阅读该页面，我没有看到任何相关内容。
+% 有人能识别 JAL 在说什么吗？如果它仍然存在，现在在哪里？
+
+% TODO #2: 最后 JAL 提到了 \showreferences，但当我尝试时，我在 PDF、.log 或 .tuc 文件中都没有看到输出。如果能让它做一些有用的事情，应该在这里注明。
+% 参见 https://www.mail-archive.com/ntg-context@ntg.nl/msg78085.html 获取可能相关的内容，但我无法想象那是 JAL 的意思。
+
+%% 
+%% \startsubsection
+%%     [title=自动生成前缀以避免重复标签]
+%% 
+%% 在大型文档中，避免标签重复并不总是容易的。因此，建议对我们选择使用哪些标签的方式加以整理。一种有帮助的做法是对标签使用前缀，这些前缀会根据标签的类型而变化。例如，\MyKey{sec:} 用于节，\MyKey{fig:} 用于图形，\MyKey{tbl:} 用于表格等。
+%% 
+%% 考虑到这一点，\ConTeXt\ 包含了一套工具，允许：
+%% 
+%% \startitemize
+%% 
+%%   \item \ConTeXt\ 本身自动为所有允许的元素生成标签。
+%% 
+%%   \item 每个手动生成的标签都带有一个前缀，可以是我们自己预先确定的，也可以是由 \ConTeXt\ 自动生成的。
+%% 
+%% \stopitemize
+%% 
+%% 这个机制的详细解释很冗长，尽管它们无疑是有用的工具，但我认为它们不是必需的。因此，由于无法用几句话解释清楚，我宁愿不解释它们，而是请读者参考 \ConTeXt\ 参考手册或 \goto{wiki}[url(https://wiki.contextgarden.net/References_notes_and_floats/References)] 中关于此问题的说明。
+%% 
+%% % 如果我们选择编写自己的标签，一个可以帮助我们避免重复的命令是 \tex{showreferences}：该命令将显示文档中所有已建立的标签列表。
+%% 
+%% \stopsubsection
+
+\stopsection
+
+
+\startsection
+  [
+    reference=sec:interactivity,
+    title=交互式电子文档,
+  ]
+
+只有电子文档才能是交互式的；但并非所有电子文档都是。{\em 电子}文档是指存储在计算机文件中，可以直接在屏幕上打开和阅读的文档。另一方面，{\em 交互式}电子文档是指配备了允许用户{\em 与之交互}的实用程序的文档；也就是说：我们可以做的不仅仅是阅读。例如，当文档包含执行某些操作的按钮、可以通过其跳转到文档另一点（或外部文档）的链接，或者文档中有用户可以书写的区域、可以播放的视频或音频片段等时，就存在交互性。
+
+所有由 \ConTeXt\ 生成的文档都是电子文档（因为 \ConTeXt\ 生成 PDF，而 PDF 本质上就是电子文档），但它们并不总是交互式的。要使它们具有交互性，需要如下一节所示明确指示。
+
+但请记住，尽管 \ConTeXt\ 可以生成交互式 PDF，但要欣赏这种交互性，我们需要一个能够支持它的 PDF 阅读器，因为并非所有 PDF 阅读器都允许我们使用超链接、按钮以及交互式文档特有的类似功能。
+
+\startsubsection
+    [title=启用文档中的交互性]
+\PlaceMacro{setupinteraction}
+
+\ConTeXt\ 除非明确指示，否则不会创建具有交互功能的 PDF；这通常在文档的前言中完成。启用此功能的命令是：
+
+\type{\setupinteraction[state=start]}
+
+通常，当我们要生成交互式文档时，此命令只会在文档前言中使用一次。但实际上，我们可以根据需要多次使用它来改变文档的交互状态。\MyKey{state=start} 命令启用交互性，而 \MyKey{state=stop} 禁用交互性，因此我们可以在文档中想要禁用的某些章或{\em 部分}中禁用交互性。
+
+\startSmallPrint
+
+我想不出任何理由希望交互式文档中包含非交互部分。但 \ConTeXt\ 理念的一个关键部分是，如果某件事在技术上是可行的，即使我们不太可能使用它，也会提供相应的操作步骤。正是这种理念赋予了 \ConTeXt\ 如此多的可能性，也使得像这样的简单介绍无法做到{\em 简短}。
+
+\stopSmallPrint
+
+一旦建立了交互：
+
+\startitemize
+
+  \item 某些 \ConTeXt\ 命令默认包含超链接。例如：
+
+    \startitemize
+
+      \item 用于创建目录的命令，原则上（除非另有明确指示）将是交互式的；即，单击目录中的条目将跳转到相应节开始的页面。
+
+      \item 我们在本章第一部分看到的用于内部引用的命令提供了交互性：单击它们会使支持此功能的 PDF 阅读器跳转到引用目标。
+
+      \item 对于脚注和尾注，单击正文中的注释锚点将带我们到注释所在的页面；此外，单击注释文本中的注释标记将带我们到正文中引用该脚注或尾注的位置。
+
+      \item 等等。
+
+    \stopitemize
+
+  \item 还有其他专门为交互式文档（例如演示文稿）设计的命令可用。演示文稿使用了许多与交互性相关的工具，例如按钮、菜单、图像叠加、嵌入的声音或视频等。解释所有这些内容会太冗长，而且演示文稿是一种相当特殊的文档类型。因此，在下面的内容中，我将只描述与交互性相关的一个功能：超链接。
+
+\stopitemize
+
+\stopsubsection
+
+
+\startsubsection
+    [title=交互性的基本配置]
+
+\tex{setupinteraction} 除了启用或禁用交互之外，还允许我们配置与之相关的一些事项；主要（但不限于）是链接的颜色和样式。这通过以下命令选项完成：
+
+\startitemize
+
+  \item {\tt color}：控制链接的{\em 正常}颜色。
+
+  \item {\tt contrastcolor}：确定目标与源点在同一页面上的链接的颜色。我建议此选项始终设置为与前一个选项相同的内容。
+
+  \item {\tt style}：控制链接样式；例如，\quotation{\type{style=\it}} 会使链接以斜体排版。默认情况下，链接以粗体设置。
+
+  \item {\tt title, subtitle, author, date, keyword}：分配给这些选项的值将转换为 \ConTeXt\ 生成的 PDF 的元数据。
+
+  \item {\tt click}：此选项控制链接在被点击时是否应高亮显示。
+
+\stopitemize
+
+\need 7\baselineskip
+例如，本文档的 \tex{setupinteraction} 命令某一天如下所示：
+\starttyping
+\setupinteraction
+[
+    state=start,
+    color=darkblue,
+    contrastcolor=darkblue,
+    style=,
+    title={A Not So Short Introduction to ConTeXt LMTX (Community Edition)},
+    author={Joaquín Ataz-López et al},
+]
+\stoptyping
+
+\stopsubsection
+
+\stopsection
+
+
+\startsection
+    [title=指向外部文档的超链接]
+
+我将区分不创建链接但有助于排版链接 URL 的命令和创建超链接的命令。让我们分别来看。
+
+\startsubsection
+    [title={帮助排版超链接但不创建它们的命令}]
+
+URL 通常很长，并且包含各种字符，甚至是 \ConTeXt\ 中的保留字符，因此不能直接使用。此外，虽然可能希望有一个由简短的\quotation{人类可读}单词组成的可点击链接，但在其他情况下，可能希望写出完整的 URL。 （如果 PDF 阅读器实现了交互式文档的功能，将鼠标光标悬停在链接上应该会使阅读器显示链接；但是，如果有人打印 PDF，则不会看到链接的实际目标。）
+
+此外，当 URL 本身显示在文档中时，可能很难优雅地排版它，因为 URL 可能不包含 \ConTeXt\ 可以插入换行的可接受位置。较长的 URL 可能超过一行的长度，但即使较短的 URL 也可能碰巧出现在段落中一行的末尾，可能导致换行问题。此外，对 URL 进行断字以插入换行是不合理的，因为读者很难知道连字符是否实际上是 URL 的一部分。
+
+% TODO: JD 的测试表明 \useURL 在处理长 URL 的换行方面做得相当好。所以 JAL 的文本似乎有点过时。首先，我修改了下一段。
+
+\ConTeXt\ 提供了两个用于{\em 排版} URL 的实用程序，将依次讨论。
+%
+% 第一个主要用于内部使用但不会实际显示在文档中的 URL。第二个用于必须写在文档文本中的 URL。让我们分别来看。
+第一个在必要时能较好地处理 URL 的换行。第二个可能功能更强，但它排版的 URL 不可点击（即，它们不是交互式的）。
+
+\need 5\baselineskip
+
+\startdescription{\tex{useURL}}\PlaceMacro{useURL}
+
+此命令允许我们编写一个 URL 并为其关联一个名称，以便当我们在文档中想要使用该 URL 时，可以通过关联的名称来调用它。我们可以在文档正文中的方便位置（但在我们想要使用 URL 之前）或在文档前言中使用 \tex{useURL}。对于将在文档中多次使用的 URL，在前言中定义它们特别有用。
+
+\page[preference]
+
+该命令有两种用法：
+
+\startitemize[n, packed]
+
+  \item \type{\useURL [Associated name] [URL]}
+  \item \type{\useURL [Associated name] [URL] [] [Link text]}
+
+\stopitemize
+
+\startitemize
+
+  \item 在第一个版本中，URL 简单地与一个名称关联，我们将在文档中通过该名称调用它。
+    % TODO(?): JAL 原来说了以下内容，但我不理解，至少相对于我在 LMTX 中看到的情况而言。
+    % 但是，要使用 URL，我们必须在调用它时以某种方式指示在文档中将显示哪个可点击文本。
+    也就是说，当调用 URL 时，完整的 URL 会显示在文档中，并且整个 URL 都是可点击的文本。
+
+%  过行示例：
+% 
+%     \useURL[pppp][http://www.pragma-ade.comgeneralmanualsoioioioioioioiooiowhy-is-there-air.pdf]
+% This sis siisisis     \from[pppp]
+% 
+%     lkslds sdsd dddks d \hyphenatedurl{http://www.pragma-ade.comgeneralmanualsoioioioioioioiooiowhy-is-there-air.pdf}
+% 
+% \hyphenatedurl{https://amalgamated.consolidated.incorporated.com/topic/subtopic/subsub/and/enough/to/demonstrate/line/breaking/here.html}. 此 URL 在本段落中“优雅地”跨行断开。
+
+  \item 在第二个版本中，最后一个参数提供了要在文档中排版的可点击文本。第三个参数的存在是为了我们想要将 URL 分成两部分的情况，以便第一部分包含访问地址，第二部分包含要打开的特定文档或页面的名称。例如，考虑解释 \ConTeXt\ 是什么的文档的地址：
+    \color[blue]{\hyphenatedurl{http://www.pragma-ade.com/general/manuals/what-is-context.pdf}}。
+    这个地址可以完整地写在第二个参数中，留空第三个参数：
+
+\starttyping
+\useURL [WhatIsCTX]
+  [http://www.pragma-ade.com/general/manuals/what-is-context.pdf]
+  []
+  [What is \ConTeXt?]
+\stoptyping
+
+但我们也可以将其拆分为两个参数：
+
+\starttyping
+\useURL [WhatIsCTX]
+  [http://www.pragma-ade.com/general/manuals]
+  [what-is-context.pdf]
+  [What is \ConTeXt?]
+\stoptyping
+
+\useURL [WhatIsCTX]
+  [http://www.pragma-ade.com/general/manuals]
+  [what-is-context.pdf]
+  [What is \ConTeXt?]
+
+在这两种情况下，我们都将该地址与词 \MyKey{WhatIsCTX} 关联起来；要在此地址中包含一个链接，当我们使用链接创建命令（如 \in{Section}[sec:createlinks] 中所述）时，我们只需使用 \MyKey{WhatIsCTX} 作为该命令的参数，而不是 URL 本身，从而得到链接 \quotation{\from[WhatIsCTX]}。您可以看到此文本是本文档中通常的链接颜色，如果您正在使用支持交互的 PDF 阅读器阅读本文，当您将鼠标悬停在文本上时，它应该会显示链接的目标。
+
+如果在文本中的任何时候，我们想要重现我们已经使用 \tex{useURL} 与名称关联的 URL，我们可以使用 \tex{url[Associated name]}，它将与该名称关联的 URL 插入到文档中。但此命令虽然将 URL 排版到文档中，却不会创建任何链接，如下所示：\type{\url[WhatIsCTX]} 产生 \quotation{\url[WhatIsCTX]}。
+
+\startSmallPrint
+
+    使用 \tex{url} 写入的 URL 的显示格式不是由 \tex{setupinteraction} 建立的格式，而是由 \PlaceMacro{setupurl}\tex{setupurl} 专门为此命令建立的格式，它允许我们设置样式（选项 {\tt style}）和颜色（选项 {\tt colour}）。在本文档的前言中，两种情况下指定了相同的颜色，这就是为什么上面的 URL 与可点击链接的颜色相同。
+
+\stopSmallPrint
+
+\stopitemize
+
+\stopdescription
+
+\startdescription{\tex{hyphenatedurl}}\PlaceMacro{hyphenatedurl}
+
+此命令用于将在文档文本中完整写出的 URL。此命令指示 \ConTeXt\ 在必要时在 URL 内部包含换行，以正确排版段落。其格式为：
+
+\type{\hyphenatedurl{URLaddress}}
+
+尽管 \PlaceMacro{hyphenatedurl}\tex{hyphenatedurl} 命令的名称如此，但它并不会对 URL 名称进行断字。它所做的是将 URL 中常见的某些字符视为可以插入换行的好位置（在这些字符之前或之后）。\ConTeXt\ 允许我们将额外的字符添加到允许换行的字符列表中。我们有三个命令可以做到这一点：
+
+\starttyping
+\sethyphenatedurlnormal{Characters}
+\sethyphenatedurlbefore{Characters}
+\sethyphenatedurlafter{Characters}
+\stoptyping\PlaceMacro{sethyphenatedurlnormal}\PlaceMacro{sethyphenatedurlbefore}\PlaceMacro{sethyphenatedurlafter}
+
+这些命令将它们作为参数的字符分别添加到允许之前和之后换行的字符列表、仅允许之前换行的字符列表以及仅允许之后换行的字符列表。
+
+% TODO: 我们应该一致使用“an URL”还是“a URL”？
+
+只要希望 URL 的完整文本出现在最终文档中（大致原样），就可以使用 \tex{hyphenatedurl}。它甚至可以用作 \tex{useURL} 的最后一个参数，在该命令的版本中，最后一个参数指定要在最终文档中显示的可点击文本。例如：
+
+\need 4\baselineskip
+\starttyping
+\useURL [WhatIsCTX]
+  [http://www.pragma-ade.com/general/manuals/what-is-context.pdf]
+  []
+  [\hyphenatedurl{http://www.pragma-ade.com/general/manuals/what-is-context.pdf}]
+\stoptyping
+
+\need 4\baselineskip
+
+在 \tex{hyphenatedurl} 的参数中，可以使用 \ConTeXt\ 通常所有的保留字符，除了三个必须替换为命令的字符：
+
+\startitemize[packed]
+
+  \item \%{} 必须替换为 \PlaceMacro{letterpercent}\tex{letterpercent}
+
+  \item \#{} 必须替换为 \PlaceMacro{letterhash}\tex{letterhash}
+
+  \item \backslash{} 必须替换为 \PlaceMacro{letterescape}\tex{letterescape} 或 \PlaceMacro{letterbackslash}\tex{letterbackslash}。
+
+\stopitemize
+
+每次 \tex{hyphenatedurl} 插入换行时，它都会执行 \PlaceMacro{hyphenatedurlseparator}\tex{hyphenatedurlseparator} 命令，默认情况下该命令什么都不做。但我们可以重新定义它，以便在换行之前插入一个代表性字符，类似于普通单词的处理方式，在单词中插入连字符以表示该单词在下一行继续。例如，使用：
+
+\type{\def\hyphenatedurlseparator{\curvearrowright}}
+
+\def\hyphenatedurlseparator{\curvearrowright}
+
+下面这个特别长的网址在换行前会有 \quote{\curvearrowright}，如下所示：
+
+\startnarrower\switchtobodyfont[11pt]
+
+% 移除了对邪恶帝国的引用。
+\color[blue]{\hyphenatedurl{https://wiki.contextgarden.net/Input_and_compilation/Project_and_file_management\letterhash Naming_conventions}}
+
+\stopnarrower
+
+在此示例中，为了在 URL 中得到 \quote{\letterhash}，必须使用 \tex{letterhash}。
+
+\stopdescription
+
+\stopsubsection
+
+
+% TODO: 本节标题是否有更好的翻译？
+
+\startsubsection
+  [
+    reference=sec:createlinks,
+    title=建立链接的命令,
+  ]
+
+% TODO: “But does not write any clickable text”？？这难道不正是它所做的事情吗？
+% 我重写了这一段，但我是否遗漏了要点？
+%
+% 要创建指向使用 \tex{useURL} 预定义的 URL 的链接，我们可以使用命令 \PlaceMacro{from}\tex{from}，它仅限于建立链接，但不写入任何可点击文本。\tex{useURL} 中的默认文本将用作链接文本。其语法为：
+
+要创建指向已使用 \tex{useURL} 定义的 URL 的链接，我们可以使用命令 \PlaceMacro{from}\tex{from}。该命令将可点击文本插入文档；该文本将是：如果使用双参数形式的 \tex{useURL}，则为完整的 URL 本身；如果使用四参数形式的 \tex{useURL}，则为第四个参数。其语法为：
+
+\type{\from[Name]}
+
+其中 {\tt Name} 是先前使用 \tex{useURL} 与 URL 关联的名称。
+
+要创建链接并将其与尚未预先定义的可点击文本关联，我们有 \PlaceMacro{goto}\tex{goto} 命令，它适用于内部和外部链接。其语法为：
+
+\type{\goto{Clickable text}[Target]}
+
+其中 {\tt Clickable text} 是要在最终文档中显示的文本（鼠标点击该文本将产生跳转），而 {\tt Target} 可以是以下之一：
+
+\startitemize
+
+  \item 我们文档中的一个标签。在这种情况下，\tex{goto} 将生成跳转，类似于我们已经讨论过的 \tex{in} 或 \tex{at} 命令。但与这些命令不同的是，在 \tex{goto} 使用的位置不会（自动）显示与标签关联的任何信息。例如，这里有一个指向“Internal References”节的链接，使用 \type{\goto{xyzzy}[sec:references]} 生成：\goto{xyzzy}[sec:references]。（链接名称“xyzzy”非常没有意义，但通过使用该名称，您可以相当确定链接文本不是从最初创建引用的地方检索的。）
+    % TODO 上面的 \goto 示例应该使用 "\about[sec:references]"
+    % 而不是 "Internal References"，以防有人以后更改名称。
+    % 但我没有立即弄清楚如何让 \type{} 做这样的事情：
+    % \type[escape=\ABC]{this is a \ABC\curvearrowright}
+    % wiki 上关于 \type, \setuptyping, ... 的条目在这一点上非常不清楚。
+
+  \item 一个 URL 本身。在这种情况下，必须通过如下写法明确指明它是一个 URL：
+
+    \type{\goto{Clickable text}[url(URL)]}
+
+    其中 URL 又可以是先前通过 \tex{useURL} 与 URL 关联的名称，或者是 URL 本身，在后一种情况下，在编写 URL 时，我们必须确保 \ConTeXt\ 的保留字符在 \ConTeXt\ 中正确书写。按照 \ConTeXt\ 规则书写 URL 不会影响链接的功能。
+
+    例如，已经将 URL 与 {\tt WhatIsCTX} 关联后，我们可以写 \type{\goto{What is ConTeXt, anyway?}[url(WhatIsCTX)]}，这会产生此链接：\goto{What is ConTeXt, anyway?}[url(WhatIsCTX)]。再举一个例子，\tex{goto} 命令可以创建一个 \MyKey{mailto:} 链接；假设您的 PDF 阅读器支持邮件链接并且您的系统已配置好邮件链接，那么命令 \type{\goto{Email}[url(mailto:spam@example.com)]} 将在您的文档中插入一个文本为 \quotation{Email} 的链接，如果点击该链接，PDF 阅读器将请求您的邮件程序开始向收件人 {\tt spam@example.com} 撰写电子邮件。
+
+\stopitemize
+
+\stopsubsection
+
+\stopsection
+
+
+\startsection
+    [title=在最终 PDF 中创建书签]
+
+PDF 文件可以有一个内部书签列表，允许读者在 PDF 查看器程序的特殊窗口中看到这些书签，并且只需单击其中一个书签即可在文档中移动。
+
+默认情况下，\ConTeXt\ 不会为输出的 PDF 提供书签列表。然而，要获得与文档中各节相对应的书签列表，只需包含 \PlaceMacro{placebookmarks}\tex{placebookmarks} 命令即可，其语法为：
+
+\type{\placebookmarks[List of sections]}
+
+其中 {\tt List of sections} 是一个逗号分隔的列表，列出了应该出现在书签列表中的节级别。例如，命令
+\starttyping
+\placebookmarks[chapter,section,subsection]
+\stoptyping
+将为每一章、每一节和每一小节在书签列表中放置一个书签。
+
+关于此命令，请记住以下几点：
+
+\startitemize
+
+% TODO: JD 的测试表明它必须在 \setupinteraction 之后（至少在 2026 年 3 月）。为什么会这样？
+%%  \item 根据我的测试，\tex{placebookmarks} 如果放在文档前言中则不起作用。但是，在文档主体内（在 \tex{starttext} 和 \tex{stoptext} 之间，或在 \tex{startproduct} 和 \tex{stopproduct} 之间），无论将其放在何处，书签列表也将包括该命令之前的节或小节。然而，我认为为了源文件能被正确理解，最合理的做法是将该命令放在开头。
+
+  \item \tex{placebookmarks} 必须放在 \tex{setupinteraction} 之后。
+  当使用一个或多个环境文件时，最好将 \tex{placebookmarks} 放在 \tex{setupinteraction} 命令之后不久（或紧接其后）。
+
+  \item 由用户定义的节类型（使用 \tex{definehead}）并不总是位于书签列表中的正确位置。最好将它们排除在外。
+
+  \item 如果任何节的节标题包含尾注或脚注，脚注的文本将被视为书签的一部分。
+
+  \item 作为参数，除了节列表，我们可以简单地指示象征性的词 \MyKey{all}，顾名思义，它将包含所有节；然而，根据我的测试，这个词除了确实是一些节之外，还包含了一些使用非节命令放置的文本，因此生成的列表有些不可预测。
+
+\stopitemize
+
+并非所有 PDF 查看器程序都允许我们查看书签；而且许多允许的程序默认并未启用此功能。因此，要检查此功能的结果，我们必须确保我们的 PDF 阅读器程序支持此功能并已启用。例如，Acrobat 默认不显示书签，尽管其工具栏上有一个按钮可以打开书签显示。
+
+最后：默认情况下，根据 PDF 阅读器的不同，书签列表可能只显示顶级书签；在这种情况下，要查看次级书签，读者必须单击某个图形元素以显示下一级别的书签（依此类推）。如果您希望默认显示更多级别，可以给 \tex{placebookmarks} 添加第二个参数，指示默认情况下哪些级别的书签将是可见的。例如，以下命令告诉 \ConTeXt\ 在书签列表中包含四个级别的节，并默认显示前三个级别：
+
+\starttyping
+\placebookmarks[chapter,section,subsection,subsubsection]
+               [chapter,section,subsection]
+\stoptyping
+
+\stopsection
+
+\stopchapter
+
+\stopcomponent
+
+%%% Local Variables:
+%%% mode: ConTeXt
+%%% eval: (auto-fill-mode 1)
+%%% coding: utf-8-unix
+%%% TeX-master: "../introCTX_eng.tex"
+%%% End:
+%%% vim:set filetype=context tw=72 : %%%

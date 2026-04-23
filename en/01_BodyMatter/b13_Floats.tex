@@ -1,0 +1,1675 @@
+%%% File:      b13_Floats
+%%% Author:    Joaquín Ataz-López et al
+%%% Begun:     August 2020
+%%% Concluded: August 2020
+%%% Contents:  Arriving at this chapter I was already tired of the
+%%%            introduction. Hence, for example, there is only one
+%%%            kind of table explained. Doing tables (in TeX, LaTeX or
+%%%            ConTeXt) makes me lazier. The chpater's organisation
+%%%            on the other hand is somewhat heterodox (I think)
+%%%            It is clear to me, but I am not sure if the public
+%%%            will think that what is an ingenious" círcle" for me
+%%%            is no more than some powerful mental disorder!
+%%% Edited with: Emacs + AUCTeX - And at times vim + context-plugin
+%%%
+
+\environment introCTX_env.tex
+
+\startcomponent b13_Floats.tex
+
+\startchapter
+  [
+      title={Images, tables and other floating objects},
+  ]
+
+\TocChap
+
+This chapter is mainly about floating objects (floats).  But following up on
+this concept, we take advantage of it to explain two object types that are
+not necessarily floats, although they are often configured as if they were:
+external images and tables.  Looking at this chapter's table of contents,
+one might think this is all very untidy: it begins by talking about
+floating objects, then goes on to talk about images and tables, and
+finishes by once again talking about floating objects.  The reasons for this
+untidiness are {\em pedagogical}: images and tables can be explained
+without insisting too much on the fact that they are normally floats; and
+yet, when we start examining them it helps a lot to discover that, surprise
+surprise, we already know about two floating objects.
+
+\startsection
+  [
+      reference=sec:floating objects,
+      title={What are floating objects and what do they do?},
+  ]
+
+If a document were to contain only {\em normal} text, paginating it would
+be relatively easy: knowing the maximum height of the text area of the page
+is enough to measure the height of the different paragraphs to know where
+to insert page breaks.  The problem is that in many documents there are
+objects, fragments or indivisible blocks of text such as an image, a table,
+a formula, a framed paragraph, etc.
+
+Sometimes these objects can occupy a large portion of the page, which in
+turn poses the problem that if one has to be inserted at a particular point
+in the document, it may not fit on the current page.  In this case the page
+may have to be interrupted abruptly, leaving a large blank space at the
+bottom, so that the object in question, as well as the text that follows
+it, are moved to the next page.  The rules of good typesetting, however,
+indicate that, except for the last page of a chapter, there should be the
+same amount of text on each page.
+
+It is therefore advisable to avoid large blank vertical spaces appearing;
+{\em floating} objects are the main mechanism for achieving this.
+A \quotation{floating object} is one that does not have to be located at a
+specific point in the document, but can {\em move} or {\em float} around in
+the document.  The idea is to allow \ConTeXt\ to decide on the best place,
+from a pagination point of view, to locate such objects, even authorising
+them to move to another page; but always ensuring that they do not stray too
+from the point of inclusion in the source file.
+
+Therefore, there are no objects that have to be floats {\em per se}.  But
+there are objects that will occasionally need to be floats.  The decision,
+in any case, is up to the author (or the person in charge of typesetting,
+if that is a different person).
+
+Undoubtedly, allowing the exact placement of an indivisible object to
+change, very much facilitates the task of typesetting nicely balanced
+pages.  But the problem that goes with this is that since we don't know
+exactly where such an object will end up at the time we are writing the
+original, it is difficult to make reference to it.  So, for example, if I
+have just put a command in my document that inserts an image and in the
+next paragraph I want to describe it and write something about it
+like: \quotation{As you can see from the previous figure}, when the figure
+{\em floats} it could well be placed {\em after} what I have just written
+and the result is an inconsistency: the reader is looking for an image {\em
+before} the text that refers to it and can't find it because after
+floating, the image has {\em ended} up after that reference.
+
+This is fixed by {\em numbering} floating objects (after distributing them
+in categories), so that in instead of referring to an image
+as \quotation{the previous image} or \quotation{the next image}, we will
+refer to it as (for example) \quotation{Figure 1.3}, since we can
+use \ConTeXt's internal reference mechanism to ensure that the image number
+is always kept up to date (see \in{Section}[sec:references]).  In addition,
+the numbering of these kinds of objects makes it easy to create an index of
+them (index of tables, index of graphs, index of images, index of
+equations, etc.).  For how to do this, see (\in{Section}[sec:lists]).
+
+The mechanism for dealing with floating objects in \ConTeXt\ is quite
+sophisticated and reaches high levels of abstraction that, perhaps, are not
+suitable for beginners.  Therefore, in this chapter I will start by
+explaining it using two particular cases: images and tables.  Then I will
+try to generalise somewhat so that we can understand how to extend the
+mechanism to other kinds of objects.
+
+\stopsection
+
+
+\startsection
+    [
+        reference=sec:externalgraphics,
+        title={External images},
+    ]
+
+As the reader at this stage knows (since it has been explained
+in \in{Section}[sec:ctx]), \ConTeXt\ is perfectly integrated with MetaPost
+and can generate images and graphics that are {\em programmed} in much the
+same way as text transformations are programmed.  There is also an
+extension module for \ConTeXt\footnote{\ConTeXt\ extension modules provide
+    additional utilities, but their descriptions are not included in this
+    introduction.} that allows it to work with TikZ\null.\footnote{This is
+    a graphics programming language intended to work with \TeX-based
+    systems.  TikZ is a \quotation{recursive acronym} from the German
+    sentence \quotation{TikZ ist keinen Zeichenprogramm}, which translated
+    means: \quotation{TikZ is not a drawing program}.  Recursive acronyms
+    are a kind of programmers' joke.  Leaving aside MetaPost (which I do
+    not know how to use), I believe that TikZ is a great system for
+    programming graphics with.} But such images are not dealt with in this
+introduction (as this would probably force its length to be doubled).
+Instead, here I refer to the use of external images, which reside in a file
+on our computer or are downloaded directly from the Internet by \ConTeXt.
+
+\startsubsection
+    [title={Directly inserting images}]
+    \PlaceMacro{externalfigure}
+
+To directly insert an image (not as a floating object) we use
+the \tex{externalfigure} command whose syntax is
+
+\type{\externalfigure [Name] [Configuration]}
+
+where:
+
+\startitemize
+
+  \item {\tt Name} can be either the name of the file containing the image,
+    or the web address of an image found on the Internet, or a symbolic
+    name we have previously associated with an image using
+    the \PlaceMacro{useexternalfigure}\tex{useexternalfigure} command; this
+    command's format is similar to that of \tex{externalfigure}, although it
+    takes a first argument with the symbolic name that will be associated
+    with the image in question.
+
+  \item {\tt Configuration} is an optional argument that allows us to apply
+    certain transformations to the image before it is inserted into our
+    document.  We will examine this argument more closely
+    in \in{Section}[sec:configimage].
+
+\stopitemize
+
+The image formats allowed are {\tt pdf}, {\tt jpg}, {\tt jp2} (JPEG~2000),
+{\tt jbig}, {\tt jbig2}, {\tt jb2}, {\tt png}, {\tt gif}, {\tt tif}, {\tt
+    svg}, {\tt mps} and {\tt eps}.  \ConTeXt\ can directly manage eight of
+these, while the rest ({\tt svg}, {\tt eps}, {\tt gif} and {\tt tif}) need
+to be converted with an external tool (that changes according to the
+operating system), and therefore must be installed on the system so
+that \ConTeXt\ can manipulate these kinds of files.
+
+\startSmallPrint
+
+% TODO: Is this list up to date for LMTX?
+
+    MkIV notes: among the formats supported by \tex{externalfigure} are
+    also some video formats.  In particular: QuickTime (extension {\tt
+        .mov}), Flash Video (extension {\tt .flv}) and MPEG~4 (extension
+    {\tt .mp4}).  But most PDF viewers do not know how to handle PDF files
+    with embedded video.  I can't say much about this, as I haven't done
+    any tests.
+
+    LMTX update: tests show that {\tt .mp4} and {\tt .mov} files can be
+    successfully embedded in \ConTeXt\ output, and that (using Linux) the
+    PDF viewer {\tt evince} will play the movies.  Other success stories
+    will be added here if/when they are discovered and reported.
+
+\stopSmallPrint
+
+There is no need to indicate the file extension: \ConTeXt\ will search for
+a file with the specified name and one of the extensions for the known
+image formats.  If there are several candidates, first the PDF format is
+used if there is one, and in its absence the MPS format (graphics generated
+by MetaPost).  In the absence of these two, the following order is followed:
+% ANSS: jpeg, png, jp2, jbig and jbig2.
+% TODO: this info was taken from
+% .../tex/texmf-context/tex/context/base/mkxl/grph-inc.lmt
+% in the "figures_order" variable.
+{\tt jpg}, {\tt png}, {\tt jp2}, {\tt jbig}, {\tt svg}, {\tt eps}, {\tt
+    tif} and finally {\tt gif}.
+
+
+
+\startSmallPrint
+
+    If the actual format of the image does not correspond to the extension
+    of the file that stores it, \ConTeXt\ cannot open it unless we indicate
+    the actual format of the image using the {\tt method} option.
+
+\stopSmallPrint
+
+If the image is not placed on its own outside of a paragraph, but is
+integrated into a text paragraph, and its height is greater than the line
+spacing, the line spacing will be adjusted to prevent the image from
+overlapping the previous lines, as in the example that accompanies this
+line\externalfigure[cow-brown][width=2.5em].
+
+By default, \ConTeXt\ searches for the images in the working directory, in
+its parent directory and in that directory's parent directory.  We can
+indicate the location of a directory containing the images we will work
+with using the {\tt directory} option of the \tex{setupexternalfigures}
+command, which would add that directory to the search path.  If we want the
+search to be performed {\em only} in the image directory, we have to set
+the {\tt location} option as well.  So, for example, in order
+that \ConTeXt\ looks for all the needed images in the \MyKey{img}
+directory, we should write:
+
+\starttyping
+  \setupexternalfigures
+      [directory=img, location=global]
+\stoptyping
+
+\startSmallPrint
+
+    In the {\tt directory} option in \tex{setupexternalfigures}, we can
+    include more than one directory, separating them with commas; but in
+    this case we need to enclose the directories within curly brackets.  For
+    example \MyKey{directory=\{img, \lettertilde/images\}}.
+
+    For the {\tt directory} option we always use the \quote{/} character as
+    the separator between directories, even for Microsoft Windows, which
+    uses the \quote{\textbs} as its directory separator character.
+
+\stopSmallPrint
+
+\tex{externalfigure} is also able to use images hosted on the Internet.
+So, for example, the following snippet will instruct \ConTeXt\ to insert
+the CervanTeX logo directly from the Internet into the document.  CervanTeX
+is the \TeX\ Spanish-speaking user group:\footnote{Internet addresses tend
+    to be very long, and there is not much space available to display the
+    side-by-side example.  Therefore, in order to make the command in the
+    left column fit properly, I have inserted a line break within the web
+    address. If you copy and paste the example's URL, it may not work if
+    this line break is not deleted (depending on your operating system, how
+    a copied URL is sent to your web browser, and possibly your web browser
+    itself).}
+
+\startbuffer
+\externalfigure
+[http://www.cervantex.es/files/
+cervantex/cervanTeXcolor-small.jpg]
+\stopbuffer
+\ShowAndExecute
+
+\startSmallPrint
+
+    When a document containing a remote file is first compiled, it is
+    downloaded from the server and stored in the LuaMetaTeX cache
+    directory, which, for the standalone \ConTeXt\ distribution, is found
+    in the sub-directory {\tt tex/texmf-cache/luametatex-cache/context/} of
+    wherever \ConTeXt\ is installed on your system.  If instead you are
+    using \TeX{}live, the cache directory is in the sub-directory {\tt
+    texmf-var/luametatex-cache/context/}.
+    Cached files are used during subsequent compilations.  Normally, the
+    remote image is downloaded again if the image in the cache is older
+    than one day.  To change this threshold see 
+    \goto{this
+        page}[url(https://wiki.contextgarden.net/Graphics_and_media/Tutorials/Using_graphics)]
+    of the \ConTeXt\ wiki.
+
+\stopSmallPrint
+
+If \ConTeXt\ does not find the image that should be inserted, no error is
+generated, but instead of the image a text block will be inserted with
+information about the image that should go there.  The size of this block
+will be the image size (if known by \ConTeXt\) or, otherwise, a standard
+size.  There is an example of this in \in{Section}[sec:startcombination].
+
+\stopsubsection
+
+
+\startsubsection
+  [
+    reference=sec:placefigure,
+    title={Inserting an image with \tex{placefigure}},
+  ]
+  \PlaceMacro{placefigure}
+
+Images can be directly inserted with \tex{externalfigure}, as we have
+already seen.  But it is preferable to insert images
+with \tex{placefigure}.  This command causes \ConTeXt:
+
+\startitemize
+
+  \item to know that an image is being inserted that must be incorporated
+    into the list of images in the document that can then be used, if we
+    wish, to produce an index of images;
+
+  \item to assign a number to the image, thus facilitating internal
+    references to it;
+
+  \item to add a title to the image, creating a text block between the
+    image and its title (which means these cannot be separated);
+
+  \item to automatically set the white space (horizontal and vertical)
+    needed for the image to be viewed correctly;
+
+  \item to position the image in the place indicated, making the text flow
+    around it if necessary; and
+
+  \item to convert the image to a floating object if it is possible, taking
+    into account its size and location specifications.\footnote{This latter
+        is my conclusion, given that among the placement options there are
+        ones like {\tt force} or \Conjecture {\tt split} that go against
+        the true notion of the floating object.}
+
+\stopitemize
+
+The syntax for this command is as follows:
+
+\type{\placefigure[Options] [Label] {Title} {Image}}
+
+The various arguments have the following meanings:
+
+\startitemize
+
+  \item {\tt Options} are a set of indications that generally refer to
+    where to place the image.  Since these options are the same in this and
+    other commands, I will explain them together later
+    (in \in{Section}[sec:placingobjects]).  For now, I will use the {\tt
+    here} option for examples.  It tells \ConTeXt\ that, as far as
+    possible, it should place the image exactly at the point in the
+    document where the command that inserts it is found.
+
+  \item {\tt Label} is a text string to refer internally to this object so
+    we can make reference to it (see \in{Section}[sec:references]).
+
+  \item {\tt Title} is the title text to be added to the image.
+
+  \item {\tt Image} is the command that inserts the image.
+
+\stopitemize
+
+For example:
+
+\starttyping
+  \placefigure
+    [here] [fig:texknuth]
+    {\TeX\ logo and photo of {\sc Knuth}}
+    {\externalfigure[https://i.ytimg.com/vi/8c5Rrfabr9w/maxresdefault.jpg]
+                    [scale=600]}
+\stoptyping
+
+  \placefigure
+    [here]
+    [fig:texknuth]
+    {\TeX\ logo and photo of {\sc Knuth}}
+    {
+      \externalfigure
+        [https://i.ytimg.com/vi/8c5Rrfabr9w/maxresdefault.jpg]
+        [scale=600]
+    }
+
+As we can see in the example, by inserting the image (which, by the way,
+has been done directly from an image hosted on the Internet), there are
+some changes regarding what happens when using the \tex{externalfigure}
+command directly. Vertical space is added, the image is centred and a title
+is added. Those are {\em external} changes obvious at first sight. From an
+internal point of view the command has also produced other no less
+important effects:
+
+\startitemize
+
+  \item First of all, the image has been inserted into the \quotation{list
+    of images} which \ConTeXt\ maintains internally for objects inserted
+    into the document.  This, in turn, means that the image will appear in
+    the image index that can be generated with \tex{placelist[figure]}
+    (see \in{Section}[sec:lists]), although there are two specific commands
+    to generate the image index which are
+    \PlaceMacro{placelistoffigures}\tex{placelistoffigures} or
+    \PlaceMacro{completelistoffigures}\tex{completelistoffigures}.
+
+  \item Secondly, the image has been linked to the label that was added as
+    the second argument to the \tex{placefigure} command, which means that
+    from now on we can make internal references to it using that label
+    (see \in{Section}[sec:references]).
+    For example, \quotation{\type{See \in{Figure}[fig:texknuth]}} results
+    in \quotation{See \in{Figure}[fig:texknuth]}.
+
+  \item Finally, the image has become a float, which means that if, for
+    typesetting needs (pagination) it needed to move, \ConTeXt\ would alter
+    its placement.
+
+\stopitemize
+
+Actually, \tex{placefigure}, despite its name, is not only used for
+inserting images. We can insert anything with it, including text. However,
+the text or other items inserted into the document with \tex{placefigure},
+will be treated {\em as if they were an image}, even though they are not;
+they will be added to the list of images internally managed by \ConTeXt,
+and we can apply transformations similar to the ones we use for images such
+as scaling or rotating, framing, etc.  Thus the following example:
+
+% \backslash used here because in this case we get the same \backslash
+% as \textbs and \backslash is a normal ConTeXt command.
+
+\startbuffer
+\placefigure
+  [here, force]
+  [fig:testtext]
+  {Using \backslash placefigure for text transformations}
+  {\rotate[rotation=180]{\framed{\tfd Test text}}}
+\stopbuffer
+
+\getbuffer
+
+which is achieved as follows:
+
+\typebuffer
+
+\stopsubsection
+
+
+\startsubsection
+  [title={Inserting images integrated into a text block}]
+
+Except for very small images, which can be integrated into a line without
+too much disruption to paragraph spacing, images are usually inserted into
+a paragraph that contains only them (or put in other words, the image can
+be thought of as a paragraph in its own right).  If the image is inserted
+with \tex{placefigure} and its size allows, depending on what we have
+indicated regarding its placement
+(see \in{Section}[sec:placingobjects]), \ConTeXt\ will allow the text from
+the previous and subsequent paragraphs to flow around the image.  However,
+if we want to ensure that a certain image will not be separated from a
+certain text, we can use the {\tt \PlaceMacro{startfiguretext}figuretext}
+environment whose syntax is as follows:
+
+\starttyping
+  \startfiguretext
+    [Options]
+    [Label]
+    {Title}
+    {Image}
+
+    ... Text
+
+  \stopfiguretext
+\stoptyping
+
+% TODO: left, bottom didn't work in my tests.  How does one make this work?
+%       Further, I am not getting the text to unindent after it "passes"
+%       below the figure.  What am I doing wrong?
+
+The environment's arguments are exactly the same as for \tex{placefigure}
+and have the same meaning.  But here the options are no longer options for
+placement of a floating object, but indications regarding the integration
+of the image into the paragraph; so, for example, \MyKey{left} here means
+that the image will be placed on the left while text will flow to the
+right, while \MyKey{left, bottom} will mean that the image must be placed
+on the lower left side of the text associated with it.
+
+The text written within the environment is what will flow around the image.
+
+\stopsubsection
+
+
+\startsubsection
+  [
+    reference=sec:configimage,
+    title={Configuration and transformation of images inserted},
+  ]
+
+\startsubsubsection
+  [title={Insert command options that cause some transformation of the image}]
+  \PlaceMacro{setupexternalfigures}
+
+The final argument in the \tex{externalfigure} command allows us to carry
+out certain adjustments to the image inserted.  We can make these
+adjustments:
+
+\startitemize
+
+  \item In general, for all images to be inserted in the document; or for
+    all images to be inserted after a certain point.  In this case we make
+    the adjustment with the \tex{setupexternalfigures} command.
+
+  \item For a specific image that we want to insert several times in the
+    document.  In this case the adjustment is made in the last argument of
+    the \tex{useexternalfigure} command that associates an external figure
+    with a symbolic name.
+
+  \item At the exact moment when we insert a specific image.  In this case
+    the adjustment is made in the \tex{externalfigure} command itself.
+
+\stopitemize
+
+The changes in the image that can be achieved by this route are the following:
+
+\startdescription{Changing the size of the image.}
+
+We can do this:
+
+\startitemize
+
+  \item {\em By assigning a precise width or height}, something done with
+    the {\tt width} and {\tt height} options respectively; if only one of
+    the two values is adjusted, the other is automatically adapted to
+    maintain the image's aspect ratio.
+
+    We can either assign a specific height or width, or indicate it as a
+    percentage of page height or line width.  For example:
+
+    \type{width=.4\textwidth}
+
+    will ensure that the image has a width equal to 40\% of the line width.
+
+  \item {\em Scaling the image}: The {\tt xscale} option will scale the
+    image horizontally; {\tt yscale} will do so vertically, and {\tt scale}
+    will scale both horizontally and vertically.  These three options
+    expect a number representative of the scaling factor multiplied by
+    1000.  That is to say: {\tt scale=1000} will leave the image in its
+    original size, while {\tt scale=500} will reduce it by half, and {\tt
+    scale=2000} will double its size.
+
+    A conditional scaling, which is applied only if the image exceeds
+    certain dimensions, is obtained with the {\tt maxwidth} and {\tt
+    maxheight} options that take a dimension.  For example {\tt
+    maxwidth=0.2\textbs textwidth} will scale the image only if it
+    turns out to be more than 20\% of the line width.
+
+\stopitemize
+
+\stopdescription
+
+\startdescription{Rotating the image.}
+
+    To rotate the image we use the {\tt orientation} option, which takes a
+    value specifying the number of degrees of rotation that will be
+    applied (e.g., {\tt orientation=90}).  The rotation is done in a
+    counter-clockwise direction.
+
+    % JD note: I tried orienting the cow at 45 degrees and, sadly, it lost
+    % its legs.  So I updated what JAL wrote.
+
+    \startSmallPrint
+
+        The wiki implies that the rotations that can be achieved with this
+        option must be multiples of 90 (90, 180 or 270) and to achieve a
+        different rotation we must use the \tex{rotate} command.
+%%        However, I have not had any problem applying a 45 degree rotation
+%%        to an image with only {\tt orientation=45}, without the need to use
+%%        the \tex{rotate} command.
+        Tests with \ConTeXt\ LMTX show that other values are accepted, but
+        the image {\em may} be corrupted by doing so.  Consequently, use
+        other values only with caution.
+
+    \stopSmallPrint
+
+\stopdescription
+
+\startdescription{Framing the image.}
+
+    We can also surround the image with a frame using the {\tt frame=on}
+    option, and configure the frame colour ({\tt framecolor}), the distance
+    between the frame and the image ({\tt frameoffset}), the thickness of
+    the line that draws the frame ({\tt rulethickness}) or the shape of its
+    corners ({\tt framecorner}) which can be rounded ({\tt round}) or
+    rectangular.
+
+\stopdescription
+
+\startdescription{Other configurable aspects of images.}
+
+    In addition to the aspects already seen, which imply a transformation
+    of the image to be inserted, using \tex{setupexternalfigures} we can
+    configure other aspects, such as where to look for the image ({\tt
+    directory} option), whether the image should be searched for only
+    in the indicated directory ({\tt location=global}) or whether it should
+    also include the working directory and its parent directories ({\tt
+    location=local}), and whether the image will or will not be
+    interactive ({\tt interaction}), etc.
+
+\stopdescription
+
+\stopsubsubsection
+
+
+\startsubsubsection
+    [title={Specific commands for transforming an image}]
+
+There are three commands in \ConTeXt\ that can be used to transform an
+image and can be used in combination with \tex{externalfigure}.  These are:
+
+\startitemize
+
+  \item {\em Mirror image}: achieved with
+    the \PlaceMacro{mirror}\tex{mirror} command.
+
+  \item {\em Clipping}: achieved with the \PlaceMacro{clip}\tex{clip}
+    command, where the width ({\tt width}), height ({\tt height}),
+    horizontal offset ({\tt hoffset}) and vertical offset ({\tt voffset})
+    dimensions of the clipping are given.  For example, compare the {\tt
+        minidoubt.jpg} image with a clipped version:
+
+\startbuffer
+\externalfigure[minidoubt]
+      [width=2cm,frame=on,
+      framecolor=red]
+\stopbuffer
+\ShowAndExecute
+
+\startbuffer
+\clip [width=2cm, height=1cm, 
+   hoffset=3mm, voffset=2mm]
+  {\externalfigure[minidoubt]
+      [width=2cm,frame=on,
+       framecolor=red]}
+\stopbuffer
+\ShowAndExecute
+
+
+  \item {\em Rotation.}  A third command to apply transformations to
+    an image is the \PlaceMacro{rotate}\tex{rotate} command.  Here is a cow
+    on a 30 degree incline:
+
+\startbuffer
+\rotate[rotation=-30]
+   {\externalfigure[cow]
+                   [width=2cm]}
+\stopbuffer
+\ShowAndExecute
+
+%% JD commented this out, since his experiments say otherwise.
+%%    but normally this would not be
+%%    necessary given that the latter has, as we have seen, the {\tt
+%%    orientation} option that produces the same result.
+
+%?\startSmallPrint
+% TODO Is there something here in Spanish that didn't make it to the UK?
+%?\stopSmallPrint
+
+\stopitemize
+
+The typical use of these commands is with images, but they actually act on
+{\em boxes}.  That's why we can apply them to any text simply by enclosing
+it in a box (which the command does automatically), that will produce
+curious effects like the following:
+
+% TODO: is there any straightforward way to make the top row of text purple
+% like the other row?
+
+\startbuffer
+  \mirror{Test text}\\
+  \rotate[rotation=20] {Test text}
+\stopbuffer
+\ShowAndExecute
+
+\stopsubsubsection
+
+\stopsubsection
+
+\stopsection
+
+
+\startsection
+  [
+    reference=sec:tables,
+    title={Tables},
+  ]
+
+\startsubsection
+    [title={General ideas about tables and their placement in the document}]
+
+Tables are structured objects that contain text, formulas or even images
+arranged in a series of {\em cells} that allow us to graphically see the
+relationship between the contents of each cell.  To do this, the
+information is organised into rows and columns: all data (or entries) in
+the same row have a certain relationship to each other, as well as all data
+(or entries) in the same column.  A cell is the intersection of a row with
+a column, as shown in \in{Figure}[fig:table].
+
+% TODO: why is there so many short lines *after* the caption?
+% height: move top of figure above baseline
+% low: this slightly reduces the number of short lines after the figure.
+
+\placefigure
+  [right,height,low]  
+  [fig:table]
+  {Image of a simple table}
+  {\externalfigure[tablas_eng][width=.6\textwidth]}
+
+Tables are ideal for displaying text or data items that are related to each
+other, because as each one is enclosed in its own cell, even if its
+content, or the content of the remaining cells changes, the relative
+position of one cell with respect to the others will not change.
+
+Of all the tasks involved in typesetting a text, the creation of tables is
+the only one that, in my opinion, is easier to do in a graphic program
+(word processor type) than in \ConTeXt.  Because it's easier {\em to draw}
+the table (which is what you do in a word processing program) than {\em
+describe it} which is what we do when we work with \ConTeXt.  Every row
+change and column change requires the presence of a command, and that means
+that it takes much longer to implement the table, instead of simply saying
+how many rows and columns we want.
+
+\ConTeXt\ has three different mechanisms for producing tables; one is the
+{\tt tabulate} environment, which is recommended for simple tables and
+which is the most directly inspired by \TeX\ tables.  Another is the
+so-called {\em natural tables}, inspired by HTML tables, suitable for
+tables with special design needs where, for example, not all rows have the
+same number of columns.  A third option is the so-called {\em extreme
+tables}, clearly based on XML and recommended for medium or long tables
+which take up more than one page.  Of the three, I will explain only the
+first.  The natural tables are reasonably well explained
+in \quotation{\ConTeXt\ Mark IV an excursion} (but also look for a file
+called {\tt examples-naturaltables.pdf} in your \ConTeXt\ distribution),
+and for {\em extreme tables} there is a document about them in the \suite-
+documentation (look for a file called {\tt xtables-mkiv.pdf}).
+
+Something similar to what happens with images occurs in tables: we can
+simply write the necessary commands at some point in the document to
+generate a table and it will be inserted at that exact point, or we can use
+the \PlaceMacro{placetable}\tex{placetable} command to insert a table.
+This latter approach has some advantages:
+
+\startitemize
+
+  \item \ConTeXt\ will number the table and adds it to the list of tables,
+    allowing internal references to the table (through its numbering),
+    and including it in an (eventual) index of tables.
+
+  \item Flexibility in table placement within the document will be gained,
+    thus facilitating the task of pagination.
+
+\stopitemize
+
+The format of \tex{placetable} is similar to what we saw for
+\tex{placefigure} (see \in{Section}[sec:placefigure]):
+
+\type{\placetable[Options] [Label] {Title} {table}}
+
+I refer to \in{Sections}[sec:placingobjects] and \in{}[sec:confcaptions]
+regarding options related to table placement and configuration of the
+title.  Among the options there is one, however, that seems to be designed
+exclusively for tables.  This is the \MyKey{split} option which, when set,
+authorises \ConTeXt\ to extend the table over two or more pages, in which
+case the table can no longer be a floating object.
+
+In general terms we can set the configuration for tables with
+the \PlaceMacro{setuptables}\tex{setuptables} command.  Also, as with
+images, it is possible to generate an index of tables with
+\PlaceMacro{placelistoftables}\tex{placelistoftables}
+or \PlaceMacro{completelistoftables}\tex{completelistoftables}.
+See \in{Section}[sec:variouslists] for more information about printing
+such lists.
+
+\stopsubsection
+
+
+\startsubsection
+  [title={Simple tables with the {\tt tabulate} environment}]
+\PlaceMacro{starttabulate}
+
+The simplest tables are those achieved with the {\em tabulate} environment,
+whose format is:
+
+\vbox{\starttyping
+  \starttabulate[Table column layout]
+    ... % Table contents
+    ...
+    ...
+  \stoptabulate
+\stoptyping}
+
+where the argument taken in square brackets describes (in code) the number
+of columns the table will have, and (sometimes indirectly) indicates their
+width.  I say that the argument describes the design {\em in code}, because
+at first glance it seems very cryptic: it consists of a sequence of
+characters, each with a special meaning.  I will explain it little by
+little and in steps, because I think that this way it is easier to
+understand.
+
+\startSmallPrint
+
+    This is the typical case in which the huge number of aspects that we
+    can configure means we need a lot of text to describe it.  This seems
+    to be devilishly difficult.  In fact, for most of the tables that are
+    built in practice, points 1 and 2 are enough.  The rest are extra
+    possibilities whose existence is useful to know, but are not essential
+    to know to typeset most tables.
+
+\stopSmallPrint
+
+\startsubsubsection
+  [title={Table column layout for the {\tt tabulate} environment}]
+
+We begin by explaining how columns are described in the {\tt tabulate}
+environment.  After this is completed, we describe how the actual data is
+entered into the table (\in{Subsubsection}[subsubsec:column-data-entry]).
+
+\startitemize[n]
+
+  \item {\bf Columns delimiter}: the \MyKey{\|} character is used to
+    delimit table columns.  So, for example, \MyKey{[\|lT\|rB\|]} will
+    describe a table with two columns, one of which would have the
+    characteristics associated with the indicators \MyKey{l} and \MyKey{T}
+    (which we will see immediately following) and the second column will
+    have the characteristics associated with \MyKey{r} and \MyKey{B}.  For
+    example, a simple table with three columns, in which the data is
+    left-aligned in each column, would be described
+    as \MyKey{[\|l\|l\|l\|]}.
+
+  \item {\bf Determining the basic nature of the cells in a column:} the
+    first thing to decide when we build our table is whether we want the
+    contents of a given cell to always be written on a single line, or if,
+    on the contrary, the text of a given cell may be distributed over two
+    or more lines (if the text is too long to fit on one line).  In the
+    {\tt tabulate} environment that question is not decided cell by cell
+    but is considered a characteristic of the column.
+
+    \startitemize[a]
+
+      \item {\em One line cells:} if the contents of the cells in a column,
+        regardless of their length, are to be written on a single line, we
+        must specify the alignment of the text in the column, which can be
+        left (\MyKey{l}), right (\MyKey{r}) or centred (\MyKey{c}).
+
+        \startSmallPrint
+
+            In principle, these columns will be as wide as necessary to fit
+            the widest cell.  But we can limit the width of the column with
+            the \MyKey{w(Width)} specifier.  For
+            example, \MyKey{[\|rw(2cm)\|c\|c\|]} will describe a table with
+            two columns, the first aligned to the right and with an exact
+            width of 2 centimetres, and the other two centred and with no
+            width limitation.
+
+            It should be noted that the width limitation in single-line
+            columns may cause the text in one column to overlap text in the
+            next column. So my advice is that when fixed-width columns are
+            required, always use multi-line cell columns.
+
+        \stopSmallPrint
+
+      \item {\em Cells that can take up more than one line if needed}:
+        the \MyKey{p} specifier (\quotation{paragraph}) generates columns
+        in which the text in every cell will occupy as many lines as
+        needed. If we simply specify \MyKey{p}, the width of the column
+        will be the full width available (taking into account the width
+        required for the other columns).  But it is also possible to
+        indicate \MyKey{p(Width)}, in which case the width will be that
+        expressly specified.  Consider the following examples:
+
+        \starttyping
+\starttabulate[|l|r|p|]
+\starttabulate[|l|p(4cm)|]
+\starttabulate[|r|p(.6\textwidth)|]
+\starttabulate[|p|p|p|]
+        \stoptyping
+
+        The first example will create a table with three columns, the first
+        and second of a single line, aligned to the left and right
+        respectively, and the third, which will occupy the remaining width
+        and the height required to house all its contents.  In the second
+        example, the second column will measure exactly four centimetres
+        wide, whatever its content; but if the content does not fit in that
+        space, it will take up more than one line.  The third example
+        calculates the width of the second column in proportion to the
+        maximum width of the line, and in the last example, there will be
+        three columns that will share the available width equally. 
+
+    \stopitemize
+
+% TODO: I'm thinking there might be a better way to say the intended thing
+% than the next paragraph.  Anyone?
+
+    \startSmallPrint
+
+        Note that, in reality, if a cell is a quadrilateral, what
+        the \MyKey{p} specifier does is authorise a variable height for the
+        cells in a column, depending on the length of the text.
+
+    \stopSmallPrint
+
+  \item {\bf Adding indications to the description of the column, about the
+      font style and variant to be used}: once the basic nature of the
+    column (width and height, automatic or fixed) has been decided, we can
+    still add, in the description of the contents of the column, a
+    character representative of the {\em format} in which it must be
+    written.  These characters can be \MyKey{B} for bold, \MyKey{I} for
+    italic, \MyKey{S} for slanted, \MyKey{R} for Roman style lettering
+    or \MyKey{T} for {\em typewriter} style lettering.
+
+
+% TODO: Why was this item previously started with \starthead?
+% (JD changed it to \item for consistency, and also because the ':' was
+% printed on the next line all by itself.)
+%    \starthead {\bf Other additional aspects that can be specified in the
+%        description of table columns}:
+%    \stophead
+
+    \item {\bf Other additional aspects that can be specified in the
+        description of table columns}:
+
+    \startitemize[1]
+
+      \item {\em Columns with maths formulas}: the \MyKey{m} and \MyKey{M}
+        specifiers enable maths mode in a column without the need to
+        specify it in each of its cells.  The cells in this column will not
+        be able to hold normal text.
+
+        \startSmallPrint
+
+            Although \TeX, \ConTeXt's predecessor, came into existence for
+            typesetting any kind of maths, until now I have hardly said
+            anything about writing maths.  In the maths mode (which I will
+            not be explaining) \ConTeXt\ alters our normal rules and even
+            uses different fonts.  The maths mode has two varieties: one we
+            could call {\em linear} in that the formula is housed within a
+            line containing normal text (\MyKey{m} indicator), and the {\em
+            complete maths mode} that displays formulas in an
+            environment where there is no normal text. The main difference
+            between the two modes, in a table, is basically the size which
+            the formula will be written in and the horizontal and vertical
+            space surrounding it.
+
+        \stopSmallPrint
+
+% TODO(?) I changed JAL's claims of how much (e.g.) 'j1' adds, based on
+% some experiments.
+% No j0: 6 pts less than no j spec at all
+%    j1: 6 points more than no spec (so 12pt != 1em more than j0)
+%    j2: 12 points more than j1
+% I significantly rewrote this paragraph after some experimentation.
+
+      \item {\em Adjust the amount of horizontal white space around the
+          contents of the cells in a column}.  By default, the {\tt
+          tabulate} environment adds a bit of extra space between columns,
+        to ensure that the contents of two adjacent cells don't touch each
+        other.  (Note that it does {\em not} add extra space to the left of
+        the leftmost column nor to the right of the rightmost column, which
+        is most evident if your table design uses vertical lines on the
+        left or right side.)  This amount of space can be set with a
+        command like \type{\setuptabulate{unit=10mm}}, which would set up
+        the {\em inter-column} space to be 10mm, distributed evenly between
+        the two columns.  We can remove this extra space or increase it
+        with the \MyKey{in}, \MyKey{jn} and \MyKey{kn} indicators.  Each of
+        these replaces the normally-provided amount of space on the left,
+        right, or both sides (respectively) of the column with {\tt n}
+        times the {\tt unit} space, which is 1~em by default.  So, for
+        example, \MyKey{\|j2r\|} specifies a column that will be aligned to
+        the right, and in which we want a blank space of 2 {\em em}'s width
+        following the contents of that cell.  If a fractional multiple of
+        the {\tt unit} space is desired, enclose the decimal fraction in
+        curly brackets, as in this example: \type{j{1.5}}.
+
+      \item {\em Adding text before or after the contents of each cell in a
+        column}. The {\tt b\{Text\}} and {\tt a\{Text\}} specifiers cause
+        the text between curly brackets to be written before (\MyKey{b},
+        from {\em before}) or after (\MyKey{a}, from {\em after}) the
+        cell's contents.
+
+      \item {\em Applying a format command to the entire
+        column}. The \MyKey{B}, \MyKey{I}, \MyKey{S}, \MyKey{R} \MyKey{T}
+        indicators we mentioned previously do not cover all the format
+        possibilities: e.g., there is no indicator for small caps, or for
+        {\em sans serif}, or that affects the font size. With
+        the \MyKey{f\backslash Command} indicator we can specify a format
+        command that is automatically applied to all cells in a column. For
+        example, \MyKey{\|lf\backslash sc\|} will typeset the column's
+        contents in small caps.
+
+      \item {\em Applying any command to all the cells in the
+        column}. Finally, the \MyKey{h\backslash Command} indicator will
+        apply the specified command to all cells in the column.
+
+    \stopitemize
+
+\stopitemize
+
+In \in{Table}[tbl:examplestabulate] some examples of table format
+specification strings are shown.
+
+\placetable
+  [here]
+  [tbl:examplestabulate]
+  {Some examples of how to specify the format of the columns in {\tt tabulate}}
+{\starttabulate[|lT|p(.6\textwidth)|]
+\HL
+\NC{\bf\rm Format specifier}
+\NC{\bf Meaning}
+\NR
+\HL
+\NC \|l\|
+\NC Generates a column whose width is automatically left-aligned.
+\NR
+\NC \|rB\|
+\NC Generates a column whose width is automatically right-aligned, and in bold.
+\NR
+\NC \|cIm\|
+\NC Generates a column enabled for maths content.  Centred and in italics.
+\NR
+\NC \|j4cb\{---\}\|
+\NC This column will have its contents centred, will begin with an em dash
+(---) and will have 4 {\tt units} white space on the right.
+\NR
+\NC \|l\|p(.7\tex{textwidth})\|
+\NC generates two columns: the first is left-aligned and has automatic
+width.  The second takes up 70\% of the total width of the line.
+\NR
+\HL
+\stoptabulate}
+
+\stopsubsubsection
+
+
+\startsubsubsection
+  [title={Column entries for the {\tt tabulate} environment},
+  reference=subsubsec:column-data-entry]
+
+Once the table has been designed, its contents need to be input.  To explain
+how to do this I will start by describing how a table should be filled in
+where we have lines separating rows and columns:
+
+\startitemize
+
+  \item We often start by drawing a horizontal line. In a table this is
+    done with the \PlaceMacro{HL}\tex{HL} command (from {\em Horizontal
+    Line}).
+
+  \item Then we write the first line: at the beginning of each cell we must
+    indicate that a new cell begins.  This can be done either with
+    the \tex{NC} command (from {\em Next Column}), or if a vertical line is
+    desired, the \PlaceMacro{VL}\tex{VL} command (from {\em Vertical Line})
+    can be used.  So we start with this command, and we write the content
+    of each cell. Every time we change cells we use the \tex{NC}
+    or \tex{VL} command (as desired).
+
+  \item At the end of a row, we expressly indicate that a new row is going
+    to be started with the \PlaceMacro{NR}\tex{NR} command (from {\em Next
+    Row}). After \tex{NR}, we repeat the \tex{HL} to draw a new horizontal
+    line (if desired).
+
+  \item And so, one by one, we write all the rows of the table. When we
+    finish we add a \tex{NR} command and, if desired, another \tex{HL} to
+    close the grid with a bottom horizontal line.
+
+\stopitemize
+
+It's not especially difficult when we get the hang of it, although when we
+look at the source code for a table it's hard to get an idea what it will
+look like.  In \in{Table}[tbl:tablecommands] we see the commands that can
+(and must) be used within a table. There are some that I have not
+explained, but I think the description I have given is enough.
+The \ConTeXt\ wiki page for \tex{starttabulate} has some options not
+explained here.
+
+\placetable
+  [here, force]
+  [tbl:tablecommands]
+  {Commands to be used within a table}
+{\starttabulate[|l|p(.6\textwidth)|]
+\HL
+\NC {\bf Command}
+\NC {\bf Meaning}
+\NR
+\HL
+\NC \tex{HL}
+\NC Inserts a horizontal line
+\NR
+\NC \tex{NC}
+\NC Begins a new column
+\NR
+\NC \tex{NR}
+\NC Begins a new row
+\NR
+\NC \tex{VL}
+\NC Inserts a vertical line delimiting a column (used in place of \tex{NC})
+\NR
+\NC \PlaceMacro{NN}\tex{NN}
+\NC Begins a column in maths mode (used in place of \tex{NC})
+\NR
+\NC \PlaceMacro{TB}\tex{TB}
+\NC Adds some extra vertical space between two rows
+\NR
+\NC \PlaceMacro{NB}\tex{NB}
+\NC Indicates that the next row starts an indivisible block within which
+there cannot be a page break
+\NR
+\HL
+\stoptabulate}
+
+And now, as an example I will transcribe the code with
+which \in{Table}[tbl:tablecommands] was written.
+
+\starttyping
+\placetable
+  [here]
+  [tbl:tablecommands]
+  {Commands to be used within a table}
+{\starttabulate[|l|p(.6\textwidth)|]
+\HL
+\NC {\bf Command}
+\NC {\bf Meaning}
+\NR
+\HL
+\NC \tex{HL}
+\NC Inserts a horizontal line
+\NR
+\NC \tex{NC}
+\NC Begins a new column
+\NR
+\NC \tex{NR}
+\NC Begins a new row
+\NR
+\NC \tex{VL}
+\NC Inserts a vertical line delimiting a column (used in place of \tex{NC})
+\NR
+\NC \tex{NN}
+\NC Begins a column in maths mode (used in place of \tex{NC})
+\NR
+\NC \tex{TB}
+\NC Adds some extra vertical space between two rows
+\NR
+\NC \tex{NB}
+\NC Indicates that the next row starts an indivisible block within which
+there cannot be a page break
+\NR
+\HL
+\stoptabulate}
+\stoptyping
+
+The reader will notice that in general I have used one (or two) lines of
+text for each cell.  In a real source file I would have only used a line of
+text for each cell; in the example I have split the lines that are too
+long.  Using a single line per cell makes it easier for me to write the
+table because what I do is to write the contents of each cell, without row
+or columns separation commands.  When everything is written, I select the
+text from the table and ask my text editor to insert \quotation{\tex{NC }}
+at the beginning of each line.  After that, every two lines (because the
+table has two columns) I insert a line that adds the \tex{NR} command,
+because every two columns starts a new row.  Finally, by hand, I insert
+the \tex{HL} commands at the points where I want a horizontal line to
+appear.  It takes me almost longer to describe it than to do it!
+
+But also see how, within a table, we can use \ConTeXt's ordinary commands.
+In particular in this table we continually use \tex{tex} which is explained
+in \in{Section}[sec:verbatim].
+
+\stopsubsubsection
+
+\stopsubsection
+
+\stopsection
+
+
+\startsection
+    [title={Aspects common to images, tables and other floating objects}]
+
+We already know that images and tables do not have to be floating objects,
+but they are good candidates to be so, although they have to be inserted in
+the document by means of the \tex{placefigure} or \tex{placetable}
+commands.  In addition to these two commands, and with the same structure,
+in \ConTeXt\ we have the \PlaceMacro{placechemical}\tex{placechemical}
+command (to insert formulas chemicals),
+the \PlaceMacro{placegraphic}\tex{placegraphic} command (to insert
+graphics) and the \PlaceMacro{placeintermezzo}\tex{placeintermezzo} command
+for inserting a structure that \ConTeXt\ calls an {\em
+    Intermezzo}.\footnote{In books, an intermezzo is a short interlude
+    separating longer passages.}  All these commands are in turn concrete
+applications of a more general command called
+\PlaceMacro{placefloat}\tex{placefloat}, whose syntax is as follows:
+
+\type{\placefloat [Name] [Options] [Label] {Title} {Contents}}
+
+Note that \tex{placefloat} is identical to \tex{placefigure}
+and \tex{placetable} except for the first argument, which in \tex{placefloat}
+takes the name of the floating object.  This is because {\em each type of
+floating object can be inserted into the document with two different
+commands}: \tex{placefloat[TypeName]} or \tex{placeTypeName}. In other
+words: \tex{placefloat[figure]} and \tex{placefigure} are exactly the same
+command, just as \tex{placefloat[table]} is the same command
+as \tex{placetable}.
+
+I will therefore speak from now on of \tex{placefloat}, but please note
+that everything I say will also apply to \tex{placefigure}
+or \tex{placetable} which are specific applications of said command.
+
+The \tex{placefloat} arguments are:
+
+\startitemize
+
+  \item {\tt Name}: refers to the floating object in question. It can be
+    some predetermined floating object ({\tt figure, table, chemical,
+    intermezzo}) or a floating object created by ourselves
+    using \tex{definefloat} (see \in{Section}[sec:definefloat]).
+
+  \item {\tt Options}: a series of symbolic words that tell \ConTeXt\ how
+    it should insert the object. The great majority of these refer to {\em
+    where} to insert it. We will see this in the next section.
+
+  \item {\tt Label}: A label for internal references to this object.
+
+  \item {\tt Title}. The title text to be added to the object. Regarding
+    its configuration, see \in{Section}[sec:confcaptions].
+
+  \item {\tt Contents}. This depends, of course, on the type of object. For
+    images it is usually a \tex{externalimage} command; for tables, the
+    commands that will create the table; for {\em intermezzi}, a (possibly
+    framed) text fragment; etc.
+
+\stopitemize
+
+The first three arguments, which are introduced in square brackets, are
+optional.  The last two (which are introduced between curly brackets) are
+mandatory, although they can be empty.  So, for
+example: \cmd{placefloat\{\}\{\}} will insert:
+
+\placefloat{}{}
+
+in the document.  (The size of the frame here shows \ConTeXt's default size
+when no size is specified by the options or the content.)
+
+\startitemize
+
+    {\bf Note:} We see that \ConTeXt\ considered that the object to be
+    inserted was an image, since it was numbered as an image and included
+    in the list of \Conjecture images.  This makes me assume that images
+    are the default floating objects.
+
+\stopitemize
+
+\startsubsection
+  [
+    reference=sec:placingobjects,
+    title={Floating object insertion options},
+  ]
+
+The {\tt Options} argument in \tex{placefigure}, \tex{placetable}
+and \tex{placefloat} controls different aspects regarding the insertion of
+these types of objects, mainly the place on the page where the object will
+be inserted.  Here several values are supported, each of a different nature:
+
+\startitemize
+
+  \item Some of the insertion places are established in relation to page
+    elements ({\tt top}, {\tt bottom}, {\tt inleft}, {\tt inright}, {\tt
+        inmargin}, {\tt margin}, {\tt leftmargin}, {\tt rightmargin}, {\tt
+        leftedge}, {\tt rightedge}, {\tt innermargin}, {\tt inneredge},
+    {\tt outeredge}, {\tt inner}, {\tt outer}).  It must, of course, be an
+    object that can fit in the area where it is intended to be placed and
+    space must have been reserved for that element in the page
+    layout.  Regarding this, see section \in{}[sec:page-elements]
+    and \in{}[sec:pagelayout].
+
+  \item Other possible insertion places are more related to the text
+    surrounding the object, and are an indication of where the object
+    should be placed so that the text flows around it.  Fundamentally,
+    these are the {\tt left} and {\tt right} values.
+
+  \item The {\tt here} option is interpreted as a recommendation to keep
+    the object at the point in the source file where it is located.  This
+    {\em recommendation} will not be respected if the pagination
+    requirements do not allow it.  This indication is reinforced if we add
+    the {\tt force} option which means exactly that: force the insertion of
+    the object at that point.  Note that by forcing the insertion at a
+    particular point, the object will no longer be floating.
+
+  \item Other possible options relate to the page on which the object is to
+    be inserted: \MyKey{page} inserts it on a new page; \MyKey{opposite}
+    inserts it on the page opposite the current one; \MyKey{leftpage}
+    inserts it on an even page; and \MyKey{rightpage} inserts it on an odd
+    page.
+
+\stopitemize
+
+There are some options that are not related to the location of the object.
+Among them:
+
+\startitemize
+
+  \item {\tt none}: this option suppresses the title.
+
+  \item {\tt split}: this option allows the object to extend over more than
+    one page.  It must, of course, be an object that is divisible by
+    nature, such as a table.  When this option is used and the object is
+    split, it can no longer be said to be floating.
+
+\stopitemize
+
+\stopsubsection
+
+
+\startsubsection
+  [
+    reference=sec:confcaptions,
+    title={Configuring floating object titles},
+  ]
+
+Unless we use the \MyKey{none} option in \tex{placefloat}, by default
+floating objects are associated with a title that consists of three
+elements:
+
+\startitemize
+
+  \item The name of the type of object in question.  This name is exactly
+    that of the object type; so if, for example, we define a new floating
+    object called \quotation{sequence} and we insert a \quotation{sequence}
+    as a floating object, the title will be \quotation{Sequence~1}.  This
+    is simply the name of the object capitalised.
+
+    \startSmallPrint
+
+        Despite what has just been said, if the main language of the
+        document is not English, the English name for predefined objects,
+        like for example the \MyKey{figure} or \MyKey{table} objects, will
+        be translated.  So, for example, the \MyKey{figure} object in
+        documents in Spanish are called \MyKey{Figura}, while
+        the \MyKey{table} object is called \MyKey{Tabla}.  These Spanish
+        names for predefined objects can be changed
+        with \tex{setuplabeltext} as explained in \in{Section}[sec:labels].
+
+    \stopSmallPrint
+
+  \item Its number.  By default the objects are numbered by chapters, and
+    so the first table in Chapter 3 will be \quotation{Table~3.1}.
+
+  \item Its contents.  This is introduced as an argument of \tex{placefloat}.
+
+\stopitemize
+
+With \PlaceMacro{setupcaptions}\tex{setupcaptions}
+or \PlaceMacro{setupcaption}\tex{setupcaption[Object]} we can change the
+numbering system and the appearance of the title itself.  The first command
+will affect all the titles of all objects, and the second will affect only
+the title of a particular type of object:
+
+\startitemize
+
+  \item As for the numbering system, this is controlled by the {\tt
+    number}, {\tt way}, {\tt prefixsegments} and {\tt numberconversion}
+    options:
+
+    \startitemize
+
+      \item {\tt number} can adopt the {\tt yes}, {\tt no} or {\tt none}
+        values and controls whether there will be a number or not.
+
+      \item {\tt way} indicates whether the numbering will be sequential
+        throughout the document ({\tt way=bytext}), or whether it will
+        recommence at the beginning of each chapter ({\tt way=bychapter})
+        or section ({\tt way=bysection}). In the case of a restart, it is
+        appropriate to coordinate the value of this option with the {\tt
+        prefixsegments} option.
+
+      \item {\tt prefixsegments} indicates if the number will have a {\em
+        prefix}, and what this will be.  Thus {\tt prefixsegments=chapter}
+        causes the number of objects to always start with the chapter
+        number, while {\tt prefixsegments=section} will precede the object
+        number with the section number.
+
+      \item {\tt numberconversion} controls the kind of numeration.  The
+        values for this option can be: Arabic numbers (\MyKey{numbers}),
+        lower case letters (\MyKey{a}, \MyKey{characters}), upper case
+        letters (\MyKey{A}, \MyKey{Characters}), small caps letters
+        (\MyKey{KA}), upper case Roman numerals
+        (\MyKey{I}, \MyKey{R}, \MyKey{Romannumerals}), lower case Roman
+        numerals (\MyKey{i}, \MyKey{r}, \MyKey{romannumerals}) or Roman
+        numerals in small caps (\MyKey{KR}).
+
+    \stopitemize
+
+  \item The appearance of the title itself is controlled by numerous
+    options.  I will list them, but for a detailed explanation of the
+    meaning of each one of them, I refer to \in{Section}[sec:titlestyle]
+    where the control of the appearance of the sectioning commands is
+    explained, as the options are largely the same. The options in
+    question are:
+
+    \startitemize
+
+      \item To control the format of all the elements of the title, {\tt
+          style}, {\tt color}, {\tt command}.
+
+      \item To control the format only of the name for the kind of object:
+        {\tt headstyle}, {\tt headcolor}, {\tt headcommand}, {\tt headseparator}.
+
+      \item To control only the numbering format: {\tt numbercommand}.
+
+      \item To control only the format of the title itself: {\tt
+          textcommand}.
+
+    \stopitemize
+
+  \item We can also control other aspects such as the distance between the
+    different elements that make up the title, the width of the title, its
+    placement in relation to the object, etc.  I refer here to the
+    information in \goto{\ConTeXt\ wiki}[url(wiki)] regarding the options
+    that can be configured with this command.
+
+\stopitemize
+
+\stopsubsection
+
+
+\startsubsection
+  [
+    reference=sec:startcombination,
+    title={Combined insertion of two or more objects},
+  ]
+
+To insert two or more different objects in the document, such
+that \ConTeXt\ keeps them together and deals with them as a single object,
+we have the \PlaceMacro{startcombination}\tex{startcombination} environment
+whose syntax is:
+
+\type{\startcombination[Ordering] ... \stopcombination}
+
+where {\tt Ordering} indicates how the objects should be ordered: if they
+all need to be ordered horizontally, {\tt Ordering} only indicates the
+number of objects to be combined. But if we want to combine the objects in
+two or more rows, we will have to indicate the object number per row,
+followed by the number of rows, and separating both numbers by
+the \quote{*} character.  For example:
+
+\starttyping
+\startcombination[3*2]
+  {\externalfigure[test1]}
+  {\externalfigure[test2]}
+  {\externalfigure[test3]}
+  {\externalfigure[test4]}
+  {\externalfigure[test5]}
+  {\externalfigure[test6]}
+\stopcombination
+\stoptyping
+
+which will produce the following alignment of images.
+
+\startcombination[3*2]
+  {\externalfigure[test1]}
+  {\externalfigure[test2]}
+  {\externalfigure[test3]}
+  {\externalfigure[test4]}
+  {\externalfigure[test5]}
+  {\externalfigure[test6]}
+\stopcombination
+
+In the previous example, the images I have combined actually do not exist
+(in the source of this document), which is why, instead of the
+images, \ConTeXt\ has generated text boxes with information about them.
+
+See, on the other hand, how each element to be combined
+within \tex{startcombination} is enclosed within curly brackets.
+
+In fact, \tex{startcombination} not only allows us to connect and align
+images, but any kind of {\em box}, such as texts inside
+a \tex{startframedtext} environment, tables, etc.  To configure the
+combination we can use the \tex{setupcombination} command and we can also
+create pre-configured combinations
+using \PlaceMacro{definecombination}\tex{definecombination}.
+
+\stopsubsection
+
+
+\startsubsection
+    [title={General configuration of floating objects}]
+
+We have already seen that with \tex{placefloat} we can control the location
+of the floating object being inserted and some other details.  It is also
+possible to configure:
+
+\startitemize
+
+  \item The global characteristics of a particular type of floating
+    object.  This is done with
+    \PlaceMacro{setupfloat}\cmd{setupfloat[Name of type of floating object]}.
+
+  \item The global characteristics of all floating objects in our document.
+    This is done with \PlaceMacro{setupfloats}\tex{setupfloats}.
+
+\stopitemize
+
+Bear in mind that in the same way that \tex{placefloat[figure]} is
+equivalent to \tex{placefigure}, \tex{setupfloat[figure]} is equivalent
+to \tex{setupfigures}, and \tex{setupfloat[table]} is equivalent
+to \tex{setuptables}.
+
+Regarding the configurable options for these, I refer to the \ConTeXt\
+official list of commands (\in{Section}[sec:qrc-setup-en]).
+
+\stopsubsection
+
+
+\startsection
+  [
+    reference=sec:definefloat,
+    title={Defining additional floating objects},
+  ]
+  \PlaceMacro{definefloat}
+
+The \tex{definefloat} command allows us to define our own floating
+objects.  Its syntax is:
+
+\type{\definefloat [Singular name] [Plural name] [Configuration]}
+
+where the {\tt Configuration} argument is an optional argument that allows
+us to indicate the configuration of this new object at the time of its
+creation.  We can also do it later with
+\tex{setupfloat[Name in the singular]}.
+
+Since we are ending our introduction with this section, I am going to take
+advantage of it to go a little deeper into the apparent {\em jungle}
+of \ConTeXt\ commands which, once understood, is not so much of a {\em
+jungle} but is, in fact, quite rational.
+
+Let's start by asking ourselves what a floating object really is
+for\ConTeXt, the answer being that it is an object with the following
+characteristics:
+
+\startitemize
+
+  \item It has a certain margin of freedom with respect to its
+    location on the page.
+
+  \item It has a {\em list} associated with it, that allows it to number
+    these kinds of objects and, eventually, to generate an index of them.
+
+  \item It has a title.
+
+  \item When the object can really float, it must be treated as an
+    inseparable unit, meaning (in \TeX\ terminology) {\em enclosed in a
+    box}.
+
+\stopitemize
+
+In other words, the floating object is actually made up of three elements:
+the object itself, the list associated with it, and the title.  To control
+the object itself we only need one command to set up its location and
+another to insert the object into the document; to set up the list aspects,
+general list control commands are sufficient, and to set up the title
+aspects, the general title control commands.
+
+And this is where the genius of \ConTeXt\ comes in: it could have been
+designed with a simple command to control floating objects
+(\tex{setupfloats}), and a simple command to insert floating
+objects: \tex{placefloat}; but what \ConTeXt\ does is to:
+
+\startitemize[n]
+
+  \item Design a command to link a name to a specific floating object
+    configuration. This is the \tex{definefloat} command, which does not
+    actually link one name, but two names, one in the singular and one in
+    the plural.
+
+  \item Create, together with the global floating objects configuration
+    command, a command that allows us to configure only a specific type of
+    object: \tex{setupfloat[Object]}.
+
+  \item Add to the floating object location command (\tex{placefloat}) an
+    argument that allows us to differentiate between object types:
+    (\tex{placefloat[Object]}).
+
+  \item Create commands, including the object name, for all actions of a
+    floating object.  Some of these commands (which are actually clones of
+    other more general commands) will use the object's name in the singular
+    and others will use it in the plural.
+
+\stopitemize
+
+Therefore, when we create a new floating object and tell \ConTeXt\ what its
+name is in the singular and the plural, \ConTeXt:
+
+\startitemize
+
+  \item Reserves a space in memory to store the specific configuration of
+    that object type.
+
+  \item Creates a new list with the singular name of that object type,
+    since floating objects are associated with a list.
+
+  \item Creates a new kind of \quotation{title} linked to this new object
+    type, in order to maintain a customised configuration of these titles.
+
+  \item And finally, it creates a group of new commands specific to that
+    new object type, whose name is actually a synonym for the more general
+    command.
+
+\stopitemize
+
+In \in{Table}[tbl:floatcommands] we can see the commands that are
+automatically created when we define a new floating object, as well as the
+more general commands they are synonyms of:
+
+\placetable
+  [here]
+  [tbl:floatcommands]
+  {Commands that are automatically created when a new floating object is created}
+{\switchtobodyfont[small]
+\starttabulate[|lT|lT|lT|]
+\HL
+\NC{\bf\rm Command}
+\NC{\bf\rm Synonym of}
+\NC{\bf\rm Example}
+\NR
+\HL
+\NC\backslash completelistof<PluralName>
+\NC\backslash completelist[PluralName]
+\NC\backslash completelistoffigures
+\NR
+\NC\backslash place<SingularName>
+\NC\backslash placefloat[SingularName]
+\NC\backslash placefigure
+\NR
+\NC\backslash placelistof<PluralName>
+\NC\backslash placelist[PluralName]
+\NC\backslash placelistoffigures
+\NR
+\NC\backslash setup<SingularName>
+\NC\backslash setupfloat[SingularName]
+\NC\backslash setupfigure
+\NR
+\HL
+\stoptabulate
+}
+
+\startSmallPrint
+
+    Actually, some additional commands are created which are synonymous
+    with the previous ones, and since I have not included them in the
+    explanation of the chapter, I have omitted them
+    from \in{Table}[tbl:floatcommands], they are: \tex{start<NameSingular>},
+    \tex{start<NameSingular>text} and \tex{startplace<NameSingular>}.
+
+\stopSmallPrint
+
+I have used the command used for images (\quotation{figures}) as an example
+of the commands created when defining a new floating object; and I did so
+because images, like tables and the rest of the floats predefined
+by \ConTeXt, are actual cases of \tex{definefloat}:
+
+\starttyping
+\definefloat[chemical][chemicals]
+\definefloat[figure][figures]
+\definefloat[table][tables]
+\definefloat[intermezzo][intermezzi]
+\definefloat[graphic][graphics]
+\stoptyping
+
+Finally, we see that in reality \ConTeXt\ in no way controls any kind of
+material included in each particular floating object; it presumes that this
+is the author's job.  This is why we can also insert text with
+the \tex{placefigure} or \tex{placetable} commands.  However, the text that
+is input with \tex{placefigure} is included in the list of images, and if
+input with \tex{placetable}, in the list of tables.
+
+\stopsection
+
+\stopchapter
+
+\stopcomponent
+
+%%% Local Variables:
+%%% mode: ConTeXt
+%%% eval: (auto-fill-mode 1)
+%%% coding: utf-8-unix
+%%% TeX-master: "../introCTX_eng.tex"
+%%% End:
+%%% vim:set filetype=context tw=75 : %%%

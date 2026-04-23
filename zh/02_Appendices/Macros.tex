@@ -1,0 +1,41 @@
+%%% File:     Macros.tex
+%%% Author:   Joaquín Ataz-López
+%%% Begun:    August 2020
+%%% Concluded:August 2020
+%%% Contents: 包含整个文档中提到的 ConTeXt（和 TeX）命令列表。
+%%%
+%%% Edited with: Emacs + AUCTeX - And at times vim + context-plugin
+%%%
+
+\environment introCTX_env.tex
+
+\startcomponent Macros.tex
+
+\startchapter[title=命令索引]
+
+本索引列出了本入门中讨论过的命令。有些命令仅仅是顺带提及，在这种情况下，索引中出现的页码指示了它们被提及的位置。但其他命令则是更详细解释的主题。在后一种情况下，索引中只列出详细解释开始的位置，尽管该命令也可能在本入门中的其他地方被引用。
+
+索引中不包括：
+
+\startitemize
+
+  \item 关闭先前用 \tex{startSomething} 打开的结构的 \tex{stopSomething} 命令，除非文本对 \tex{stop} 命令有特别说明，或者在与相应的 \tex{start} 命令不同的位置进行了处理。
+
+  \item 旨在生成符号的命令，所有这些命令都可在 \in{附录}[app:symbols] 中找到。
+
+  \item 对于生成变音符号或字母的命令，并且有大写和小写版本（分别用于生成大写或小写字母），只包含小写版本。
+
+\stopitemize
+
+\blank\midaligned{***}\blank
+
+\placemacro
+
+\stopcomponent
+
+%%% Local Variables:
+%%% mode: ConTeXt
+%%% eval: (auto-fill-mode 1)
+%%% TeX-master: "../introCTX_eng.tex"
+%%% coding: utf-8-unix
+%%% End:

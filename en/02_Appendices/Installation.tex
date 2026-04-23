@@ -1,0 +1,889 @@
+%%% File:     Installation.tex
+%%% Author:       Joaquín Ataz-López
+%%% Begun:      May 2020
+%%% concluded: May 2020
+%%% Contents: I thought about whether or not to include this appendix.  I
+%%% was clear from the outset that if it were to be included it had to be
+%%% as an appendix, because if I put it at the beginning, it would be more
+%%% difficult to engage the reader from the start.  I wasn't so keen on it
+%%% either because I didn't want to explain aspects related to Windows or
+%%% Apple that I don't really know, since I haven't used the former for
+%%% more than 15 years and the latter I have never used.  I was also tempted
+%%% to refer to Pablo Rodriguez's text (much more complete), but finally,
+%%% the fact that now the "official" version has become LMTX, in a way,
+%%% Pablo's information is out of date, so I decided to include the
+%%% appendix, but in very summary form.  As I am unable to compile this
+%%% document with the current version of LMTX (it compiled well up to a
+%%% version in early August) and I have been reading the ConTeXt
+%%% distribution list for a couple of months, I see that it is relatively
+%%% common for a new version of LMTX to include a bug that needs to be
+%%% fixed... I decided to recommend Standalone.
+%%%
+%%% Edited with: Emacs + AUCTeX - And at times vim + context-plugin
+%%%
+%%% JD note: I removed the MkII stuff, since that is now archaic and out of
+%%% scope for this intro to LMTX.
+%%%
+%%% TODO: this chapter was *very* quickly edited, with the pre-LMTX
+%%% instructions mostly commented out or removed.  However, this caused it
+%%% to become a bit of a mish-mash, and it really needs some more significant
+%%% editing and/or reorganization.  In particular the parts about running
+%%% multiple versions of ConTeXt.
+
+\environment introCTX_env.tex
+
+\setuphead
+  [section]
+  [sectionsegments=3:3]
+
+\setuphead
+  [subsection]
+  [sectionsegments=3:4]
+
+\startcomponent c01_Installation.tex
+
+\startchapter
+  [
+    reference=installation_suite,
+    title={Installing, configuring and updating \ConTeXt},
+  ]
+
+\TeX's main distributions (\TeX~Live, MikTeX, MacTeX, etc.\null) include a
+version of \ConTeXt.  However, this is not always the most up-to-date
+version.  In this appendix I will explain the procedure to install
+\ConTeXt\ LMTX.  This installation includes \ConTeXt\ MkIV as well,
+but does not include the now-archaic MkII.
+
+The installation procedure follows the same steps on any operating system;
+but the details change from one system to another.  However, we can simplify
+things in such a way that in the following lines I will distinguish between
+two big groups of systems:
+
+\startitemize
+
+  \item {\bf Unix-type systems:} This includes Unix itself, as well as GNU
+    Linux, Mac OS, FreeBSD, OpenBSD or Solaris.  The procedure is basically
+    the same in all these systems; there are some very small differences that
+    I will highlight in the appropriate place.
+
+  \item {\bf Windows systems}, that includes the different versions of that
+    operating system: Windows 11 (the latest version at time of writing),
+    Windows 10, Windows 8, Windows 7, Windows Vista, Windows XP, Windows
+    NT, etc.
+
+\stopitemize
+
+\startSmallPrint
+
+  {\bf Important note on the installation process on Microsoft Windows systems:}
+
+  \dontleavehmode\ConTeXt, like all \TeX\ systems, is designed to work from
+  a terminal; the programs and procedures for installation are similarly
+  designed.  In Windows this is also perfectly possible and should not
+  create any major difficulty.  The problem is that, on the one hand
+  Windows users are not always used to doing this, and on the other, since
+  Windows came into being with the {\em illusion} (false) that everything
+  in a computer system could be done graphically, in general the versions
+  of that operating system do not {\em advertise} too much about how to use
+  the terminal.  And further, it is common for each version of this system
+  to change the name of the program that runs the terminal and how to open
+  it.  As far as I know, the Windows terminal emulation program has been
+  given many names: \quotation{DOS window}, \quotation{Command
+  Prompt}, \quotation{cmd}, etc.  The location of this program in the
+  Windows application menu also changes depending on the version of Windows
+  in question.
+
+  I stopped using Windows-based systems in 2004, so there is little I can
+  do here to help the reader.  He or she will have to figure out, on their
+  own, how to open a terminal in their particular version of the operating
+  system; which shouldn't be too difficult.
+
+\stopSmallPrint
+
+
+\startsection[title=Installing and configuring\\\suite-]
+
+The \ConTeXt\ distribution known as \quotation{Standalone}, also known
+as \quotation{\ConTeXt\ Suite}, is a complete and updated distribution
+of \ConTeXt, which downloads the necessary files from the internet, does
+not take up too much disk space, is easy to update, and above all --- hence
+the name {\em Standalone} --- is contained in a single directory which can
+be located anywhere we want on the hard disk.  It would even be possible
+for a single computer to have several versions of \ConTeXt\, each in its
+own directory.  This distribution includes the fonts, binary files and
+documentation needed to run \ConTeXt\ LMTX (which implies the LuaMetaTeX
+engine), as well as \ConTeXt\ Mark~IV (which implies the LuaTeX engine).
+
+\startSmallPrint
+
+For information about \TeX\ {\em engines}, see \in{Section}[sec:engines];
+and on \TeX\ engines in relation to \ConTeXt, as well as the versions known
+as Mark~II and Mark~IV, \in{Section}[sec:historyctx].
+
+\stopSmallPrint
+
+The following sections explain how to install, run, update and
+restore \suite- on our system.  The data and procedures provided here are a
+summary of the much more extensive information included in
+the \goto{\ConTeXt\
+    wiki}[url(https://wiki.contextgarden.net/Introduction/Installation)],
+to which I have added some additional detail drawn from a wikibook
+on \ConTeXt\ hosted
+on \goto{wikibooks}[url(https://fr.wikibooks.org/wiki/ConTeXt/Installation)].
+If there is any problem with the installation, or if you want to extend any
+detail, you should directly consult any of these (though the latter is in
+French)
+
+%% \startsubsection[title=Installation]
+%%
+%% This is the non-LMTX instructions.  Keep for now, just in case.
+%%Installing \suite- means having an Internet connection, and implies the
+%%following steps:
+%%
+%%\startitemize[n, packed]
+%%
+%%\item Creating the directory in which \ConTeXt\ will be installed.
+%%
+%%\item Downloading the installation {\em script} into this directory.
+%%
+%%\item Running this {\em script} with the desired options.
+%%
+%%\item Making some final adjustments.
+%%
+%%\stopitemize
+%%
+%%\subsubsubject{Step 1: creating the installation directory}
+%%
+%%This, in fact, has nothing to do with \ConTeXt\ and we have to assume that
+%%every user will know how to do it. In Windows systems the normal way is to
+%%do it from the file manager. On Unix-type systems, it can be done from a
+%%file manager or from a terminal. It is important, however, to keep in mind
+%%that it is not recommended that the installation directory contains any
+%%blank space in your path. I personally also tend to shy away from using
+%%non-English directory names with things like accented vowels in them.
+%%
+%%From now on I will assume that the installation directory is, in Unix-like
+%%systems, \MyKey{\lettertilde/context/} and in Windows,
+%%\MyKey{C:\backslash Programs\backslash context}.
+%%
+%%\subsubsubject{Step 2: Download the installation {\em script} into the
+%%installation directory}
+%%
+%%The installation {\em script} will differ according to the operating system
+%%you are installing on:
+%%
+%%\startitemize
+%%
+%%  \item On Unix-like systems it can be downloaded, with a web browser, or,
+%%    from a terminal with \MyKey{wget} or \MyKey{rsync}:
+%%
+%%  \starttyping
+%%
+%%    wget http://minimals.contextgarden.net/setup/first-setup.sh
+%%    rsync rsync://minimals.contextgarden.net/setup/first-setup.sh
+%%
+%%  \stoptyping
+%%
+%%\item On Windows-type systems, as far as I know, there are no standard
+%%  tools for downloading from the console. It has to be done with a web
+%%  browser. The download address can be any of the following:
+%%
+%%  \color [blue] {\goto {\ttx http://minimals.contextgarden.net/setup/context-setup-mswin.zip}[url(http://minimals.contextgarden.net/setup/context-setup-mswin.zip)]\\    \goto{\ttx http://minimals.contextgarden.net/setup/context-setup-win64.zip}[url(http://minimals.contextgarden.net/setup/context-setup-win64.zip)]}
+%%
+%%  Once downloaded, in Windows you have to unzip the file,
+%%
+%%\stopitemize
+%%
+%%\subsubsubject{Step 3: Run the installation {\em script}}
+%%
+%%The installation {\em script} must be run from the terminal. In Unix-type
+%%systems the name of the {\em script} is \MyKey{first-setup.sh} and can be
+%%run with {\tt bash} or {\tt sh}. In Windows-type systems the {\em script}
+%%is called \MyKey{first-setup.bat} and is run by simply typing its name in
+%%the system console or MS-DOS window from the installation directory.
+%%
+%%The installation {\em script} allows for the following options:
+%%
+%%%By default the installation {\em script} installs the latest beta version,
+%%%not including the extension modules. But this depends on the installation
+%%%options that we indicate when running the {\em script}. These are the
+%%%following:\footnote{In the French Wikibook I mentioned at the beginning of
+%%%the appendix, the \MyKey{--fonts=all} and \MyKey{--goodies=all} are also
+%%%discussed. Contextgarden does not mention them, but including them in the
+%%%command as well does not hurt.}
+%%
+%%\startitemize
+%%
+%%  \item {\tt\bf --context}: this option determines which version of ConTeXt
+%%    will be installed, whether the most recent development version
+%%    (\quotation{--context=latest}) or the latest stable version
+%%    (\quotation{--context=beta}). The default value is \quotation{beta}.
+%%
+%%  \item {\tt\bf --engine}: allows us to indicate whether we want to install
+%%    Mark IV (\quotation{--engine=luatex}, the default value) or Mark II.
+%%
+%%  \item {\tt\bf --modules}: also install the ConTeXt extension modules that
+%%    do not belong to the distribution as such, but that offer interesting
+%%    additional utilities. To do this we need to
+%%    indicate \quotation{--modules=all}.
+%%
+%%\stopitemize
+%%
+%%\startSmallPrint
+%%    With regard to the installation options, I believe that
+%%    the information in the wiki is now obsolete. There it says that to
+%%    install only Mark IV you need to explicitly indicate the
+%%    "--engine=luatex" option and that the "--context=latest" option
+%%    installs the latest stable version, not the development
+%%    version. However, from halfway through 2020 the content of
+%%    first-setup.sh changed, and taking a look inside it I found that to
+%%    install the very latest version you need to expressly indicate
+%%    "--context=latest", and that "--engine=luatex" is enabled by default.
+%%\stopSmallPrint
+%%
+%%The French Wikibook I mentioned at the beginning adds two other possible
+%%options to the options I just mentioned (documented on the ConTEXt wiki):
+%%\quotation{--fonts=all} and \quotation{goodies=all}. ConTeXtgarden doesn't
+%%mention them, but including them in the installation command as well
+%%doesn't hurt. Therefore I would advise you to run the installation script
+%%with the following options (depending on whether we are on a Unix- or
+%%Windows-type system):
+%%
+%%\startitemize[packed]\tfx
+%%
+%%  \item Unix:
+%%    \type{bash first-setup.sh --context=latest --modules=all --fonts=all --goodies=all}
+%%
+%%  \item Windows:
+%%    \type{first-setup.bat --context=latest --modules=all --fonts=all --goodies=all}
+%%
+%%\stopitemize
+%%This, depending on the speed of our Internet connection, may take some
+%%time, but not too much.
+%%
+%%\startSmallPrint
+%%
+%%\subsubsubject{Configuring a proxy}
+%%
+%%The installation script uses rsync to obtain the necessary files. So, if
+%%you are behind a proxy server, you need to specify its details to
+%%rsync. The easiest way to set this is to set the variable RSYNC_PROXY in
+%%the terminal or in your startup {\em script} (.bashrc or the corresponding
+%%file for each shell). Replace the username, password, proxyhost and
+%%proxyport with the correct information. This is done, on Unix-type systems,
+%%with the \MyKey{export} command, and in Windows-type systems with
+%%the \MyKey{set} command. For example:
+%%
+%%\type{export RSYNC_PROXY=username:password@proxyhost:proxyport}
+%%
+%%Sometimes, when we are behind a firewall, port 873 may be closed for
+%%outgoing TCP connections. If port 22 is open for ssh connections, one trick
+%%that can be used is to connect to a computer somewhere outside the firewall
+%%and tunnel into port 873 (using the nc program).
+%%
+%%\type{export RSYNC_CONNECT_PROG='ssh tunelhost nc %H 873'}
+%%
+%%where the \quote{tunnelhost} is the machine outside the firewall we have
+%%access to.  Of course, this machine must have nc and port 873 open for the
+%%outgoing TCP connection
+%%
+%%\stopSmallPrint
+%%
+%%After running \MyKey{first-setup} in the installation directory two new
+%%directories will appear called, \MyKey{bin} and \MyKey{tex} respectively.
+%%
+%%\subsubsubject{Step 4: Final adjustments (Only on GNU Linux)}
+%%
+%%In GNU Linux systems there are many directories where fonts can be
+%%installed.  If we want \ConTeXt\ to use these fonts we must tell it where
+%%to find them.  To do this we must add the following line to
+%%the \MyKey{tex/setuptex} file created after the installation:
+%%
+%%{\tfx\type{export OSFONTDIR="~/.fonts:/usr/share/fonts:/usr/share/texmf/fonts/opentype/”}}
+%%
+%%with which the environment variable OSFONTDIR is loaded with the three
+%%directories in which the fonts installed in the system are normally located
+%%
+%%\startSmallPrint
+%%
+%%    The /usr/share/texmf/fonts/ will only be there if there is some other
+%%    installation of \TEX\ or other systems based on it in our operating
+%%    system; in this case it should be included in the OSFONTDIR path so we
+%%    can use the opentype fonts that such an installation may have
+%%    included. If you have any commercial fonts that you want \ConTeXt\ to
+%%    use, you have to make sure that the path to these is one of those
+%%    included in OSFONTDIR, or otherwise, add the path to this variable. I
+%%    have seen, for example, that some fonts are installed in
+%%    /usr/local/fonts instead of /usr/share/fonts.
+%%
+%%\stopSmallPrint
+%%
+%%Finally, it may be a good idea to have \ConTeXt\ generate a database with
+%%the necessary files for execution. This will be done by running the
+%%following three commands from a terminal:
+%%
+%%
+%%\starttyping
+%%  . ~/context/tex/setuptex
+%%  context --generate
+%%  context --make
+%%\stoptyping
+%%
+%%The first instruction is a point (dot). That's an abbreviation for bash's
+%%internal {\tt source} command. We can also, of course, run {\em source} if
+%%it's more convenient for us.
+%%
+%%\stopsubsection
+
+
+% In ANSS, the "installing LMTX" came after the "running" and "updating"
+% subsections.  But since the non-LMTX installation is not here any more,
+% the LMTX section was moved up here.
+
+
+\startsection[title=Installing LMTX]
+
+%%If we only plan to use \ConTeXt\ Mark~IV, and we want to compile our
+%%projects not directly with LuaTeX but with LuaMetaTex, a simplified LuaTeX
+%%that uses less system resources and that can work on {\em less powerful}
+%%systems, instead of \suite-, we need to install 
+
+LMTX is the latest version of \ConTeXt.  The name is an acronym of the name
+of the \TeX\ engine being used: LuaMetaTeX.  This version was launched in
+2019, and since approximately May 2020 it has been the recommended
+default \ConTeXt\ distribution, as suggested in the \goto{\ConTeXt\
+    wiki}[url(wiki)].
+
+\startSmallPrint
+
+In 2019 the development of LMTX was fairly intense, and the version could
+change several times a week.  However, by 2026 LMTX has long been a stable
+and reasonably mature product.  Although LMTX is still actively developed,
+the development mainly involves adding new features or improving the
+existing capabilities, and it is very unlikely that an update
+will \quotation{break} an existing LMTX document.
+
+\stopSmallPrint
+
+\startsubsection[title=The installation itself]
+
+The installation is as simple as:
+
+\startitemize
+
+  \item {\bf Step 1:} Decide on the location where you want to install
+    LMTX, and, if necessary, create a directory at that location.  For
+    these instructions I will assume that the installation is done in a
+    directory called \quotation{\tt context} located somewhere under our
+    home directory.
+
+  \item {\bf Step 2:} Download (to the installation directory) the zip file
+    from the 
+    \goto{\ConTeXt\
+        wiki}[url(https://wiki.contextgarden.net/Introduction/Installation)]
+    that corresponds to your operating system and processor.  As of
+    April~2026 it can be any of the following:
+
+
+\page[preference]
+
+  \startitemize[packed]
+
+  \item GNU/Linux
+    \startitemize
+    \item X86/AMD64 Processor
+      \startitemize
+      \item \goto{32 bit version}[url(http://lmtx.pragma-ade.nl/install-lmtx/context-linux.zip)].
+      \item \goto{64 bit version}[url(http://lmtx.pragma-ade.nl/install-lmtx/context-linux-64.zip)].
+      \stopitemize
+    \item ARM Processor
+      \startitemize
+      \item \goto{32 bit version}[url(http://lmtx.pragma-ade.nl/install-lmtx/context-linux-armhf.zip)].
+      \item \goto{64 bit version}[url(http://lmtx.pragma-ade.nl/install-lmtx/context-linux-aarch64.zip)].
+      \stopitemize
+    \stopitemize
+  \item Mac OS,
+    \startitemize
+    \item \goto{AMD64 bit version}[url(http://lmtx.pragma-ade.nl/install-lmtx/context-osx-64.zip)]
+  \item \goto{ARM 64 bit version}[url(http://lmtx.pragma-ade.nl/install-lmtx/context-osx-arm64.zip)]
+\stopitemize
+  \item FreeBSD~14.0
+    \startitemize
+    \item \goto{AMD64 version}[url(http://lmtx.pragma-ade.nl/install-lmtx/context-freebsd-amd64.zip)].
+    \stopitemize
+  \item OpenBSD~7.4
+    \startitemize
+    \item \goto{AMD64 version}[url(http://lmtx.pragma-ade.nl/install-lmtx/context-openbsd-amd64.zip)].
+    \stopitemize
+  \item Microsoft Windows
+    \startitemize
+    \item \goto{X86 (32 bit) version}[url(http://lmtx.pragma-ade.nl/install-lmtx/context-mswin.zip)]
+    \item \goto{AMD64 version}[url(http://lmtx.pragma-ade.nl/install-lmtx/context-win64.zip)]
+    \item \goto{ARM 64 bit version}[url(http://lmtx.pragma-ade.nl/install-lmtx/context-windows-arm64.zip)]
+    \stopitemize
+
+  \stopitemize
+
+  If you don't know whether your system is 32-bit or 64-bit, chances are
+  --- unless your computer is {\em very} old --- that it's 64-bit.  If you don't
+  know whether your processor is X86/AMD64 or ARM, for Linux and windows
+  users it's most likely X86/AMD64, and for people with Apple computers
+  manufactured after 2020, it's most likely ARM~64.
+
+  \item {\bf Step 3:} Unzip the file downloaded in the previous step into
+    the installation directory.  This will create a directory
+    called \MyKey{bin} containing three files necessary for the
+    installation.  It will also create two (Unix-like systems) or three
+    (windows systems) files, one called \MyKey{installation.pdf}, a file
+    which is the actual installation program called \MyKey{install.sh}
+    (Unix-type systems) or \MyKey{install.bat} (windows systems), and on
+    windows systems another file called \MyKey{setpath.bat}.  The {\tt
+    installation.pdf} file has helpful information about the way
+    the \ConTeXt\ files are organized, how to update the installation, and
+    a few places you can get help.
+ 
+
+  \item {\bf Step 4:} Run the installation program (\MyKey{install.sh}
+    or \MyKey{install.bat}).  This program needs an internet connection, as
+    it downloads the \ConTeXt\ distribution files over the internet.
+
+  \startitemize
+
+    \item On Unix-type systems the installation program, located in the
+      installation directory, is run from a terminal, either with {\tt
+      bash} or {\tt sh}:
+      \\\type{sh install.sh}\\
+      It is not necessary to have
+      administrator privileges, unless the installation directory is
+      outside the user's home directory.  
+
+      In most cases it is probably best to {\em not} install \ConTeXt\ with
+      administrator privileges; if you want to install it in some location
+      outside your home directory (e.g., \type{/usr/local/context}) it is
+      best to first create the directory with administrator privileges,
+      then use administrator privileges to change the ownership of the
+      chosen directory to your userid.  For example, these two commands
+      \starttyping
+sudo mkdir /usr/local/context
+sudo chown $USER /usr/local/context
+    \stoptyping %$
+      will create the directory {\tt /usr/local/context} and change its
+      ownership to your userid, so that from then on you can create and
+      delete files in that directory without invoking administrator
+      privileges.
+
+% TODO: is it (still?) the case that one needs admin perms to create
+% symlinks on windows?
+
+    \item In windows-type systems, you must open a terminal, move to the
+      installation directory, and from the terminal, run {\tt install.bat}.
+      It is not necessary here either that the installation program is run
+      as a system administrator, but it is recommended that this be done so
+      that symbolic links of the files can be used, thus saving disk space.
+
+  \stopitemize
+
+  \item {\bf Step 5}: Make the location of LMTX known:
+
+    In windows systems, installing \ConTeXt\ creates a file
+    called \MyKey{setpath.bat} which updates all the configuration files
+    necessary to let windows know that you have installed LMTX in the
+    system and where you have done so. 
+
+    In GNU Linux systems, FreeBSD, OpenBSD or Mac OS, no {\em script} that
+    automates the task is generated, so we must incorporate the address for
+    the \ConTeXt\ binaries in our PATH variable, which we could do by
+    running the following commend (after changing it to contain the correct
+    information!\null) in the terminal:
+
+    {\tt export PATH="{\em InstallationDir}/tex/texmf-{\em Platform}/bin:\$PATH”}
+
+    where {\tt {\em InstallationDir}} is the chosen installation directory and
+    {\tt texmf-{\em Platform}} will vary according to the version of LMTX
+    we have installed.  As an example, if we installed \ConTeXt\ in {\tt
+        /home/user/context} on an AMD64 Linux system, {\tt texmf-{\em
+            Platform}} will be {\tt texmf-linux-64}, and thus we
+    should run the following command from the terminal:
+
+    {\tt export PATH="/home/user/context/texmf-linux-64/bin:\$PATH”}
+
+    Running this command will include LMTX in the command interpreter's
+    path, but only as long as the terminal from which it has been run
+    remains open.  If we want the location of the {\tt context} program to
+    be set up automatically every time a terminal is opened (and in 99.9\%
+    of all situations, we do), we must include this command in the
+    configuration file of the {\em shell\,}\footnote{In Unix-type systems
+        the command interpreter is usually referred to as
+        the \quotation{shell}.}  program used by our user.  The name of
+    this file changes according to the particular shell ({\tt bash,} {\tt
+        sh}, {\tt zsh}, {\tt ksh}, {\tt tcsh}, {\tt csh}, \unknown\) which
+    we use.  On most Linux systems the default shell is {\tt bash}; for
+    {\tt bash} users the file to update is called \MyKey{.bashrc}, and so
+    we should run the following command:
+
+    \starttyping
+echo export PATH="/home/user/context/texmf-linux-64/bin:$PATH" >> ~/.bashrc
+   \stoptyping
+
+    For people who use {\tt zsh}, the analogous command is
+
+    \starttyping
+echo export PATH="/home/user/context/texmf-linux-64/bin:$PATH" >> ~/.zshenv
+    \stoptyping
+
+%% I think this is over-stating the situation:
+%%    {\bf Important note:} By executing this step, we will disable the
+%%    possibility of using other versions of \ConTeXt\ on our system, such as
+%%    the one incorporated in \TeX~Live or \quotation{\ConTeXt\
+%%    Standalone}.  If we want to make both versions compatible, it is
+%%    preferable to use the procedure described
+%%    in \in{Section}[sec:run-several-versions].
+
+
+\item {\bf Step 6:  Final adjustments (Mostly for GNU Linux)}
+
+\ConTeXt\ comes with a large selection of fonts, but you may wish to be
+able to use \quotation{system} fonts and/or fonts that you have obtained
+and stored somewhere under your home directory.  (If you have no such wish,
+you can skip this entire step.)
+
+At time of writing, on windows systems the \ConTeXt\ standalone
+distribution looks for fonts in
+\starttyping
+C:/windows/fonts//
+\stoptyping
+and on Apple systems it looks in 
+\starttyping
+$HOME/Library/Fonts//;/Library/Fonts//;/System/Library/Fonts//
+\stoptyping %$
+
+In GNU Linux systems there are many directories where fonts can be
+installed, and (at time of writing) \ConTeXt\ does not set up a default
+location to look for system or user fonts.  Consequently, if we
+want \ConTeXt\ to be able to use these fonts we must tell it where to find
+them.  To do this we {\em could} modify the
+file \type{.../tex/texmf-linux-64/bin/mtxrun.lua} in our \ConTeXt\
+installation, but our change may get overwritten by the next \ConTeXt\ is
+updated.  Aside from that issue, modifying this critical \ConTeXt\ file is
+not a good idea for most non-expert users.
+
+% TODO: is the // at the end of each directory required and/or desired in Linux?
+
+Instead, users of non-windows, non-Apple systems can set an environment
+variable {\tt OSFONTDIR} listing the directories in which \ConTeXt\ should search 
+for fonts.  For example,
+\starttyping
+export OSFONTDIR=~/.fonts//:/usr/share/fonts//:/usr/share/texmf/fonts//
+\stoptyping tells \ConTeXt\ to look for fonts in three additional
+directories (and subdirectories below them!\null): the {\tt .fonts} directory
+immediately below our home directory, the system directory {\tt
+    /usr/share/fonts} and the system directory {\tt
+    /usr/share/texmf/fonts/opentype}.  Each user will have to decide on
+the specific list of directories he or she wants \ConTeXt\ to search.
+
+\startSmallPrint
+
+    The {\tt /usr/share/texmf/fonts} directory will only be there if there
+    is some other installation of \TeX\ (or other system based on \TeX) in
+    our operating system; in this case this directory should be included in
+    the OSFONTDIR path so we can use the opentype fonts that such an
+    installation may have included.  If you have any commercial fonts that
+    you want \ConTeXt\ to use, you have to ensure that the path to the
+    directory (or directories) containing these fonts is one of those
+    included in OSFONTDIR\null.  I have seen, for example, that sometimes fonts
+    are installed in {\tt /usr/local/fonts} instead of (or as well as) {\tt
+        /usr/share/fonts}.
+
+\stopSmallPrint
+Although you can type the \type{export OSFONTDIR=...} command every time
+you open a terminal emulator window to run \ConTeXt, once you have decided
+upon the desired list of directories, it makes sense to put that command in
+one of the initialization files which your command interpreter
+(\quotation{shell}) reads on startup
+(e.g., \type{~/.zshenv}, \type{~/.bashrc}, \type{~/.cshrc}, \type{~/.profile}, \unknown).
+
+If you start your editor from your desktop environment or window manager,
+and run \ConTeXt\ from within your editor, you must also ensure that the
+{\tt OSFONTDIR} environment variable is known to your editor.  How to do
+this depends on your particular desktop environment or window manager, and
+if you don't know how to get {\tt OSFONTDIR} in your editor's environment,
+your best bet might be to ask on a web forum or mailing list dealing with
+your specific type of system.
+
+Finally, it may be a good idea to have \ConTeXt\ update its font database
+with the font files added via {\tt OSFONTDIR}.  This is done by running the
+following commands from a terminal in which {\tt OSFONTDIR} is known and
+exported:
+
+\starttyping
+  context --generate
+  context --make
+\stoptyping
+
+\stopitemize
+
+\stopsubsection
+
+
+% TODO: this subsection and the run-several-versions section really need to
+% be rationalized.
+
+
+\startsubsection[title=Running \suite-]
+
+\suite- has been designed to be able to coexist with other installations
+of \TeX\ systems, which is an advantage because it allows us to have
+several different versions installed on the same operating system.  (This
+concept is more fully described in \in{Section}[sec:run-several-versions]
+of this chapter.)
+
+In order to exploit this advantage we have two choices for specifying the
+particular {\tt context} which we want to run:
+\startitemize
+  \item On Unix-type systems, we can simply give a \quotation{full
+      pathname} to the particular {\tt context} we want to run.  For
+    example, we might have set up out {\tt PATH} variable to point to (for
+    example) {\tt /usr/local/context/tex/texmf-linux-64/bin:\$PATH} (as
+    described in {\bf Step~5} above).  If we wanted to use another {\tt context}
+    program, perhaps one found in the directory {\tt
+        /usr/local/texlive/current/bin/x86_64-linux}, we can execute the
+    (somewhat long) command
+    \starttyping
+/usr/local/texlive/current/bin/x86_64-linux/context mydoc.tex
+    \stoptyping
+    to compile {\tt mydoc.tex} using the \TeX{}live {\tt context} executable.
+  \item On Unix-type systems we could instead change the {\tt PATH}
+    environment variable whenever we want to try a different {\tt context}
+    program.  However, it is probably easier to create a shell {\em alias}
+    or a shell {\em function} to call alternative {\tt context} programs.
+    (Instructions for creating a shell alias are found
+    in \in{Section}[sec:run-several-versions] below; instructions for
+    creating a shell function is out of scope for this introduction
+    to \ConTeXt\ LMTX, but instructions are easy to find with a simple
+    internet search.)
+  \item On windows system, we can run (in the terminal)
+    the \type{tex\setuptex.bat} command from the particular installation
+    directory for the version of {\tt context} which we want to use.
+    After running this command, running the {\tt context} command will
+    refer to the context in this particular installation directory.
+\stopitemize
+
+If there is no other installation of \TeX\ or any of its derivatives in our
+system, we can avoid the above effort by automating the specification of
+the location of {\tt context} and {\bf mtxrun} every time a terminal is
+opened:
+
+\startitemize
+
+  \item On Unix-like systems this is done by including it in the file
+    containing the general terminal startup {\em script}
+    (e.g., \MyKey{.bashrc}, \MyKey{.zshenv}, \unknown).
+
+  \startSmallPrint
+
+      The configuration file of a terminal depends on the {\em shell}
+      program that the terminal uses by default. If this is {\tt bash}
+      (which is the most used in GNU Linux systems), the file read at the
+      beginning is {\tt .bashrc}. The {\tt sh} and {\tt ksh} {\em shells}
+      use a file called {\tt .profile}, {\tt zsh} uses {\tt .zshenv}, and
+      {\tt tcsh} or {\tt csh} read the {\tt .cshrc} file. Some specific
+      implementation may change the names of these files and so, for
+      example, {\tt .bashrc} is sometimes called {\tt .bash_profile}.
+
+  \stopSmallPrint
+
+  \item In Windows-type systems we can create a shortcut on the desktop
+    that runs cmd.exe and then edit it, putting as a command to run when we
+    double click on it:
+
+  \starttyping
+    C:\WINDOWS\System32\cmd.exe /k C:\Programs\context\tex\setuptex.bat
+  \stoptyping
+
+\stopitemize
+
+% TODO: is this list of editors correct?
+
+Another possibility, if we do not wish to run this script each time we want
+to use ConTeXt, nor want to permanently set the environment variables
+necessary for it to be run, is to do it from the text editor itself,
+instead of running ConTeXt from a terminal.  How you do this depends on the
+particular text editor you are using.  The ConTeXt wiki provides
+information on how to set up various common editors: emacs, LEd, Notepad++,
+Scite, TeXnicCenter, TeXworks, vim and some others.
+
+\stopsubsection
+
+% This now seems to be redundant
+%%\startsubsection
+%%  [title=Updating the version of \suite- or returning to an earlier version]
+%%
+%%\ConTeXt\ LMTX is under continuous development, so \suite- is often
+%%updated.  To update the installation just repeat the process: download a
+%%new version of \MyKey{install.sh} (if it has been deleted) and run it.
+%%Easier yet is to just leave {\tt install.sh} (or {\tt install.bat}) in the
+%%directory where you unpacked the zip file.
+
+% TODO: can this be done in LMTX?
+%%If, for whatever reason, we want to go back to a previous version
+%%of \suite-, just run \MyKey{first-setup} with the \MyKey{--context=date}
+%%option, where {\em date} is the date corresponding to the version we want
+%%to recover. Note that the date has to be introduced in the US
+%%months-days-years format.
+%%
+%%The complete list of \ConTeXt\ versions and associated dates can be found
+%%at \goto{this link}[url(https://minimals.contextgarden.net/current/context/)].
+%%
+%%Finally, keep in mind that after reinstalling the system, whether it is to
+%%upgrade or to return to a previous version, on GNU Linux systems you will
+%%have to run step 4 of the installation again, which I have
+%%called \quotation{Final Adjustments}.
+
+\stopsubsection
+
+\stopsection
+
+
+\startsubsection[title=Installing extension modules in LMTX]
+
+\ConTeXt\ LMTX incorporates a procedure for installing or upgrading
+the \ConTeXt\ extension modules.  In the \ConTeXt\ wiki there are
+directions for installing and updating modules; see
+\goto{this page}[url(https://wiki.contextgarden.net/Input_and_compilation/Modules)],
+to discover the commands to run from a terminal.  I have personally
+verified that this works on a GNU Linux system.  I'm not sure if it will
+work on a Windows system, since I don't have any version of that operating
+system to check it with.
+
+The following command (at least as of \ConTeXt\ version 2026.03.25) lists
+all the known modules:
+\starttyping
+mtxrun --script install-modules --list
+\stoptyping
+
+
+\stopsubsection
+
+\startsubsection[title=Updating LMTX]
+
+\ConTeXt\ LMTX is under continuous development, so \suite- is often
+updated.  Updating LMTX is as simple as running the installation program
+(\MyKey{install.sh} or \MyKey{install.bat}) again: it will check the
+installed files against those on the web server and update as necessary.
+
+In the very unlikely event that the website from which the files are
+obtained changes, we may need to reinstall \ConTeXt\ from scratch.
+Alternatively, we could download the new zip file, unzip it in our
+existing \ConTeXt\ installation directory, and execute
+the \MyKey{install.sh} script (or, for windows users,
+the \MyKey{install.bat} script).
+
+\stopsubsection
+
+% I am not sure that this isn't more confusing to a n00b than it needs to be.
+% TODO: Perhaps say something about TEXROOT or TEXMFHOME or TEXMFPROJECT or
+% TEXMFFONTS or TEXMFLOCAL or TEXMFMODULES or TEXMFCONTEXT or TEXMFOS or TEXMFMAIN?
+%%\startsubsection
+%%  [title={Creating a file that loads the variables into memory needed for
+%%          LMTX (only GNU/Linux systems)}]
+%%
+%%\suite- contains, as we already know, a (\MyKey{tex/setuptex}) file that
+%%loads into memory all the variables needed to run it, but LMTX does not
+%%include a similar file. We can, however, easily create it ourselves and
+%%store it, for example, as \MyKey{setuplmtx} in the \MyKey{tex}
+%%directory. The commands that this file could have would be:
+%%
+%%\starttyping
+%%export PATH="~/context/LMTX/tex/texmf-linux-64/bin:"\$PATH
+%%echo "Adding ~/context/LMTX/tex/texmf-linux-64/bin to PATH"
+%%export TEXROOT="~/context/LMTX/tex"
+%%echo "Setting ~/context/LMTX/tex as TEXROOT"
+%%export OSFONTDIR="~/.fonts:/usr/share/fonts:/usr/share/texmf/fonts/opentype/"
+%%echo "Loading font directories into memory"
+%%alias lmtx="~/context/LMTX/tex/texmf-linux-64/bin/context"
+%%echo "Creating an alias to run lmtx"
+%%\stoptyping%$
+%%
+%%With this, besides loading into memory the paths and variables needed to
+%%run LMTX we would be enabling the \MyKey{lmtx} command as a synonym
+%%of \MyKey{context}.
+%%
+%%After creating this file, before being able to use LMTX, where we intend to
+%%use it we should run the following in the terminal:
+%%
+%%\type{source ~/context/LMTX/tex/setuplmtx}
+%%
+%%all this assuming that LMTX is installed in \MyKey{~/context/LMTX} and that
+%%we have called this file \MyKey{setuplmtx} and stored it
+%%in \MyKey{~/context/LMTX/tex}.
+%%
+%%\startSmallPrint
+%%
+%%  The above is what I do, to work with LMTX in the same way I used to work
+%%  with \suite-.  However, I do not exclude the possibility that in LMTX it
+%%  is not necessary, for example, to load into memory the variable
+%%  OSFONTDIR, since I am struck by the fact that \ConTeXt\ wiki says nothing
+%%  about this.
+%%
+%%\stopSmallPrint
+%%
+%%\stopsubsection
+%%
+%%\stopsection
+
+\startsection
+  [
+    reference=sec:run-several-versions,
+    title={Using several versions of \ConTeXt\ on the same system (only for
+        Unix-type systems)}
+  ]
+
+The shell feature (in most or all command interpreters of Unix-like
+systems) called {\tt alias} allows us to associate different names with
+different versions of \ConTeXt.  So we can use, for example, the version
+of \ConTeXt\ included in \TeX~Live; or the {\em Standalone} version
+of LMTX.
+
+For example, if we store the versions of LMTX downloaded in January and
+August 2020 in different directories, we could write the following two
+instructions in \type{~/.bashrc} (or the equivalent file read by your choice
+of shell when opening a terminal, such as \type{~/.zshenv}
+or \type{~/.profile}):
+
+\starttyping
+alias context-01=”/home/user/context/202001/tex/texmf-linux-64/bin/context”
+alias context-08=”/home/user/context/202008/tex/texmf-linux-64/bin/context”
+\stoptyping
+
+Note that {\tt csh} and {\tt tcsh} users would have to use the following
+syntax, and would want to enter these commands in their \type{~/.cshrc} or
+\type{~/.tcshrc} files:
+
+\starttyping
+alias context-01 ”/home/user/context/202001/tex/texmf-linux-64/bin/context”
+alias context-08 ”/home/user/context/202008/tex/texmf-linux-64/bin/context”
+\stoptyping
+
+These instructions will associate the names {\tt context-01} with the
+version of LMTX installed in the \MyKey{context/202001} directory and {\tt
+    context-08} with the version installed in \MyKey{context/202008}.
+After having entered these aliases in the appropriate file (and having
+opened a new terminal emulator so they take effect) {\tt mydoc.tex} could
+be processed with the January~2020 version of \ConTeXt\ by typing:
+
+\starttyping
+context-01 mydoc.tex
+\stoptyping
+
+\stopsection
+
+\stopchapter
+
+\stopcomponent
+
+%%% Local Variables:
+%%% mode: ConTeXt
+%%% eval: (auto-fill-mode 1)
+%%% coding: utf-8-unix
+%%% TeX-master: "../introCTX_eng.tex"
+%%% End:

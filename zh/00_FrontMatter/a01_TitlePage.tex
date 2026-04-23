@@ -1,0 +1,189 @@
+%%% vim:set filetype=context tw=72 : %%%
+%%% File:     TitlePage.tex
+%%% Component:Cover, credits and table of contents
+%%% Author:   Joaquín Ataz-López et al
+%%% Begun:    April 2020
+%%% Concluded:March 2026
+%%%
+%%% Edited with: Emacs + AUCTeX - And at times with vim + context-plugin
+%%%
+
+\startcomponent a01_TitlePage.tex
+
+\setvariables
+  [document]
+  [
+      titleA=ConTeXt\ LMTX,
+      titleB={\switchtobodyfont[ss,tfxx] 简明教程},
+      titleC={\switchtobodyfont[ss,tfxx] （社区版）},
+      titleD=,
+      authorA=Joaquín Ataz-López,
+      authorB=（等）,
+  ]
+
+  \startpagemakeup
+    \startMPcode
+      StartPage ;
+      fill Page enlarged 5mm withcolor \MPcolor{purple} ;
+
+      draw anchored.lrt(image(draw textext("\getvariable{document}{titleA}")
+          xsized(.750PaperWidth) withcolor white),
+          (lrcorner Page) shifted (-PaperWidth/20, PaperWidth * 0.45)) ;
+      draw anchored.lrt(image(draw textext("\getvariable{document}{titleB}")
+          xsized(.750PaperWidth) withcolor white),
+          (lrcorner Page) shifted (-PaperWidth/20, PaperWidth * 0.32)) ;
+      draw anchored.lrt(image(draw textext("\getvariable{document}{titleC}")
+          xsized(.750PaperWidth) withcolor white),
+          (lrcorner Page) shifted (-PaperWidth/20, PaperWidth * 0.19)) ;
+      draw anchored.lrt(image(draw textext("\getvariable{document}{titleD}")
+          xsized(.750PaperWidth) withcolor white),
+          (lrcorner Page) shifted (-PaperWidth/20, PaperWidth*0.07)) ;
+
+      draw anchored.urt(image(draw textext("\getvariable{document}{authorA}")
+          ysized(.039PaperWidth) rotated 90 withcolor white),
+          (urcorner Page) shifted (-PaperWidth/10, -PaperWidth/20)) ;
+      draw anchored.urt(image(draw textext("\getvariable{document}{authorB}")
+          ysized(.039PaperWidth) rotated 90 withcolor white),
+          (urcorner Page) shifted (-PaperWidth/20, -PaperWidth*0.184)) ;
+      setbounds currentpicture to Page ;
+      StopPage ;
+    \stopMPcode
+  \stoppagemakeup
+
+  {
+    \useURL[CC-BY-NC-SA][https://creativecommons.org/licenses/by-nc-sa/4.0/][][]
+    \useURL[SourceCode][https://codeberg.org/jd/anss-ce][][]
+    \useURL[wiki][https://wiki.contextgarden.net][][]
+    \useURL[pragma][https://www.pragma-ade.com][]
+
+    \page[blank]
+    \parindent0pt
+    \parskip0pt
+    \ \vfill
+
+    \switchtobodyfont[small]
+    {\bf ConTeXt\ LMTX 简明教程（社区版）}
+    \crlf
+    版本 1.1 [\RevisionDate]
+    \blank
+
+    \quotation{ConTeXt\ LMTX 简明教程}
+    \copyright\ 2020--2021, 2026，Joaquín Ataz-López 等贡献者
+    采用 CC BY-NC-SA 4.0 许可证。如需查看该许可证的副本，请访问 \from[CC-BY-NC-SA]。
+
+    \blank
+    本作品可从 \from[SourceCode] 下载和使用，须遵守上述许可证条件。
+
+    \blank
+
+    版本历史：
+    \startitemize[packed]\smallbodyfont
+
+      \item \date[y=2026, m=3, d=6]:
+        版本 1.0。初版，基于 Joaquin Ataz-López 所著《ConTeXt\ Mark~IV 简明教程》1.6 版本的英文翻译（译者匿名）。
+
+      \item \date[y=2026, m=4, d=21]: 版本 1.1。重大内容更新，反映 ConTeXt LMTX 的特性。移除了部分 MkII 和 MkIV 信息，新增了部分内容，修正了一些排版错误，更新了一些翻译等。
+
+    \stopitemize
+  }
+
+  {
+    \page
+    \parindent0pt
+    \ \vfill
+
+    \centerline{以下是原版版权页}
+    \centerline{\it ConTeXt\ Mark~IV 简明教程}
+    \vfill
+    \vfill
+
+    \switchtobodyfont[small]
+    {\bf ConTeXt\ Mark~IV 简明教程}\\
+    版本 1.6 [\date[y=2021, m=1, d=2]]\\
+    \blank
+
+    {\copyright} 2020--2021，Joaquín Ataz-López\\
+    \blank
+    原标题：Una introducción (no demasiado breve) a \ConTeXt\ Mark~IV\\
+    英文翻译：一位希望保持匿名的朋友。
+
+    本文档的作者（及其英文翻译者）授权其自由分发和使用，包括在以下条件下以数字格式复制和重新分发本文档的权利：须注明其作者身份，且不得将其包含在任何软件包或套件中，或包含在使用或分发条件不包括接收者自由复制和重新分发权利的文档中。本文档的翻译同样获得授权，但须注明原始文本的作者身份，且翻译文本须在
+    {\em Free Software Foundation} 的 FDL 许可证、{\em Creative Commons}
+    授权复制和重新分发的许可证或类似许可证下分发。
+
+    上述规定并不妨碍以书面形式获得作者明确授权后方可出版、营销或翻译本文档纸质版。
+
+    版本历史：
+
+    \startitemize[packed]\smallbodyfont
+
+      \item \date[y=2020, m=8, d=18]: 版本 1.0（仅西班牙语）：
+      原始文档。
+
+      \item \date[y=2020, m=8, d=23]: 版本 1.1（仅西班牙语）：
+        作者修正了 minor 错误、拼写误解。
+
+      \item \date[y=2020, m=9, d=3]: 版本 1.15（仅西班牙语）：
+        更多错误、拼写误解。
+
+      \item \date[y=2020, m=9, d=5]: 版本 1.16（仅西班牙语）：
+        更多错误、拼写误解，以及一些非常细微的更改，使文本更加清晰（我希望如此）。
+
+      \item \date[y=2020, m=9, d=6]: 版本 1.17（仅西班牙语）：
+        我发现的 minor 错误数量令人难以置信。我只需要停止重新阅读文档，就找不到更多错误了！
+
+      \item \date[y=2020, m=10, d=21]: 版本 1.5（仅西班牙语）：
+        纳入了建议并修正了 NTG-context 用户报告的错误。
+
+      \item \date[y=2021, m=1, d=2]: 版本 1.6：在仔细重新阅读文档后提出的修正建议，恰逢其被翻译成英文。这是第一个英文版本。
+
+    \stopitemize
+  }
+
+  \starttitle
+    [title={目录}]
+
+    \setupheadertexts
+      [\tfx 目录]
+      [\tfx\pagenumber]
+
+    \setuplist
+      [part]
+      [
+        before={\blank[2*big]},
+        after={\blank[big]},
+        style=\bfa,
+        aligntitle=yes,
+      ]
+
+    \setuplist
+      [chapter]
+      [
+        before=\blank,
+        style=\bf,
+        margin=.5cm,
+        aligntitle=yes
+      ]
+
+    \setuplist
+      [section]
+      [
+        aligntitle=yes,
+        style=\tfx,
+        margin=1.5cm
+      ]
+
+    \definecombinedlist
+      [Toc]
+      [part, chapter, section]
+      [level=subsection, alternative=c]
+
+    \start
+      \setupwhitespace[none]
+      \switchtobodyfont[11pt]
+      \setupinterlinespace[small]
+      \placeToc
+    \stop
+
+  \stoptitle
+\stopcomponent

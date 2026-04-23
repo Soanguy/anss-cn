@@ -1,0 +1,759 @@
+%%% File:       b11_ParasLines.tex
+%%% Author:     Joaquín Ataz-López et al
+%%% Begun:      August 2020
+%%% Concluded:  August 2020
+% 内容：本章比前一章更连贯。《TeXBook》的大部分内容都在解释垂直间距，而在 ConTeXt 的 Excursion 中，题为“Spacing”的一章也涉及垂直间距。
+%
+%%% 编辑工具：Emacs + AUCTeX - 有时也用 vim + context-plugin
+%%%
+
+\startcomponent b11_ParasLines.tex
+
+\environment introCTX_env.tex
+
+\startchapter
+  [title={段落、行与垂直间距},
+   bookmark={段落、行与垂直间距}]
+
+\TocChap
+
+文档的整体外观主要由页面大小和布局（我们在 \in{Chapter}[cap:pages] 中已经了解）、我们选择的字体（在 \in{Chapter}[sec:fontscol] 中讨论过）以及行间距、段落对齐方式和段落间距等其他因素决定。本章重点讨论这些其他因素。
+
+\startsection
+    [title={段落及其特性}]
+
+段落是 \ConTeXt 的基本文本单位。开始一个新段落有两种方式：
+
+% TODO：难道 \par 和 \endgraf 不是用来结束段落的吗？如果是这样，下面的说法有点误导。
+
+\startitemize[n]
+
+  \item 在源文件中插入一个或多个连续的空行。
+
+  \item 使用 \PlaceMacro{par}\tex{par} 或 \PlaceMacro{endgraf}\tex{endgraf} 命令。
+
+\stopitemize
+
+第一种方式是通常使用的方法，因为它更简单，并且生成的源文件更易于阅读和理解。使用显式命令插入段落分隔符通常只在宏内部（参见 \in{Section}[sec:define]）或表格单元格中（参见 \in{Section}[sec:tables]）进行。
+
+在一个排版良好的文档中，从排版角度来看，段落之间在视觉上相互区分是很重要的。有两种典型的方法可以实现这一点：稍微缩进每个段落的第一行，或者稍微增加段落之间的空白。有时会结合使用这两种方法，尽管在某些地方不推荐这样做，因为被认为在排版上显得冗余。
+
+\startSmallPrint
+
+    我并不完全同意。单纯的首行缩进并不总能足够地在视觉上突出段落之间的分隔；但不伴随缩进而增加间距会在段落从页面顶部开始时带来问题：我们可能不确定这是一个新段落，还是上一页的延续。结合使用两种方法可以消除疑虑。
+
+\stopSmallPrint
+
+首先，让我们看看如何使用 \ConTeXt 实现行和段落的缩进。
+
+\startsubsection
+  [
+    reference=sec:indentation,
+    title={自动缩进段落首行},
+  ]
+
+段落首行自动插入小缩进的功能默认是禁用的。我们可以根据需要启用和禁用它。启用时，缩进的程度可以通过 \PlaceMacro{setupindenting}\tex{setupindenting} 命令来指示，该命令允许使用以下值来指示是否应启用缩进：
+
+\startitemize[packed]
+
+  \item {\tt\bf always}：所有段落都将缩进，无一例外。
+
+  \item {\tt\bf yes}：启用 {\em 正常} 段落缩进。某些前面有额外垂直间距的段落，如章节的第一个段落，或某些环境之后的段落，将不会缩进。
+
+  \item {\tt\bf no, not, never, none}：禁用段落首行自动缩进。
+
+\stopitemize
+
+在启用自动缩进的情况下，我们还可以通过相同的命令指示缩进多少。为此，我们可以直接使用一个尺寸（例如 1.5cm）或象征性的词 \MyKey{small}、\MyKey{medium} 和 \MyKey{big}，它们分别表示我们想要小、中或大的缩进。
+
+\startSmallPrint
+
+    在某些排版传统中（包括西班牙语），默认缩进是两个 quad。在排版术中，quad（最初是 {\em quadrat}）是一种用于活字排版的金属隔片，其高度和宽度等于所用字体的磅值大小。因此，对于 12 磅的字体，quad 的尺寸将是宽 12 磅、高 12 磅。这个术语后来被用作排版术中两种常见空格大小的通用名称，无论使用何种排版形式。\ConTeXt\ 有两个 quad 命令：\tex{quad} 生成一个上述类型的空格，\tex{qquad} 生成两倍于此的空格，但同样基于所使用的字体。对于 11 磅的字母，两个 quad 的缩进将为 22 磅；对于 12 磅的字母，则为 24 磅。
+
+\stopSmallPrint
+
+当缩进启用时，如果我们不想让某个段落缩进，需要使用 \PlaceMacro{noindentation}\tex{noindentation} 命令。
+
+\startSmallPrint
+
+    通常，我会在我的文档中使用 \tex{setupindenting[yes, big]} 启用自动缩进。但在本文档中，我没有这样做，因为如果启用了缩进，大量的短句和示例会导致页面外观视觉上不整洁。
+
+\stopSmallPrint
+
+\stopsubsection
+
+
+\startsubsection
+    [
+        reference=sec:narrower,
+        title=特殊段落缩进,
+    ]
+
+突出段落的一种图形化方法是缩进段落的右侧或左侧（或两侧）。例如，这用于块引用。
+
+\ConTeXt\ 有一个环境允许我们改变段落缩进以突出段落中的文本。这就是 \MyKey{narrower} 环境：
+
+\PlaceMacro{startnarrower}\tex{startnarrower [Options] ... \stopnarrower}
+
+其中 {\tt Options} 可以是：
+
+\startitemize
+
+  \item {\tt\bf left}：缩进左边距。
+
+  \item {\tt\bf Num*left}：缩进左边距，将 {\em 正常} 缩进量乘以 {\tt Num}（例如 {\tt 2*left}）。
+
+  \item {\tt\bf right}：缩进右边距。
+
+  \item {\tt\bf Num*right}：缩进右边距，将 {\em 正常} 缩进量乘以 {\tt Num}（例如 {\tt 3*right}）。
+
+  \item {\tt\bf middle}：缩进两边距。这是默认值。
+
+  \item {\tt\bf Num*middle}：缩进两边距，将 {\em 正常} 缩进量乘以 {\tt Num}。
+
+\stopitemize
+
+在解释选项时，我提到了 {\em 正常缩进}；这指的是 \MyKey{narrower} 默认应用的左右缩进量。这个 {\em 量} 可以通过 \PlaceMacro{setupnarrower}\tex{setupnarrower} 配置，该命令允许以下配置选项：
+
+\startitemize[packed]
+
+  \item {\tt\bf left}：应用于左边距的缩进量。
+
+  \item {\tt\bf right}：应用于右边距的缩进量。
+
+  \item {\tt\bf middle}：应用于两边距的缩进量。
+
+  \item {\tt\bf before}：进入环境前要运行的命令。
+
+  \item {\tt\bf after}：退出环境后要运行的命令。
+
+\stopitemize
+
+如果我们想在文档中使用 narrower 环境的不同配置，我们可以使用 \PlaceMacro{definenarrower}\type{\definenarrower [Name] [Configuration]} 为每个配置分配不同的名称，其中 {\tt Name} 是与该配置关联的名称，{\tt Configuration} 允许与 \tex{setupnarrower} 相同的选项。
+
+\stopsubsection
+
+\stopsection
+
+
+\startsection
+  [
+    reference=sec:verticalspace,
+    title={段落之间的垂直间距},
+  ]
+
+\startsubsection
+  [title=\tex{setupwhitespace}]
+
+正如我们已经从 (\in{Section}[sec:linebreaks]) 中知道的，源文件中有多少个连续的空行对 \ConTeXt 来说并不重要：一个或多个空行只会在最终文档中插入一个段落分隔符。要增加段落之间的间距，在源文件中添加额外的空行是无济于事的。相反，此功能由 \PlaceMacro{setupwhitespace}\tex{setupwhitespace} 命令控制，该命令允许以下值：
+
+\startitemize
+
+  \item {\tt\bf none}：表示段落之间不会有额外的垂直间距。
+
+  \item {\tt\bf small, medium, big}：分别插入小、中或大的垂直间距。这些值插入的实际间距大小取决于字体大小。
+
+  \item {\tt\bf line, halfline, quarterline}：根据行高来度量额外的空白，分别插入额外的一行、半行或四分之一行的间距。
+
+  \item {\tt\bf DIMENSION}：为段落之间的间距设定一个特定的尺寸，与字体大小无关。例如，\tex{setupwhitespace[5pt]}。
+
+\stopitemize
+
+作为一般规则，不建议为 \tex{setupwhitespace} 设置精确的尺寸值。最好使用象征性的值 small、medium、big、line、halfline 或 quarterline。这样做的原因有两个：
+
+\startitemize
+
+  \item 象征性值是所谓的弹性尺寸（参见 \in{Section}[sec:dimensions]），这意味着它们有 {\em 正常} 尺寸，但允许该值有一定程度的增加或减少（\quotation{拉伸} 或 \quotation{收缩}），以帮助 \ConTeXt\ 排版页面，使得段落分隔在美学上相似。然而，段落之间的固定分隔尺寸使得实现良好的文档分页更加困难。
+
+  \item 象征性值 small、medium、big 等是基于字体大小计算的，因此如果在某些部分字体大小发生变化，段落之间的垂直间距量也会发生变化，最终结果将始终是和谐的。相反，垂直间距的固定值不会受到字体大小变化的影响，这通常会转化为文档中空白分布不佳（从美学角度而言）且不符合排版调整规则的文档。
+
+\stopitemize
+
+% TODO：是否值得指出，有人可以使用“特定尺寸”，如“2ex plus 0.5 ex minus 0.5 ex”，这允许一个特定的度量，但会随字体大小变化？
+
+当为段落垂直间距设置了某个值后，还有两个额外的命令可用：\PlaceMacro{nowhitespace}\tex{nowhitespace}，它消除特定段落之间的任何额外间距；以及 \PlaceMacro{whitespace}\tex{whitespace}，它执行相反的操作。然而，这些命令很少需要，因为 \ConTeXt\ 本身就能很好地管理段落之间的垂直间距；尤其是如果输入的是根据当前活动字体大小和间距计算的预定义尺寸之一作为值。
+
+\startSmallPrint
+
+    \tex{nowhitespace} 的含义是显而易见的。但 \tex{whitespace} 本身就不一定了，因为既然已经为所有段落普遍设置了垂直间距（\ConTeXt 猜想），那么为特定段落命令垂直间距有什么意义呢？然而，在编写高级宏时，\tex{whitespace} 在需要根据某个条件的值做出决策的循环上下文中可能很有用。这或多或少属于高级编程，我在此不作深入讨论。
+
+\stopSmallPrint
+
+\stopsubsection
+
+
+\startsubsection
+    [title={之间没有额外垂直间距的段落}]
+
+如果我们希望文档的特定部分中的段落之间没有额外的垂直间距，当然可以修改 \tex{setupwhitespace} 的通用配置，但这在某种程度上违背了 \ConTeXt\ 的理念，即通用配置命令应仅放在源文件的前言中，以实现文档一致且易于修改的通用外观。因此有了 \MyKey{packed} 环境，其通用语法为：
+
+\PlaceMacro{startpacked}\type{\startpacked [Space] ... \stoppacked}
+
+其中 {\tt Space} 是一个可选参数，指示环境内段落之间所需的垂直间距量。如果省略 {\tt Space}，则不会应用额外的垂直间距。
+
+\stopsubsection
+
+
+\startsubsection
+    [title={在文档特定位置添加额外的垂直间距}]
+
+如果在文档的某个特定位置，段落之间的正常垂直间距不够，我们可以使用 \PlaceMacro{blank}\tex{blank} 命令。不带参数使用时，\tex{blank} 和 \tex{blank[big]} 都将插入与 \tex{setupwhitespace} 设置的相同的垂直间距量。但我们可以在方括号之间指示一个特定的尺寸，或者根据字体大小计算的象征性值之一：small、medium 或 big。我们还可以将这些尺寸乘以某个整数，等等，例如，\tex{blank[3*medium]} 将插入相当于三个 medium 换行的间距。我们还可以将两个尺寸放在一起。例如，\tex{blank[2*big, medium]} 将插入两个 large 和一个 medium 的间距。
+
+由于 \tex{blank} 旨在增加段落之间的垂直间距，如果在应该增加间距的两个段落之间插入了分页符，则 \tex{blank} 无效；如果我们连续插入两个或更多 \tex{blank} 命令，则只有一个会生效（即要插入间距最大的那个）。放置在分页符之后的 \tex{blank} 命令也没有任何效果。然而，在这些情况下，我们可以使用象征性词 \MyKey{force} 作为命令选项来强制插入垂直间距。因此，例如，如果我们希望文档中的章节标题在页面上更靠下，使得该页的总长度小于其他页面（一种相对常见的排版实践），在配置 \tex{chapter} 命令时，我们应该写入类似于以下的内容：
+
+\starttyping
+\setuphead
+  [chapter]
+  [
+    page=yes,
+    before={\blank[4cm, force]},
+    after={\blank[3*medium]}
+  ]
+\stoptyping
+
+这一系列命令将确保章节总是在新页开始，并且章节标签向下移动 4 厘米。如果不使用 \MyKey{force} 选项，则不会出现额外的间距。
+
+\stopsubsection
+
+
+\startsubsection
+  [title=\tex{setupblank} 和 \tex{defineblank}]
+\PlaceMacro{setupblank}\PlaceMacro{defineblank}
+
+之前，我说过不带参数使用的 \tex{blank} 等同于 \tex{blank[big]}。但是，我们可以使用 \tex{setupblank} 更改 \tex{blank}（不带参数）输出的间距量，例如将其设置为 \tex{setupblank[0.5cm]} 或 \tex{setupblank[medium]}；这不会影响 \tex{blank[big]}（或 \type{medium} 或 \type{small}）输出的间距量。不带参数使用时，\tex{setupblank} 将根据当前字体大小调整该值。
+
+与 \tex{setupwhitespace} 一样，当 \tex{blank} 插入的空白值是预定义的象征性值之一时，它是一个允许进行一定调整的弹性尺寸。我们可以使用 \MyKey{fixed} 来改变这一点，并且稍后可以使用 (\MyKey{flexible}) 恢复默认值。因此，例如，对于双栏文本，建议设置 \tex{setupblank[fixed, line]}，当回到单栏时，设置 \tex{setupblank[flexible, default]}。
+
+\need3\baselineskip
+
+使用 \tex{defineblank}，我们可以将某个配置与一个名称关联起来。此命令的一般格式为：
+
+\type{\defineblank [Name] [Configuration]}
+
+一旦定义了我们的空白配置，我们就可以使用 \tex{blank[ConfigurationName]} 来调用它。
+
+\stopsubsection
+
+\startsubsection
+  [title={获得更多垂直间距的其他方法}]
+
+在 \TeX\ 中，插入额外垂直间距的命令是 \PlaceMacro{vskip}\tex{vskip}。这个命令，像几乎所有 \TeX\ 命令一样，也可以在 \ConTeXt\ 中工作，但强烈建议不要使用它，因为它会干扰 \ConTeXt\ 某些宏的内部功能。建议使用 \PlaceMacro{godown}\tex{godown} 来代替，其语法为：
+
+\type{\godown[Dimension]}
+
+其中 {\em Dimension} 需要是一个带或不带小数的数字，后跟一个度量单位。例如，\tex{godown[5cm]} 将指示 \ConTeXt\ 添加一个 5~cm 的间隙。如果当前页面剩余空间小于 5~cm，\tex{godown} 将导致分页（并且 \quotation{剩余} 空间不会出现在下一页的顶部）。类似地，\tex{godown} 在页面开头无效，尽管我们可以通过写入例如 \quotation{\cmd{\textvisiblespace \backslash godown[3cm]}}\footnote{请记住，在本文档中，当空白字符对我们很重要时，我们使用 \quote{\textvisiblespace} 字符来表示它。} 来 {\em 欺骗它}，这将首先插入一个空白，意味着我们不再处于页面开头，然后向下移动三厘米。（注意：这会向下移动略多于 3~cm，因为现在页面顶部有一个（没有文本的）行。这可以避免，但如何避免的解释对于本入门指南来说有点复杂。）
+
+\startSmallPrint
+
+    正如我们所知，\tex{blank} 也允许精确尺寸作为参数。因此，从用户的角度来看，写入 \tex{blank[3cm]} 或 \tex{godown[3cm]} 几乎是一样的。然而，它们之间存在一些细微的差别。例如，两个连续的 \tex{blank} 命令不会累积；当这种情况发生时，只有施加更大距离的那个被应用。而两个或更多 \tex{godown} 命令则可以完美地累积。
+
+    起初，\tex{blank} 的 \quotation{非累积} 行为可能看起来很奇怪。但考虑一个命令，它被设计为在其产生的任何输出 {\em 之后} 留出一点空间，而第二个命令被设计为在其输出 {\em 之前} 留出一点空间。如果在某个文档中，第二个命令紧跟在第一个命令之后，我们（通常）不希望这两个间距量相加：\tex{blank} 会注意只使用两者中较大的间距量，而不是两个量的和。
+
+\stopSmallPrint
+
+另一个相当有用的 \TeX\ 命令，在 \ConTeXt\ 中使用没有问题，是 \PlaceMacro{vfill}\tex{vfill}。此命令插入一个灵活的垂直空白，一直延伸到页面底部。就好像该命令将其后书写的内容 {\em 向下推}。这允许产生有趣的效果，例如如何将某个段落放置在页面底部，只需在其前面加上 \tex{vfill} 即可。然而，如果不与强制分页结合使用，\tex{vfill} 的效果很难体现，因为如果一个段落向上增长，那么将其向下推的意义不大。
+
+因此，例如，为确保一行文本放置在页面底部，我们可以写：
+
+\starttyping
+\ 
+\vfill
+Line at the bottom
+\page[yes]
+\stoptyping
+
+像所有其他插入垂直间距的命令一样，\tex{vfill} 在页面开头无效。但我们可以通过在它前面加上一个强制空白来 {\em 欺骗它}。因此，例如：
+
+\starttyping
+\page[yes]
+\ \vfill
+Centre line
+\vfill
+\page[yes]
+\stoptyping
+
+将在页面上垂直居中短语 \quotation{centre line}。
+
+在第一个 \tex{vfill} 示例中，添加空格是为了防止有人试图只使用底部三行来创建一个示例 \ConTeXt\ 文件。但也可以让页面顶部有一个段落，后跟 \tex{vfill}、\quotation{Line at the bottom} 和 \tex{page[yes]}。
+
+\stopsubsection
+
+\stopsection
+
+
+\startsection
+  [
+    reference=sec:lines,
+    title={\ConTeXt\ 如何构建构成段落的行},
+  ]
+
+排版系统的主要任务之一是将一长串单词分割成适当大小的单独行。例如，本文中的每个段落都被分割成了宽度为 15 厘米的行，但作者不必担心这些细节，因为 \ConTeXt\ 会在整体考虑每个段落之后选择断点，这样甚至一个段落的 {\em 最后} 几个词也会影响 {\em 第一} 行的分割。其结果是，整个段落中单词之间的间距尽可能均匀。
+
+\startSmallPrint
+
+    这是最能体现文字处理器工作方式差异以及使用 \ConTeXt\ 等系统获得更高质量的一个方面。因为文字处理器在到达行尾并换到下一行时，会调整刚结束的那一行的空白以填满该行。它对每一行都这样做，最后，段落中的每一行通常都会有不同词间距。这可能会导致非常糟糕的效果（例如，词间距大的行与词间距小的行相邻会在视觉上产生冲突）。而 \ConTeXt\ 则整体处理段落，并为每一行计算有多少可接受的断点以及每种断行方式会产生的词间距量。由于一行的断点会影响后续行的潜在断点，因此可能性的总数可能非常高；但这对于 \ConTeXt\ 来说不是问题。它将基于整个段落做出最终决定，确保每一行中单词之间的间距 {\em 尽可能相似}，从而产生比粗糙系统生成的段落更美观、更少分散注意力的段落。
+
+\stopSmallPrint
+
+为了做到这一点，\ConTeXt\ 会测试不同的替代方案，并根据其内部参数为每个方案分配一个所谓的 \quotation{劣度} 值。（这些参数是在深入研究排版艺术后建立的。）最后，在探索了所有可能性之后，\ConTeXt\ 会选择最不合适的选项（劣度值最小的那个）。通常，这效果很好，但不可避免地会出现选择的断点不是最佳，或者在我们看来不是最佳的情况。因此，有时我们希望告诉程序某些位置不是好的断点。相反，在其他时候，我们希望在特定点强制断行。以下小节探讨了一些我们可能影响断行的方法。
+
+
+\startsubsection
+  [
+    reference=sec:lettertilde,
+    title={保留字符 \quote{{\tt\lettertilde}} 的使用},
+  ]
+
+行断点的主要候选者显然是单词之间的空格。为了指示某个空格绝不应该被换行代替，我们使用（正如我们已经知道的）\quote{\lettertilde} 保留字符，\TeX\ 称之为 {\em tie}，它将两个单词绑定在一起。（某些系统使用 \quotation{不间断空格} 这一表达。）
+
+通常建议在以下情况下使用此不间断空格：
+
+\startitemize[packed]
+
+% TODO：在英语中，我们是否在缩写的中间加空格？
+%   如果有人说是，我们可以取消注释此项。
+%  \item 构成缩写的各部分之间。例如，{\tt U\lettertilde S}。
+
+  \item 缩写与其所指术语之间。例如，{\tt Dr.\lettertilde Anne Ruben} 或 {\tt p.\lettertilde 45}。
+
+  \item 数字与其伴随的术语之间。例如，{\tt Elizabeth\lettertilde II}、{\tt 45\lettertilde volumes}。
+
+  \item 数字与它们之前或之后的符号之间，只要这些符号不是上标。例如，{\tt 73\lettertilde km}、{\tt 53\lettertilde €}；但不包括像 {\tt 35'} 这样的情况。
+
+  \item 用文字表示的百分比中。例如，{\tt twenty\lettertilde per\lettertilde cent}。
+
+  \item 由空白分隔的数字组中。例如，{\tt 5\lettertilde 357\lettertilde 891}。尽管在这些情况下，最好使用所谓的 {\em 薄间距}，在 \ConTeXt\ 中用 \tex{,} 命令实现，因此写成 {\tt 5\backslash,357\backslash,891}。
+
+  \need 3\baselineskip
+
+  \item 避免缩写成为该行的唯一项目。例如：
+
+    \starttyping
+    There are sectors such as entertainment, communications media,
+    commerce,~etc.
+    \stoptyping
+
+\stopitemize
+
+对于这些情况，{\sc Knuth}（\TeX\ 之父）补充了以下建议：
+
+\startitemize[packed]
+
+  \item 在不在句末的缩写之后。
+
+  \item 在引用文档的某些部分（如章节、附录、图表等）时。例如 {\tt Chapter\lettertilde 12}。
+
+  \item 在人的名字和姓氏首字母之间，或名字首字母和姓氏之间。例如，{\tt Donald\lettertilde E. Knuth}、{\tt A.\lettertilde Einstein}。
+
+  \item 在并置于名称的数学符号之间。例如，{\tt dimension\lettertilde \$d\$}、{\tt width\lettertilde \$w\$}。
+
+  \item 在序列中的符号之间。例如 {\tt \{1,\lettertilde 2, \backslash dots,\lettertilde \$n\$\}}。
+
+  \item 当一个数字与一个介词严格绑定时。例如 {\tt from 0 to\lettertilde 1}。
+
+  \item 当数学表达式用文字表达时。例如，{\tt equal\lettertilde to\lettertilde \$n\$}。
+
+  \item 在段落内的列表中。例如：{\tt (1)\lettertilde green, (2)\lettertilde red, (3)\lettertilde blue}。
+
+\stopitemize
+
+情况很多？毫无疑问，排版的完美需要付出额外的努力。很明显，如果我们不想，就不必应用这些规则，但了解它们并没有坏处。此外——这里我根据经验说——一旦我们习惯了应用它们（或其中任何一个），这样做就会变得自动化。这就像我们在书写时给单词加重音一样（就像我们在西班牙语中需要做的那样）：对于我们这些习惯自动加重音的人来说，写一个带重音的单词并不比写一个不带重音的单词花费更多时间。
+
+\stopsubsection
+
+
+\startsubsection
+  [title=单词断字]
+
+除了主要由单音节词组成的语言外，如果行断点仅限于单词之间的空格，很难获得最佳结果。因此，\ConTeXt\ 还会分析在单词的两个音节之间插入换行的可能性；要做到这一点，\ConTeXt\ 必须知道文本的语言，因为每种语言的断字规则都不同。这就是 \tex{mainlanguage} 命令在文档前言中如此重要的原因。
+
+可能会发生 \ConTeXt\ 无法适当地断字的情况。有时这可能是因为它自己的单词分割规则妨碍了这项任务（例如，\ConTeXt\ 永远不会将一个单词分成两部分，如果任一部分没有特定的最小字母数），其他时候则是因为单词有歧义。毕竟，\ConTeXt\ 会对 \quotation{unionised} 这个词做什么呢？这个词可能出现在像 \quotation{the unionised workforce} 这样的短语中，但也可能出现在化学文本中，如 \quotation{an unionised atom}（即未离子化的）。如果 \ConTeXt\ 必须在分页前处理作为页面最后一个词的 \quotation{manslaughter} 呢？它可能会将这个词拆分为 man-slaughter（正确），但也可能拆分为 mans-laughter（有歧义或完全错误）。
+
+无论出于何种原因，如果我们对单词的拆分方式不满意，或者拆分不正确，我们可以通过使用 \tex{-} 控制符号明确指示单词可以拆分的潜在位置来更改它。因此，例如，如果 \quotation{unionised} 给我们带来任何问题，我们可以在源文件中将其写为 \MyKey{union\backslash-ised}；或者如果我们对 \quotation{manslaughter} 有疑问，我们可以写 \MyKey{man\backslash-slaughter}。
+
+如果有问题的单词在文档中多次使用，那么更倾向于在前言中使用 \PlaceMacro{hyphenation}\tex{hyphenation} 命令来显示应该如何断字：该命令旨在包含在源文件的前言中，它接受一个或多个单词（逗号分隔）作为参数，指示可以用连字符分割的位置。例如：
+
+\type{\hyphenation{union-ised, man-slaughter}}
+
+如果作为此命令参数的单词不包含连字符，其效果将是该单词永远不会被断字。使用 \PlaceMacro{hbox}\tex{hbox} 命令也可以达到同样的效果，该命令会在单词周围创建一个不可见但不可分割的水平盒子，或者使用 \PlaceMacro{unhyphenated}\tex{unhyphenated}，它可以防止其参数中的一个或多个单词被断字。但是，\tex{hyphenation} 是全局起作用的，而 \tex{hbox} 和 \tex{unhyphenated} 是局部起作用的，这意味着 \tex{hyphenation} 命令会影响文档中其参数包含的单词的所有出现；而 \tex{hbox} 或 \tex{unhyphenated} 只在源文件中遇到它们的位置起作用。
+
+\startSmallPrint
+
+    在内部，断字的工作方式部分受 \TeX\ 变量 \PlaceMacro{pretolerance}\tex{pretolerance} 和 \PlaceMacro{tolerance}\tex{tolerance} 控制。第一个变量控制仅基于空白的拆分的可接受性。默认值是 100，但如果我们更改它，例如改为 10\,000，那么 \ConTeXt\ 总是认为任何需要断字的换行都是可接受的，这意味着 {\em 实际上}，我们正在取消基于音节的断字。相反，如果我们将 \tex{pretolerance} 值设置为 $-1$，我们将强制 \ConTeXt\ 每次都考虑在行末使用断字。
+
+    我们可以直接在文档中赋值来为 \tex{pretolerance} 设置一个任意值。例如：
+
+    \type{\pretolerance=10000}
+
+    但我们也可以使用 \tex{setupalign} 中的 \MyKey{lesshyphenation} 和 \MyKey{morehyphenation} 值来操作这个值；详细信息请参见 \in{Section}[sec:setupalign]。
+
+    % TODO：JAL 没有解释 \tolerance。这（对于像这样的入门级文档）可以吗？
+
+    虽然 \tex{pretolerance} 控制 \ConTeXt\ 在首次尝试将段落分解为行时是否会尝试断字，但 \tex{tolerance} 控制 \ConTeXt\ 对最终段落的挑剔程度。设置 \tex{tolerance=10000} 告诉 \ConTeXt\ 它可以输出非常 \quotation{松散} 的段落；通常这是不希望的。
+
+\stopSmallPrint
+
+\stopsubsection
+
+
+\startsubsection
+  [
+    reference=sec:horizontaltolerance,
+    title={换行的容忍度级别},
+  ]
+
+在寻找可能的换行点时，\ConTeXt\ 通常非常严格，这意味着它更倾向于允许一个单词超出右边距，因为它无法对其进行断字，并且如果导致该行词间距增加过大，它也不愿在该单词之前插入换行。这种默认行为通常能提供最佳结果，只有在极少数情况下，某些行会在右侧稍微突出。其理念是作者（或排版员）在文档完成后检查这些例外情况，然后就如何处理问题做出适当的决定。这可能意味着在超出边界的单词前插入一个 \tex{break} 命令，或者也可能意味着以不同的方式措辞段落，使该单词移到别处。稍微改写通常足以解决此类问题。
+
+然而，在某些情况下，\ConTeXt\ 的低容忍度可能是个问题。在这些情况下，我们可以告诉它对行中的空白更加宽容。我们有 \PlaceMacro{setuptolerance}\tex{setuptolerance} 命令用于此目的，它允许我们改变计算换行时的容忍度级别，\ConTeXt\ 称之为 \quotation{水平容忍度}（因为它影响水平间距）以及在计算分页时的 \quotation{垂直容忍度}。我们将在 \in{Section}[sec:VerticalAlignment] 中讨论这一点。
+
+影响换行的水平容忍度，默认设置为 \MyKey{verystrict} 值。我们可以通过设置以下任何值来改变它：\MyKey{strict}、\MyKey{tolerant}、\MyKey{verytolerant} 或 \MyKey{stretch}。因此，例如，
+
+\type{\setuptolerance[horizontal, verytolerant]}
+
+将使得一行几乎不可能超出右边距，即使这意味着在该行的单词之间建立非常大且难看的间距。
+
+\stopsubsection
+
+\startsubsection
+    [title={在特定点强制换行}]
+
+要在特定点强制换行，我们使用 \PlaceMacro{break}\tex{break}、\PlaceMacro{crlf}\tex{crlf} 或 \PlaceMacro{\backslash}{\tt\backslash\backslash} 命令。第一个命令 \tex{break} 在其所在位置输入一个换行。这很可能会导致放置该命令的行在美学上变形，该行单词之间出现巨大的空白。这可以在以下示例中看到，其中第三行（左侧源片段中）的 \tex{break} 命令导致第二行（右侧格式化文本中）非常难看。
+
+\startDoubleExample
+
+\starttyping
+On the corner of the old quarter I saw
+him \emph{swagger} along like
+the\break tough guys do when they walk,
+hands always in their overcoat pockets,
+so no one can know which of them carries
+the dagger.
+\stoptyping
+
+\column
+
+On the corner of the old quarter I saw him {\em swagger} along like
+the\break tough guys do when they walk, hands always in their overcoat
+pockets, so no one can know which of them carries the dagger.
+
+\stopDoubleExample
+
+为了避免这种效果，我们可以使用 \cmd{\ttbs} 或 \tex{crlf} 命令，它们也插入强制换行，但它们会用足够的空白填充原始行，使其左对齐：
+
+\startDoubleExample
+
+\starttyping
+On the corner of the old quarter I saw
+him \emph{swagger} along like
+the\\ tough guys do when they walk,
+hands always in their overcoat pockets,
+so no one can know which of them carries
+the dagger.
+\stoptyping
+
+\column
+On the corner of the old quarter I saw him {\em swagger} along like the\\
+tough guys do when they walk, hands always in their overcoat pockets, so no
+one can know which of them carries the dagger.
+
+\stopDoubleExample
+
+在 {\em 正常} 行上，据我所知，\cmd{\ttbs} 和 \tex{crlf} 之间没有区别；但在章节标题中，有一个区别：
+
+\startitemize
+
+  \item {\bf \tex{\}} 在文档正文中生成换行，但当章节标题传输到目录时不会生成换行。
+
+  \item {\bf\tex{crlf}} 生成的换行既适用于文档正文，也适用于当章节标题传输到目录时。
+
+\stopitemize
+
+换行不应与段落分隔符混淆。换行只是结束当前行并开始下一行，但使我们保持在同一个段落中，因此原始行和新行之间的分隔将由段落内的正常间距决定。因此，只有三种情况可能建议强制换行：
+
+\startitemize
+
+  \item 在非常特殊的情况下，当 \ConTeXt\ 无法找到合适的换行点，导致一行在右侧突出时。在这些情况下（极少发生，主要发生在行包含不可分割的 {\em 盒子} 或 {\em 照排} 文本时 [参见 \in{Section}[sec:verbatim]]），在突出到右边距的单词之前使用 \tex{break} 强制换行可能会有帮助。
+
+  \item 在实际上由单独行组成的段落中，每行包含的信息与前面行的信息无关，例如，信件的信头，其中第一行可能包含发件人姓名，第二行包含收件人，第三行包含日期；或者在谈论作品作者身份的文本中，一行是作者姓名，另一行是其职务或学术职位，也许第三行是日期，等等。在这些情况下，应使用 \tex{\} 或 \tex{crlf} 命令强制换行。这些类型的段落也通常是右对齐的。
+
+  \item 在写诗或类似类型的文本时，用于分隔诗的一行与另一行。尽管在后一种情况下，最好使用 \in{Section}[sec:startlines] 中解释的 {\tt lines} 环境。
+
+\stopitemize
+
+\stopsubsection
+
+\stopsection
+
+
+\startsection
+  [title=行间距]
+
+行间距是分隔构成段落的行的距离。\ConTeXt\ 会根据所使用的实际字体，尤其是其基本大小（通过 \tex{setupbodyfont} 或 \tex{switchtobodyfont} 设置），自动计算行间距。
+
+我们可以使用 \PlaceMacro{setupinterlinespace}\tex{setupinterlinespace} 命令来影响行间距，该命令允许三种不同的语法：
+
+\startitemize
+
+  \item \tex{setupinterlinespace [..Interline space..]}，其中 {\em Interline space} 是一个精确值或一个分配预定义行间距的象征性词：
+
+    \startitemize
+
+      % TODO：这是否准确，或者结尾应该是“默认磅值大小”？
+
+      \item 当它是一个特定值时，可以是一个尺寸（例如，15pt），或者一个简单的整数或小数（例如，1.2）。在后一种情况下，该数字根据 \ConTeXt 的默认行距被解释为 \quotation{行数}。将行间距设置为与字体大小无关的尺寸（例如 15pt）的一个问题是，如果文档的字体大小更改，15pt 可能不再合适。如果确实需要带单位的尺寸（第一种情况），通常使用（例如）3ex 这样的单位更好，因为 \quotation{ex} 是当前字体大小的函数。
+
+      \item 当它是一个象征性词时，可以是 \MyKey{small}、\MyKey{medium} 或 \MyKey{big}，分别应用小、中或大的行间距，但始终基于 \ConTeXt\ 会应用的默认行间距。
+
+    \stopitemize
+
+  \item \tex{setupinterlinespace [...=...,...]}。在这种模式下，通过显式更改 \ConTeXt\ 用来计算适当行间距的度量来设置行间距。我之前说过行间距是基于特定字体及其大小计算的；但那只是为了把事情说得非常简单：实际上，字体及其大小会建立某些度量，行间距是从这些度量计算出来的。通过这种 \tex{setupinterlinespace} 方法，这些度量被修改，因此行间距也被修改。可以通过此过程操作的实际度量和值（其含义我将不解释，因为这超出了简单 {\em 入门指南} 的范围）包括：{\tt line}、{\tt height}、{\tt depth}、{\tt minheight}、{\tt mindepth}、{\tt distance}、{\tt top}、{\tt bottom}、{\tt stretch} 和 {\tt shrink}。
+
+  \item \tex{setupinterlinespace [Name]}。使用此命令，我们建立或配置一种特定且自定义的行间距类型，该类型先前已使用 \PlaceMacro{defineinterlinespace}\tex{defineinterlinespace} 定义。
+
+\stopitemize
+
+使用：
+
+\type{\defineinterlinespace [Name] [Configuration]}
+
+我们可以将某个行间距配置与一个特定名称关联起来，然后只需在文档中的某个点使用 \tex{setupinterlinespace[Name]} 即可触发该配置。要恢复到正常的行间距，我们可以写 \tex{setupinterlinespace[reset]}。
+
+\stopsection
+
+
+\startsection
+  [title={与行相关的其他事项}]
+
+\startsubsection
+  [
+    reference=sec:startlines,
+    title={将源文件中的换行转换为最终文档中的换行},
+  ]
+
+正如我们已经知道的（参见 \in{Section}[sec:linebreaks]），默认情况下，\ConTeXt\ 会忽略源文件中它认为是简单空格的换行，除非有两个或更多连续的换行（即一个或多个空行），在这种情况下会插入一个段落分隔符。然而，在某些情况下，我们可能希望尊重原始源文件中的换行，例如在写诗时。为此，\ConTeXt\ 为我们提供了 \MyKey{lines} 环境，其格式为：
+
+\PlaceMacro{startlines}\type{\startlines [Options] ... \stoplines}
+
+其中选项可以是以下任意值（以及其他）：
+
+\startitemize
+
+  \item {\tt\bf space}：当此选项设置为 \MyKey{on} 时，除了尊重源文件中的换行外，环境还将尊重源文件中的空格，暂时忽略 \quotation{吸收} 规则。
+
+  \item {\tt\bf before}：进入环境前要插入的文本或要运行的命令。
+
+  \item {\tt\bf after}：退出环境后要插入的文本或要运行的命令。
+
+  \item {\tt\bf inbetween}：在 \quotation{段落} 之间要插入的文本或要运行的命令。
+
+  \item {\tt\bf indenting}：指示是否缩进环境中的段落的值（参见 \in{Section}[sec:indentation]）。
+
+  \item {\tt\bf align}：环境中行的对齐方式（参见 \in{Section}[sec:alignment]）。
+
+  \item {\tt\bf style}：在环境中应用的样式命令。
+
+  \item {\tt\bf color}：在环境中应用的颜色。
+
+\stopitemize
+
+因此，例如：
+
+\startDoubleExample
+\starttyping
+  \startlines
+    One-one was a race horse.
+    Two-two was one too.
+    One-one won one race.
+    Two-two won one too.
+  \stoplines
+\stoptyping
+
+\column
+
+  \startlines
+    One-one was a race horse.
+    Two-two was one too.
+    One-one won one race.
+    Two-two won one too.
+  \stoplines
+\stopDoubleExample
+
+我们还可以使用 \PlaceMacro{setuplines}\tex{setuplines} 修改环境的默认工作方式，并且与许多 \ConTeXt\ 命令一样，也可以为此环境的特定配置分配一个名称。我们使用 \PlaceMacro{definelines}\tex{definelines} 命令来执行此操作，其语法为：
+
+\type{\definelines [Name] [Configuration]}
+
+其中，作为配置，我们可以包含通常为此环境解释的相同选项。一旦我们定义了自己的自定义行环境，要插入它，我们应该写：
+
+\type{\startlines[Name] ... \stoplines}
+
+\stopsubsection
+
+
+\startsubsection
+  [
+    reference=sec:linenumbering,
+    title={行号},
+  ]
+
+在某些类型的文本中，建立某种行号是很常见的。例如，在计算机编程文本中，作为示例提供的代码片段通常带有行号；诗歌和校勘本是另外两个例子，但还有很多其他例子。对于所有这些情况，\ConTeXt\ 提供了 {\tt linenumbering} 环境，其格式为：
+
+\PlaceMacro{startlinenumbering}\type{\startlinenumbering [Options] ... \stoplinenumbering}
+
+可用的选项有：
+
+\startitemize
+
+  \item {\tt\bf continue}：在文档中有多个片段需要编号行的情况下，此选项控制是否对每个片段重新开始编号。使用 \MyKey{continue=no}（默认值），此片段的行号将重置。但如果行号希望从上一个片段结束的地方继续，我们选择 \MyKey{continue=yes}。
+
+  \item {\tt\bf start}：指示第一行的编号，以防我们不想让它从 \quote{1} 开始，也不希望它从上一个片段继续。
+
+  \item {\tt\bf step}：此选项使得行号以一定的间隔打印（尽管环境中包含的所有行都会被计数）。例如，对于诗歌，通常行号只出现在 5 的倍数行（第 5、10、15 行……）。
+
+\stopitemize
+
+所有这些选项都可以通过 \PlaceMacro{setuplinenumbering}\tex{setuplinenumbering} 为文档中的所有 {\em linenumbering} 环境进行全局设置。此命令还允许我们配置行号的其他方面：
+
+\startitemize
+
+  \item {\tt\bf conversion}：行号编号类型。它可以是 \at{page}[Num:conversion] 上关于章节编号解释的任何一种。
+
+  \item {\tt\bf style}：决定行号样式的命令（字体、大小、变体……）。
+
+  \item {\tt\bf color}：打印行号的颜色。
+
+  \item {\tt\bf location}：行号放置的位置。可以是以下任意值：{\tt text}、{\tt begin}、{\tt end}、{\tt default}、{\tt left}、{\tt right}、{\tt inner}、{\tt outer}、{\tt inleft}、{\tt inright}、{\tt margin} 或 {\tt inmargin}。
+
+  \item {\tt\bf distance}：行号与行本身之间的距离。
+
+  \item {\tt\bf align}：编号对齐方式。可以是：{\tt inner}、{\tt outer}、{\tt flushleft}、{\tt flushright}、{\tt left}、{\tt right}、{\tt middle} 或 {\tt auto}。
+
+  \item {\tt\bf command}：在打印之前，行号将作为参数传递给的命令。
+
+  \item {\tt\bf width}：为打印行号保留的宽度。
+
+  % TODO：解释这些。left 和 right 是命令，但 margin 是一个尺寸
+
+  \item {\tt\bf left, right, margin}：
+
+\stopitemize
+
+我们还可以使用 \PlaceMacro{definelinenumbering}\tex{definelinenumbering} 创建不同的自定义行号配置，以便将配置与名称关联：
+
+\type{\definelinenumbering [Name] [Configuration]}
+
+一旦定义了特定配置并将其与名称关联，我们就可以使用以下命令调用它：
+
+\type{\startlinenumbering [Name] ... \stoplinenumbering}
+
+\stopsubsection
+
+\stopsection
+
+
+\startsection
+  [
+    reference=sec:alignment,
+    title={水平与垂直对齐},
+  ]
+
+通常控制文本对齐的命令是 \PlaceMacro{setupalign}\tex{setupalign}。此命令用于控制水平对齐和垂直对齐。
+
+\startsubsection
+  [
+    reference=sec:setupalign,
+    title={水平对齐},
+  ]
+
+当一行的 {\em 精确} 宽度没有占满所有可能的宽度时，就产生了如何处理由此产生的空白的问题。\footnote{所谓 {\em 精确} 宽度，我指的是 {\em 在} \ConTeXt\ 调整词间距以实现两端对齐 {\em 之前} 的行的宽度。} 在这方面，我们基本上可以做三件事：
+
+\startitemize[n]
+
+  \item 将其累积在行的两侧之一：如果我们将其累积在左侧，行看起来会 {\em 有点向右推}，而如果我们将其累积在右侧，行则保持在左侧。前者是 {\em 右对齐}，后者是 {\em 左对齐}。默认情况下，\ConTeXt\ 对段落的最后一行应用左对齐。
+
+    % 下面的段落替换了下面立即注释掉的段落，我认为该段落有点长，并且可能包含入门读者不需要知道的一些细节。
+
+    当几个连续的行左对齐时，右侧是不规则的；但当右对齐时，看起来不均匀的是左侧。为了实现左对齐文本，使用 {\tt flushleft} 选项；类似地，对于右对齐文本，使用 {\tt flushright} 选项。\footnote{\ConTeXt\ 的一个历史趣闻是，还有 {\tt left} 和 {\tt right} 选项，它们的作用可能与您想的相反。也就是说，{\tt left} 并不执行左对齐，而是导致文本设置为右对齐，因为右对齐文本的另一个名称是 \quotation{参差不齐的左边缘}。为避免混淆，建议不要使用 {\tt left} 或 {\tt right} 作为 \tex{setupalign} 的选项。}
+
+    % 为了命名对齐某一侧或另一侧的选项，\ConTeXt\ 设置的不是它们对齐的那一侧，而是它们不均匀的那一侧。因此，{\tt flushright} 选项导致左对齐，而 {\tt flushleft} 导致右对齐。作为 {\tt flushright} 和 {\tt flushleft} 的缩写，\tex{setupalign} 也支持 {\tt right} 和 {\tt left} 作为值。但 {\bf 注意}：在这里，单词的含义具有欺骗性。尽管 {\em left} 意思是“左”，{\em right} 意思是“右”，但 \tex{setupalign[left]} 是右对齐，而 \tex{setupalign[right]} 是左对齐。如果读者想知道为什么会有这条评论，那么引用 \ConTeXt\ wiki 的话是值得的：\quotation{ConTeXt 使用 flushleft 和 flushright 选项。在所有接受对齐选项的命令中，right 和 left 对齐与通常的方向相反，就 \quote{参差不齐的左边缘} 和 \quote{参差不齐的右边缘} 的意义而言。不幸的是，当 Hans 最初编写 ConTeXt 的这一部分时，他考虑的是 \quote{参差不齐的右边缘} 和 \quote{参差不齐的左边缘} 对齐，而不是 \quote{左齐平} 和 \quote{右齐平}。既然这样已经持续了一段时间，就不可能改变了，因为改变它会破坏所有使用它的现有文档的向后兼容性。}
+
+    在准备双面打印的文档中，除了参考右边距和左边距，还可以参考内边距和外边距（内边距是页面之间的边距）。值 {\tt flushinner}（或简称 {\tt inner}）和 {\tt flushouter}（或简称 {\tt outer}）在这些情况下建立相应的对齐方式。
+
+  \item 将额外空间分布到两个边距。结果将是行居中。执行此操作的 \tex{setupalign} 选项是 {\tt middle}。
+
+  \item 将其分布到组成行的所有单词中，必要时通过增加词间距，使行的宽度正好与其可用空间相同。在这些情况下，我们称之为 {\em 两端对齐的行}。这也是 \ConTeXt 的默认值，这就是为什么 \tex{setupalign} 中没有特殊的选项来设置它。但是，如果我们更改了默认的两端对齐，可以使用 \tex{setupalign[reset]} 恢复它。
+
+\stopitemize
+
+我们刚刚看到的 \tex{setupalign} 的值（{\tt right}、{\tt flushright}、{\tt left}、{\tt flushleft}、{\tt inner}、{\tt flushinner}、{\tt outer}、{\tt flushouter} 和 {\tt middle}）可以与 {\tt broad} 结合使用，这会导致稍微粗糙一些的对齐。
+
+\startSmallPrint
+
+    影响水平对齐的另外两个可能的 \tex{setupalign} 值与行末单词的断字有关。是否发生断字会影响空白的量。
+
+    具体来说，\tex{setupalign} 接受 {\tt morehyphenation} 选项，它使 \ConTeXt\ 更加努力地寻找基于断字的断点，而 {\tt lesshyphenation} 则产生相反的效果。使用 \tex{setupalign[horizontal, morehyphenation]}，行中剩余的空白通常会减少，因此为实现对齐而添加的额外空白将不那么明显。相反，使用 \tex{setupalign[horizontal, lesshyphenation]}，将会有更多剩余空白，对齐将更加明显。
+
+\stopSmallPrint
+
+\tex{setupalign} 旨在包含在前言中并影响整个文档，或者包含在特定点并影响从该点到结束的所有内容。如果我们只想更改一行或几行的对齐方式，可以使用：
+
+\startitemize
+
+  \item \MyKey{alignment} 环境，旨在影响多行。其一般格式为：
+
+    \PlaceMacro{startalignment}\type{\startalignment [Options] ... \stopalignment}
+
+    其中 {\tt Options} 是 \tex{setupalign} 允许的任何选项。
+
+  \item \PlaceMacro{leftaligned}\tex{leftaligned}、\PlaceMacro{midaligned}\tex{midaligned} 或 \PlaceMacro{rightaligned}\tex{rightaligned} 命令，分别导致左对齐、居中对齐或右对齐；如果我们希望段落中的最后一个词（但仅限于此，而不是该行的其余部分）右对齐，我们可以使用 \PlaceMacro{wordright}\tex{wordright}。所有这些命令都需要将受影响的文本放在花括号之间。
+
+    \startSmallPrint
+
+        另一方面，请注意，如果 \tex{setupalign} 中的词 \MyKey{right} 和 \MyKey{left} 导致与名称所暗示的相反的对齐，那么 \tex{leftaligned} 和 \tex{rightaligned} 命令则不会发生同样的情况，它们带来的正是其名称所暗示的对齐方式：{\tt left} 左对齐，{\tt right} 右对齐。
+
+    \stopSmallPrint
+
+\stopitemize
+
+\stopsubsection
+
+
+\startsubsection
+  [
+    reference={sec:VerticalAlignment},
+    title={垂直对齐},
+  ]
+
+水平对齐在一行的宽度没有占满其所有可用空间时发挥作用，而垂直对齐则影响整个页面的高度。如果一页的 {\em 精确} 文本高度没有占满其所有可用高度，我们如何处理剩余的空白？我们可以将其堆积在顶部 (\MyKey{height})，这意味着页面上的文本将被向下推；我们可以将其堆积在底部 (\MyKey{bottom})，或者将其分布在段落之间 (\MyKey{line})。垂直对齐的默认值是 \MyKey{bottom}。
+
+\subsubsubject{垂直容忍度级别}
+
+就像我们可以使用 \PlaceMacro{setuptolerance}\tex{setuptolerance} 改变 \ConTeXt\ 对于一行中允许的水平间距量的容忍度级别（水平容忍度）一样，我们也可以改变其垂直容忍度，即对于段落之间的间距大于 \ConTeXt\ 默认认为排版良好的页面合理的容忍度。垂直容忍度的可能选项与水平容忍度相同：{\tt verystrict}、{\tt strict}、{\tt tolerant} 和 {\tt verytolerant}。默认值是 \tex{setuptolerance [vertical, strict]}。
+
+\subsubsubject{控制孤行和寡行}
+
+间接影响垂直对齐的一个方面是孤行和寡行的控制。这两种现象都指分页导致段落的一行与段落的其余部分被隔离在不同的页面上。这在排版上被认为是不理想的。如果与段落其余部分分离的那一行是页面上的第一行，我们称之为 {\em 寡行}；如果与其段落分离的那一行是页面上的最后一行，我们称之为 {\em 孤行}（有些人称孤行为 \quotation{clubs}）。
+
+默认情况下，\ConTeXt\ 不实施控制来确保这些行不出现。但我们可以通过更改 \ConTeXt\ 的一些内部变量来改变这一点：\PlaceMacro{widowpenalty}\tex{widowpenalty} 控制寡行，\PlaceMacro{clubpenalty}\tex{clubpenalty} 控制孤行。因此，在文档前言中执行以下语句将确保执行此控制：
+
+\starttyping
+\widowpenalty=10000
+\clubpenalty=10000
+\stoptyping
+
+执行此控制意味着 \ConTeXt\ 将避免插入将段落的第一行或最后一行与找到其余行的页面分开的分页符。这种避免的严格程度取决于我们分配给变量的值。使用示例中的 10\,000 这样的值，控制将是绝对的；使用例如 150 这样的值，控制将不那么严格，偶尔可能会出现一些孤行或寡行，当从排版角度来看替代方案更糟时。
+
+\stopsubsection
+
+\stopsection
+
+\stopchapter
+
+\stopcomponent
+
+%%% Local Variables:
+%%% mode: ConTeXt
+%%% eval: (auto-fill-mode 1)
+%%% coding: utf-8-unix
+%%% TeX-master: "../introCTX_eng.tex"
+%%% End:
+%%% vim:set filetype=context tw=75 : %%%
