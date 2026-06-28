@@ -197,7 +197,7 @@
 
 % TODO："modo" 作为等宽字体的名称正确吗？
 
-{\switchtobodyfont[script] %
+{%\switchtobodyfont[script] %
     \placetable %
       [here, force] %
       [tab:ctx-stylesstbdf] %
@@ -771,7 +771,7 @@ Three \colored[r=0.1, g=0.8, b=0.8]{coloured} cats.
 \stoptyping
 \page[no]
 
-将写出 \usecolors[xwi]\color[darkgoldenrod]{Tweedledum and Tweedledee}
+将写出 {\usecolors[xwi]\color[darkgoldenrod]{Tweedledum and Tweedledee}}
 \page[preference]
 
 \stopsubsection

@@ -16,6 +16,8 @@
 
 \startcomponent b02_FirstDoc.tex
 
+\showsetups
+
 \startchapter
   [reference=cap:firstdoc, title=我们的第一个源文件]
 
@@ -30,7 +32,7 @@
 
 \startitemize[n]
 
-  \item {\bf 一个文本编辑器}，用于编写我们的测试文件。市面上有很多文本编辑器，很难想象哪个操作系统没有预装一个。我们可以使用其中任何一个：有简单的、复杂的、强大的、付费的、免费的（免费啤酒意义上的）、自由的（自由言论意义上的）、专门用于 \TeX\ 系统的、通用型的等等。如果我们习惯使用某个特定的编辑器，最好继续使用它；如果到目前为止还不习惯使用任何编辑器，我最初的建议是找一个简单的编辑器，以免在学习 \ConTeXt\ 的难度上再增加学习使用文本编辑器的任务。尽管确实，最难学的程序往往是最强大的程序。
+  \item {\bf 一个文本编辑器}，用于编写我们的测试文件。市面上有很多文本编辑器，很难想象哪个操作系统没有预装一个。我们可以使用其中任何一个：有简单的、复杂的、强大的、付费的、免费的（免费啤酒意义上的）、自由的（自由言论意义上的）、专门用于 \TeX\ 系统的、通用型的等等。如果我们习惯使用某个特定的编辑器，最好继续使用它；如果到目前为止还不习惯使用任何编辑器，我最初的建议是找一个简单的编辑器，以免在学习 \ConTeXt\ 的难度上再增加学习使用文本编辑器的任务。尽管确实，最难学的程序通常也是最强大的。
 
   本文是用 GNU Emacs 编写的，它是有史以来最强大、最通用的编辑器之一；它确实有自己的特点，也有批评者，但总的来说，“{\em Emacs 爱好者}”比“{\em Emacs 反对者}”更多。有一个名为 AucTeX 的 GNU Emacs 扩展，用于处理 \TeX\ 文件或其衍生文件，它为编辑器提供了一些非常有趣的额外实用程序，尽管 AucTeX 通常为处理 \LaTeX\ 文件做的准备比处理 \ConTeXt\ 文件更充分。如果我们不知道选择哪个编辑器，GNU Emacs 结合 AucTeX 可能是一个不错的选择；两者都是自由 {\em 自由}软件，因此它们有适用于所有操作系统的版本。事实上，说 GNU Emacs 是“自由软件”是一种保守的说法，因为这个程序比其他任何程序都更能体现“自由软件”是什么以及意味着什么的精神。毕竟，它的主要开发者是 {\sc Richard Stallman}，他是 GNU 项目和 {\em 自由软件基金会}的创始人和理论家。
 
@@ -63,11 +65,11 @@
 
   最后一行告诉我们安装版本发布的日期。如果这太旧了，我们应该更新它或安装一个新版本。我推荐安装名为 \suite- 的发行版，其安装说明可以在 \goto{\ConTeXt\ wiki}[url(wiki)] 上找到。所有这些的摘要可以在 \in{附录}[installation_suite] 中找到。
 
-  \item {\bf 一个 PDF 文件阅读器}，以便我们在屏幕上看到实验的结果。在 Windows 和 Mac OS 中，通常有 Adobe Acrobat Reader。它不是默认安装的（或者在我 15 多年前停止使用 Microsoft Windows 时不是），但当你第一次尝试打开 PDF 文件时它会安装，所以很可能它已经安装了。Linux/Unix 系统没有当前版本的 Acrobat Reader，但你也不需要它，因为 literally 有几十个免费且非常好的 PDF 阅读器可用。此外，这些系统上几乎总是默认安装了其中一个。我最喜欢的是 MuPDF，因为它速度快且易于使用；不过如果你使用带重音字符的英语以外的语言，它有一些缺点，并且不允许你选择文本或将文档发送到打印机；它只是一个阅读器；但它非常快速且使用舒适。当我需要一些 MuPDF 中不可用的功能时，我通常使用 Okular 或 qPdfView。但同样，这是一个品味问题：你可以选择任何你喜欢的。
+  \item {\bf 一个 PDF 文件阅读器}，以便我们在屏幕上看到实验的结果。在 Windows 和 Mac OS 中，通常有 Adobe Acrobat Reader。它不是默认安装的（或者在我 15 多年前停止使用 Microsoft Windows 时不是），但当你第一次尝试打开 PDF 文件时它会安装，所以很可能它已经安装了。Linux/Unix 系统没有当前版本的 Acrobat Reader，但你也不需要它，因为实际上有几十个免费且非常好的 PDF 阅读器可用。此外，这些系统上几乎总是默认安装了其中一个。我最喜欢的是 MuPDF，因为它速度快且易于使用；不过如果你使用带重音字符的英语以外的语言，它有一些缺点，并且不允许你选择文本或将文档发送到打印机；它只是一个阅读器；但它非常快速且使用舒适。当我需要一些 MuPDF 中不可用的功能时，我通常使用 Okular 或 qPdfView。但同样，这是一个品味问题：你可以选择任何你喜欢的。
 
 \stopitemize
 
-我们可以选择我们的编辑器、PDF 阅读器、\ConTeXt\ 发行版……欢迎来到{\em 自由自由软件}的世界！
+我们可以选择我们的编辑器、PDF 阅读器、\ConTeXt\ 发行版……欢迎来到{\em 自由软件}的世界！
 
 \stopsection
 
@@ -226,11 +228,11 @@ Coding system for saving file (default utf-8-unix):
 
 然后我们需要检查发生了什么，并解决它，直到我们得到正确的编译。
 
-\placefigure
-  [here]
+\placemarginfig
+  [outermargin]
   [rain]
   {西班牙的雨……}
-  {\midaligned{\framed{\externalfigure[rain.pdf][width=13cm]}}}
+  {\framed{\externalfigure[rain.pdf][width=\rightmarginwidth]}}
 
 在 \in{图}[rain] 中，我们看到了 \MyKey{rain.pdf} 的内容。我们还看到 \ConTeXt\ 为页面和章节编号，并用我们指示的字体书写文本。这里碰巧没有任何单词断字，但默认情况下，\ConTeXt\ 会根据所选语言的断字规则在行尾断字，在我们的例子中，源文件的第一行通过命令 (\tex{mainlanguage[en]}) 指定了英语。
 
@@ -335,14 +337,13 @@ Coding system for saving file (default utf-8-unix):
 % 在 LMTX 中，错误不会立即强制处理停止，在这种情况下
 错误消息将在我们运行 \MyKey{context} 的同一个终端中可见。
 
-\placefloat
-  [here]
-  [middle]
+\placemarginfig
+  [outermargin]
   [msgerror]
   {编译错误情况下的屏幕输出}
 {
-\switchtobodyfont[script]
-\startframedtext
+% \switchtobodyfont[script]
+\startframedtext[width=\rightmarginwidth]
 \starttyping
  3     \setuppapersize[S5] % 纸张大小
  4     
@@ -373,9 +374,8 @@ mtx-context     | fatal error: return code: 1
 例如，如果在我们的测试文件 \MyKey{rain.tex} 中，错误地将 \tex{starttext} 写成了 \tex{startext}（只有一个 \quote{t}），这是一个非常常见的错误，当运行 \MyKey{context rain} 时，处理将停止，在终端中我们可以看到 \in{图}[msgerror] 中显示的信息\footnote{注意：错误报告的确切格式可能会随时间变化，但你应该会看到类似的信息。}（注意该图只显示了终端输出的末尾，前面会有许多其他“样板”输出行）。在那里我们可以看到源文件的行被编号，在其中一行（这里是第 12 行），编译器在行号和文本之间添加了 \MyKey{>>}，以指示这是它发现错误的行。文件 \MyKey{rain.log} 将给我们更多线索。在这个例子中，\MyKey{rain.log} 不是一个大文件，因为被编译的源文件很小；在其他情况下，它可能包含几乎难以应付的大量信息。但我们必须深入研究它。如果我们用文本编辑器打开 \MyKey{rain.log}\footnote{如果你的文本编辑器能够自动搜索并显示此错误消息，如果你已经“升级”到从编辑器内部运行 \ConTeXt，那就可以。例如，如果你使用带有 \MyKey{AUCTeX} 包的 Emacs，并使用 \MyKey{Ctrl-C Ctrl-C} 让 Emacs 为你编译文档，那么输入 \MyKey{Ctrl-C `} 会将你的编辑窗口分成两部分：一部分会显示错误消息，而另一部分会显示有问题的 \ConTeXt\ 代码行。}，我们会看到它存储了 \ConTeXt\ 正在做的所有事情。我们需要在那里找到以错误消息开头的行，为此我们可以使用文本编辑器的搜索功能。我们将寻找 \quotation{tex error}，这会带我们找到以下行：
 
 \starttyping
-tex error       > tex error on line 12 in file ./rain-error.tex: |
-                                                 Undefined control sequence
-
+tex error > tex error on line 12 in file ./rain-error.tex: |
+            Undefined control sequence
 <line 3.12> 
     \startext
       % Begin document contents

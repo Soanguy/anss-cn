@@ -35,7 +35,7 @@
 
 \startSmallPrint
 
-  从 \ConTeXt\ 内部运作的角度来看（实际上是 \TeX\ 的运作），{\em 原语}和 {\em 宏} 之间存在区别。原语是一个无法分解为其他更简单指令的简单指令。宏是一个可以分解为其他更简单指令的指令，而这些更简单的指令又可能进一步分解为更简单的指令，依此类推。\ConTeXt\ 的大多数命令实际上都是复杂的宏。从程序员的角度来看，宏和原语之间的区别很重要。但从用户的角度来看，这个问题不那么重要：在这两种情况下，我们拥有的是指令，无需担心它们在底层如何运作。因此，\ConTeXt\ 文档通常从用户角度谈论 {\em 命令}，从程序员角度谈论 {\em 宏}。由于本入门书仅从用户角度出发，我将交替使用这两个术语，视它们为同义词。
+  从 \ConTeXt\ （实际上是 \TeX\ ）的内部运作来看，{\em 原语}和 {\em 宏} 之间存在区别。原语是一个无法分解为其他更简单指令的简单指令。宏是一个可以分解为其他更简单指令的指令，而这些更简单的指令又可能进一步分解为更简单的指令，依此类推。\ConTeXt\ 的大多数命令实际上都是复杂的宏。从程序员的角度来看，宏和原语之间的区别很重要。但从用户的角度来看，这个问题不那么重要：在这两种情况下，我们拥有的是指令，无需担心它们在底层如何运作。因此，\ConTeXt\ 文档通常从用户角度谈论 {\em 命令}，从程序员角度谈论 {\em 宏}。由于本入门书仅从用户角度出发，我将交替使用这两个术语，视它们为同义词。
 
   % TODO：我认为严格来说，这一段（可能还有上面一段）可以重写。我想知道西班牙语原文是什么。但现在先这样……
   {\em 命令} 是给 \ConTeXt\ 去做某事的指令；我们通过它们 {\em 控制} 程序的执行。\cap{Knuth}，\TeX\ 之父，使用术语 {\em 控制序列} 来指代原语和宏，我认为这是其中最准确的术语。当我认为区分 {\em 控制符号} 和 {\em 控制词} 很重要时，我会使用它。
@@ -70,7 +70,7 @@
 
 \semitable{\backslash}
 
-这个字符对我们来说是最重要的：它表示紧随其后的内容不能被解释为文本，而应被解释为指令。它被称为 \quotation{转义字符} 或 \quotation{转义序列}（尽管它与大多数键盘上的 \quotation{Esc} 键无关）。\footnote{在计算机术语中，影响后续字符解释的字符称为 {\em 转义字符}。相比之下，键盘上的 {\em 转义键} 之所以这么叫，是因为它生成 ASCII 码中的第 27 号字符，该字符在此 ASCII 编码中用作转义字符。如今，转义键的用途更多地与取消正在进行的操作的概念相关联。}
+这个字符对我们来说是最重要的：它表示紧随其后的内容不能被解释为文本，而应被解释为指令。它被称为 \quotation{转义字符} 或 \quotation{转义序列}（注意与键盘上的Esc键不同）。\footnote{在计算机术语中，影响后续字符解释的字符称为 {\em 转义字符}。相比之下，键盘上的 {\em 转义键} 之所以这么叫，是因为它生成 ASCII 码中的第 27 号字符，该字符在此 ASCII 编码中用作转义字符。如今，转义键的用途更多地与取消正在进行的操作的概念相关联。}
 
 \semitable{\%}
 
@@ -707,6 +707,8 @@ about \TeX.
 
 \stopSmallPrint
 
+
+\SNOTE{根据源代码 \type{core-sys.mklx} 我们可以知道 \tex{definestartstop} 实际上会创建三个命令。假设我们：\type{\definestartstop[newcommand]}，那么我们会获得\type{\startnewcommand}、\penalty0 \type{\stopnewcommand}、\type{\newcommand}。而 {\tt left, right}则是用于\type{\newcommand} 中，用于对标 \type{\startnewcommand}、\penalty0 \type{\stopnewcommand} 中的 {\tt before, after}。同样的，{\tt inbetween} 也只能用于 \type{\newcommand}。因此，原作者无论如何测试，也不会生效，因为在环境命令中没有设置对应的参数。}
 其中
 
 \startitemize
@@ -715,7 +717,7 @@ about \TeX.
 
   \item {\bf 选项} 允许我们配置新环境的行为。我们可以使用以下值来配置它：
 
-  \startitemize
+  \startitemize[packed]
 
     \item {\tt before} —— 进入环境之前必须运行的命令。
 
@@ -731,10 +733,18 @@ about \TeX.
 
 \stopitemize
 
+\SNOTE{\null
+  \noindent
+  \type{\definestartstop}\par\noindent
+  \type{  [newcommand]}\par\noindent
+  \type{  [left=!,right=@,color=red,inbetween=+]}\par\noindent
+  \type{  \newcommand{contents}}\par
+  \definestartstop[newcommand][left=!,right=@,color=red,inbetween=+]
+  \framed[width=\hsize]{\newcommand{contents}}
+}
 环境定义的一个示例如下：
 
-{\switchtobodyfont[small]
-\starttyping
+{\starttyping
 \definestartstop
   [TextWithBar]
   [before=\startmarginrule\noindentation,
@@ -743,24 +753,16 @@ about \TeX.
   ]
 
 \starttext
-
 The first two fundamental laws of human stupidity state unambiguously
 that:
-
 \startTextWithBar
-
   \startitemize[n,broad]
-
     \item Always and inevitably we underestimate the number of stupid
     individuals in the world.
-
     \item The probability that a given person is stupid is independent
     of any other characteristic of the same person.
-
   \stopitemize
-
 \stopTextWithBar
-
 \stoptext
 \stoptyping
 }
@@ -792,8 +794,8 @@ that:
 \stopframedtext
 
 % TODO 待修复……这是真的吗？如果是，为什么字体更改没有继续？
-
-如果我们希望新环境成为一个组（\in{节}[sec:groups]），以便在其内部发生的任何对 \ConTeXt\ 正常工作的改变在离开环境时消失，我们必须在 \MyKey{before} 选项中包含 \PlaceMacro{bgroup}\tex{bgroup} 命令，并在 \MyKey{after} 选项中包含 \PlaceMacro{egroup}\tex{egroup} 命令。
+\SNOTE{实际上\type{\definestartstop}还有一个参数\MyKey{arguments}，当其值为 \MyKey{yes} 时，命令将会自动包裹 \tex{bgroup}、\tex{egroup}}
+如果我们希望新环境成为一个组（\in{节}[sec:groups]），以便在其内部发生的任何对 \ConTeXt\ 正常工作的改变在离开环境时消失，我们必须在 \MyKey{before} 选项中包含 \tex{bgroup} 命令，并在 \MyKey{after} 选项中包含 \tex{egroup} 命令。
 
 \stopsubsection
 
@@ -839,6 +841,11 @@ that:
 
 \stopitemize
 
+\SNOTE{
+  对于 \PlaceMacro{start}\tex{start} 和\PlaceMacro{stop}\tex{stop}还有一个特殊的用法。\tex{start}会接受一个可选参数，并同时将自己的环境命令修改为这个参数所代表的环境命令。比如我们有一组：\tex{startSomeEnvironment}、\tex{stopSomeEnvironment} 这样的命令。那么我们就可以做如下操作来减少输入：
+  \type{\start[SomeEnvironment] contents here\stop}。
+  这将和\type{\startSomeEnvironment contents here\stopSomeEnvironment} 的效果相同。
+}
 某些命令也会自动生成一个组，例如 \tex{hbox}、\tex{vbox}，以及一般来说，与创建 {\em 盒子} 相关的命令\footnote{{\em 盒子} 概念也是 \ConTeXt\ 的核心概念，但其解释未包含在本入门书中。}。除了后一种情况（由某些命令自动生成的组）之外，关闭组的方式必须与开启组的方式一致。这意味着用 \MyKey{\{} 开始的组必须用 \MyKey{\}} 关闭，用 \tex{begingroup} 开始的组必须用 \tex{endgroup} 关闭。此规则只有一个例外，即用 \MyKey{\{} 开始的组可以用 \tex{egroup} 关闭，用 \tex{bgroup} 开始的组可以用 \MyKey{\}} 关闭；实际上，这意味着 \MyKey{\{} 和 \tex{bgroup} 是完全同义且可互换的，\MyKey{\}} 和 \tex{egroup} 也是如此。
 
 \startSmallPrint

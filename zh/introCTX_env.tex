@@ -8,23 +8,42 @@
 % the beginning I copied it from the source of the file about.pdf,
 % included in the documentation on ConTeXt Standalone, and from there
 % some things were changed in accordance with need.
-\usemodule[memos][bodyfont=sourcehans,themecolor=blue]
+\usemodule[memos]
+  [ bodyfont=sourcehans,
+    fallbackfont=pagella,
+    themecolor=purple,
+    layout=exotic,
+    textcount=35,
+    margincount=10,
+    chapterstyle=kaolike,
+    hdrstyle=kaolike,
+    tocstyle=kaolike,
+  ]
 \usemodule[zhpunc]
-\startenvironment introCTX_env.tex
 
-%  \overfullrule=10pt%
-%  \let\infofont\relax
-%  \let\infofont\ttxx
-%  \version[temporary]
-%  \enabletrackers[builders.hpack.quality]
-%  \enabletrackers[builders.hpack.overflow]
-%  \enabletrackers[fonts.missing]
-%  \replacemissingcharacters
+
+\startenvironment introCTX_env.tex
+    \setuplayout[hermes][backspace=20mm,rightmargindistance=5mm]
+    
+    \definebodyfontenvironment [10.5bp]
+    \setupbodyfontenvironment  [10.5bp][
+      text=10.5bp,script=9.00bp,scriptscript=7.50bp,
+        a=14.0bp,     b=16.0bp,      c=22.0bp,
+        d=26.0bp,     x=8.80bp,     xx=6.60bp,
+      big=14.0bp, small=9.00bp,        em=italicface]
+
+    \setupbodyfont[10.5bp]
+    \setupfontexpansion[conservative]
+                       [stretch=1, shrink=1, step=0.25, factor=1]
+    
+    \definefontfeature[default][default][expansion=conservative]
+    \setuptolerance   [horizontal, verystrict]
     
     \definebreakpoint [compound] [、] [nleft=3,nright=3,type=1]
     \setbreakpoints   [compound]
 
     \placebookmarks     [part,chapter,section][chapter]
+    
     % Use Roman numerals for the frontmatter:
     \defineconversionset[frontpart:pagenumber]
                         []
@@ -58,13 +77,13 @@
     \setuptyping[color=darkmagenta, style={\switchtobodyfont[small, tt]}]
 
     % Page number location on non-"/title/chapter/section/" pages:
-    \setuppagenumbering[location={header, right}]
+    \setuppagenumbering[alternative=doublesided]
     
     % The cover page does not get a number (apparently \startXYZmakeup pages
     % don't get page numbers), but conceptually it is page 'i'.
     % Set the page number to 2 to take this unnumbered page into account.
     % (TODO: This is wrong when the cover page has not been included; fix!)
-    \setupuserpagenumber[number=2]
+%    \setupuserpagenumber[number=2] i dont know why, but it conflict with memos when doublesided is enabled?
 
     % Empty initial footers
 %    \setupfootertexts[]
@@ -80,7 +99,7 @@
     % The \need 10\baselineskip below says "don't start a new section
     % within 10 lines of the bottom of the page".
     % Ditto (but smaller amounts) for subsection and subsubsection.
-    \setuphead[part][number=no]
+%    \setuphead[part][number=no]
     % Structures defined by me
 
     \setupdescription
@@ -130,7 +149,7 @@
                         before={\startnarrower\hw\switchtobodyfont[small]},
                         after={\stopnarrower},
                     ]
-
+    \setuptyping[before=\setupwhitespace[none]\setuplocalinterlinespace[line=12pt]\blank,]
 
     % Commands and abbreviations
 
@@ -220,7 +239,7 @@
                      [n=2, rule=on, rulecolor=darkmagenta,
                       distance=0.75cm, tolerance=verytolerant]
     \unprotect % Allow _ and @ in macro names
-    \overloaded\tolerant\def\ShowAndTypeset[#1]#*[#2]#:#*#={%
+    \overloaded\tolerant\def\ShowAndTypeset[#1]#*[#2]#:#*#={\begingroup%
         \ifparameter#1\or\def\_SAT_B{#1}\else\def\_SAT_B{{}}\fi
         \ifparameter#2\or\def\_SAT_BB{#2}\else\edef\_SAT_BB{\_SAT_B}\fi
 
@@ -271,7 +290,7 @@
                 \stopparagraphs
             \stopframedtext
         \stopnarrow
-    }
+    \endgroup}
     \protect
 
 
@@ -314,16 +333,27 @@
     % Partial chapter table of contents:
     \def\Separate#1{#1;}
     \def\TocChap
-    {
-        \startnarrower\switchtobodyfont[small, sl]
-            {\bf Table of Contents:}
-            \setuplist
-                [section, subsection, subsubsection]
-                [pagenumber=no, textcommand=\Separate]
-            \setuplist[section][style=bold]
-            \placecontent[alternative=d]
-        \stopnarrower
+    {%
+      %  \startnarrower\switchtobodyfont[small, sl]
+      %      {\bf Table of Contents:}
+      %      \setuplist
+      %          [section, subsection, subsubsection]
+      %          [pagenumber=no, textcommand=\Separate]
+      %      \setuplist[section][style=bold]
+      %      \placecontent[alternative=d]
+      %  \stopnarrower
     }
+    
+    \defineresetset[default][0,0][1] 
+    \setuphead[chapter][after={\vskip2\baselineskip\relax
+          \outermargin{\noindent
+           {\bf Table of Contents:}\par
+           \setuplist
+               [section]
+               [pagenumber=no, width=fit,margin=0mm,align=inner, style=\itx]%
+          \noindent\placecontent[list=section]}}]
+          
+    \setuphead[title][after={\vskip2\baselineskip\relax}]
 
     % A command to forcibly eject this page if there is not the given
     % amount of space left on the current page.
@@ -360,7 +390,7 @@
      }    
 
     % Index
-    \defineregister[macro]
+    \defineregister[macro][index]
     \define[1]\PlaceMacro{\macro[#1]{\backslash #1}}
 
     % INTERACTIVITY
@@ -375,7 +405,7 @@
         author={Joaquín Ataz-López et al},
       ]
 
-    \setupurl [color=blue, style=\tt]
+    %\setupurl [color=blue, style=\tt]
 
     \useurl[pragma]
            [http://www.pragma-ade.com/]
@@ -414,6 +444,17 @@
 
     \useURL[SourceCode]
            [https://codeberg.org/anss-ce/ANSS-CE][][]
+    
+    \newcount\SNOTECOUNT
+           
+    \def\SNOTE#1{\start
+      \writestatus{SNOTE}{这里是新增的内容，需要进行甄别。}%
+      \inoutermargin{\global\advance\SNOTECOUNT by \plusone%
+      \startDualHeaderText[showtitle=0,number={\bf\symbol[fontawesome][info_sign] \high{\the\SNOTECOUNT}},width=\hsize,headerbgcolor=lightthemecolor]
+      \noindent  #1
+      \stopDualHeaderText
+      }
+    \stop{\color[themecolor]{\symbol[fontawesome][info_sign]\high{\the\SNOTECOUNT}\ }}}
 
 \stopenvironment
 

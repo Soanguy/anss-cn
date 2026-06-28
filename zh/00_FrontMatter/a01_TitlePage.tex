@@ -8,47 +8,72 @@
 %%% Edited with: Emacs + AUCTeX - And at times with vim + context-plugin
 %%%
 
+\environment introCTX_env
+
 \startcomponent a01_TitlePage.tex
+%
+%  \setvariables
+%  [document]
+%  [
+%      titleA=A not so short,
+%      titleB=introduction,
+%      titleC=to \ConTeXt\ LMTX,
+%      titleD=(Community Edition),
+%      authorA=Joaquín Ataz-López,
+%      authorB=(et al),
+%  ]
 
-\setvariables
-  [document]
+\startuseMPgraphic{MP:ORLY}
+    path ORLYpaper_back ;%%% i
+    ORLYpaper_back  := fullsquare xscaled \overlaywidth yscaled \overlayheight;
+    fill ORLYpaper_back withcolor white ;
+\stopuseMPgraphic
+
+  \makecover
+  [ORLY]     
   [
-      titleA=ConTeXt\ LMTX,
-      titleB={\switchtobodyfont[ss,tfxx] 简明教程},
-      titleC={\switchtobodyfont[ss,tfxx] （社区版）},
-      titleD=,
-      authorA=Joaquín Ataz-López,
-      authorB=（等）,
-  ]
+      list={series,animal,book,author},
+      series={从入门到放弃系列权威指南},
+      seriescolor=darkgray,
+      animal={\hfill\externalfigure[img/butterfly.png]},
+      book={A not so short\\introduction\\to \ConTeXt\ LMTX\\(Community Edition)},
+      bookleft={\hfill
+               \startframed[background=color,backgroundcolor=themecolor,
+                            frame=off,align=flushright,width=max]},
+      bookright={\stopframed},
+      afterbook=,
+      author={Joaquín Ataz-López\\(et al)},
+      authorstyle=\ttc,
+   ]
 
-  \startpagemakeup
-    \startMPcode
-      StartPage ;
-      fill Page enlarged 5mm withcolor \MPcolor{purple} ;
-
-      draw anchored.lrt(image(draw textext("\getvariable{document}{titleA}")
-          xsized(.750PaperWidth) withcolor white),
-          (lrcorner Page) shifted (-PaperWidth/20, PaperWidth * 0.45)) ;
-      draw anchored.lrt(image(draw textext("\getvariable{document}{titleB}")
-          xsized(.750PaperWidth) withcolor white),
-          (lrcorner Page) shifted (-PaperWidth/20, PaperWidth * 0.32)) ;
-      draw anchored.lrt(image(draw textext("\getvariable{document}{titleC}")
-          xsized(.750PaperWidth) withcolor white),
-          (lrcorner Page) shifted (-PaperWidth/20, PaperWidth * 0.19)) ;
-      draw anchored.lrt(image(draw textext("\getvariable{document}{titleD}")
-          xsized(.750PaperWidth) withcolor white),
-          (lrcorner Page) shifted (-PaperWidth/20, PaperWidth*0.07)) ;
-
-      draw anchored.urt(image(draw textext("\getvariable{document}{authorA}")
-          ysized(.039PaperWidth) rotated 90 withcolor white),
-          (urcorner Page) shifted (-PaperWidth/10, -PaperWidth/20)) ;
-      draw anchored.urt(image(draw textext("\getvariable{document}{authorB}")
-          ysized(.039PaperWidth) rotated 90 withcolor white),
-          (urcorner Page) shifted (-PaperWidth/20, -PaperWidth*0.184)) ;
-      setbounds currentpicture to Page ;
-      StopPage ;
-    \stopMPcode
-  \stoppagemakeup
+%  \startpagemakeup
+%    \startMPcode
+%      StartPage ;
+%      fill Page enlarged 5mm withcolor \MPcolor{purple} ;
+%
+%      draw anchored.lrt(image(draw textext("\getvariable{document}{titleA}")
+%          xsized(.750PaperWidth) withcolor white),
+%          (lrcorner Page) shifted (-PaperWidth/20, PaperWidth * 0.45)) ;
+%      draw anchored.lrt(image(draw textext("\switchtobodyfont[ss,tfxx] \getvariable{document}{titleB}")
+%          xsized(.750PaperWidth) withcolor white),
+%          (lrcorner Page) shifted (-PaperWidth/20, PaperWidth * 0.32)) ;
+%      draw anchored.lrt(image(draw textext("\switchtobodyfont[ss,tfxx] \getvariable{document}{titleC}")
+%          xsized(.750PaperWidth) withcolor white),
+%          (lrcorner Page) shifted (-PaperWidth/20, PaperWidth * 0.19)) ;
+%      draw anchored.lrt(image(draw textext("\getvariable{document}{titleD}")
+%          xsized(.750PaperWidth) withcolor white),
+%          (lrcorner Page) shifted (-PaperWidth/20, PaperWidth*0.07)) ;
+%
+%      draw anchored.urt(image(draw textext("\getvariable{document}{authorA}")
+%          ysized(.039PaperWidth) rotated 90 withcolor white),
+%          (urcorner Page) shifted (-PaperWidth/10, -PaperWidth/20)) ;
+%      draw anchored.urt(image(draw textext("\getvariable{document}{authorB}")
+%          ysized(.039PaperWidth) rotated 90 withcolor white),
+%          (urcorner Page) shifted (-PaperWidth/20, -PaperWidth*0.184)) ;
+%      setbounds currentpicture to Page ;
+%      StopPage ;
+%    \stopMPcode
+%  \stoppagemakeup
 
   {
     \useURL[CC-BY-NC-SA][https://creativecommons.org/licenses/by-nc-sa/4.0/][][]
@@ -64,7 +89,7 @@
     \switchtobodyfont[small]
     {\bf ConTeXt\ LMTX 简明教程（社区版）}
     \crlf
-    版本 1.1 [\RevisionDate]
+    版本 1.1 %[\RevisionDate]
     \blank
 
     \quotation{ConTeXt\ LMTX 简明教程}
